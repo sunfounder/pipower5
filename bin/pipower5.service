@@ -1,0 +1,16 @@
+# https://www.freedesktop.org/software/systemd/man/systemd.service.html
+[Unit]
+Description=pipower5 service
+# Need to start last to avoid gpio being occupied
+After=multi-user.target
+
+[Service]
+Type=forking
+# WorkingDirectory=/opt/pipower5
+ExecStart=/usr/local/bin/pipower5 start --background
+ExecStop=/usr/local/bin/pipower5 stop
+# PrivateTmp=False
+
+[Install]
+WantedBy=multi-user.target
+
