@@ -22,7 +22,6 @@ def main():
     parser.add_argument('-do', '--default-on', action='store_true', help='Read default on')
     parser.add_argument('-sr', '--shutdown-request', action='store_true', help='Read shutdown request')
     parser.add_argument('-cc', '--charging-current', action='store_true', help='Max charging current')
-    parser.add_argument('-bi', '--board-id', action='store_true', help='Read board id')
     parser.add_argument('-a', '--all', action='store_true', help='All')
 
     args = parser.parse_args()
@@ -123,8 +122,6 @@ def main():
         print(f"Shutdown request: {shutdown_request} - {shutdown_request_str}")
     if args.charging_current:
         print(f"Max chargig current: {spc.i2c.read_byte_data(150)*100} mA")
-    if args.board_id:
-        print(f"Board id: {spc.read_board_id()}")
     if args.all:
         data_buffer = spc.read_all()
         print(f"Input voltage: {data_buffer['input_voltage']} mV")
@@ -149,6 +146,5 @@ def main():
             shutdown_request_str = 'Unknown'
         print(f"Shutdown request: {data_buffer['shutdown_request']} - {shutdown_request_str}")
         print(f"Max chargig current: {spc.i2c.read_byte_data(150)*100} mA")
-        print(f'Board id: {spc.read_board_id()}')
         print(f"Default on: {spc.read_default_on()}")
         print(f"Shutdown percentage: {spc.read_shutdown_percentage()} %")
