@@ -18,11 +18,13 @@ def main():
     parser.add_argument('-bp', '--battery-percentage', action='store_true', help='Read battery percentage')
     parser.add_argument('-bs', '--battery-source', action='store_true', help='Read battery source')
     parser.add_argument('-ii', '--is-input-plugged_in', action='store_true', help='Read is input plugged in')
-    parser.add_argument('-ic', '--is-charging', action='store_true', help='Read is charging')
+    parser.add_argument('-ichg', '--is-charging', action='store_true', help='Read is charging')
     parser.add_argument('-do', '--default-on', action='store_true', help='Read default on')
     parser.add_argument('-sr', '--shutdown-request', action='store_true', help='Read shutdown request')
     parser.add_argument('-cc', '--charging-current', action='store_true', help='Max charging current')
-    parser.add_argument('-a', '--all', action='store_true', help='All')
+    parser.add_argument('-a', '--all', action='store_true', help='Show all status')
+    parser.add_argument('-v', '--version', action='store_true', help='pipower5 library version')
+    parser.add_argument('-fv', '--firmware', action='store_true', help='pipower5 firmware version')
 
     args = parser.parse_args()
 
@@ -107,7 +109,7 @@ def main():
     if args.is_charging:
         print(f"Charging: {spc.read_is_charging()}")
     if args.default_on:
-        print(f"Default on: {spc.read_default_on()}")
+        print(f"Default on: {'on' if spc.read_default_on() else 'off'}")
     if args.shutdown_request:
         shutdown_request = spc.read_shutdown_request()
         shutdown_request_str = 'None'
@@ -145,6 +147,10 @@ def main():
         else:
             shutdown_request_str = 'Unknown'
         print(f"Shutdown request: {data_buffer['shutdown_request']} - {shutdown_request_str}")
-        print(f"Max chargig current: {spc.i2c.read_byte_data(150)*100} mA")
-        print(f"Default on: {spc.read_default_on()}")
+        print(f"Max chargig current: {spc.i2c.read_byte_data(149)*100} mA")
+        print(f"Default on: {'on' if spc.read_default_on() else 'off'}")
         print(f"Shutdown percentage: {spc.read_shutdown_percentage()} %")
+    if args.version:
+        print(f"Pipower5 library version: {__version__}")
+    if args.firmware:
+        print(f"Pipower5 firmware version: {spc.read_firmware_version()}")
