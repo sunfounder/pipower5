@@ -51,8 +51,8 @@ installer = SF_Installer(
     bin_files = ['pipower5'],
 
     # - Copy device tree overlay to /boot/overlays
-    # dtoverlay = ['sunfounder-pipower5.dtbo'],
-    dtoverlay = [],
+    # dtoverlay = [],
+    dtoverlay = ['sunfounder-pipower5.dtbo'],
 
 )
 installer.install()
