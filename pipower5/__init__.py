@@ -123,7 +123,7 @@ def main():
             shutdown_request_str = 'Unknown'
         print(f"Shutdown request: {shutdown_request} - {shutdown_request_str}")
     if args.charging_current:
-        print(f"Max chargig current: {spc.i2c.read_byte_data(150)*100} mA")
+        print(f"Max chargig current: {spc.i2c.read_byte_data(149)*100} mA")
     if args.all:
         data_buffer = spc.read_all()
         print(f"Input voltage: {data_buffer['input_voltage']} mV")
