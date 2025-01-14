@@ -89,9 +89,12 @@ class SF_Installer():
     APT_DEPENDENCIES = [
         'python3-pip',
         'python3-venv',
+        'git',
     ]
 
     PIP_DEPENDENCIES = [
+        'pip',
+        'setuptools',
         'build',
     ]
 
@@ -100,12 +103,15 @@ class SF_Installer():
                  friendly_name=None,
                  description=None,
                  venv_options=[],
+                 build_dependencies=None,
+                 run_commands_before_install={},
                  apt_dependencies=None,
                  pip_dependencies=None,
                  python_source=None,
                  work_dir=None,
                  log_dir=None,
                  config_txt=None,
+                 modules=None,
                  service_files=None,
                  bin_files=None,
                  dtoverlay=None
@@ -126,15 +132,19 @@ class SF_Installer():
         self.friendly_name = friendly_name
         self.work_dir = work_dir
         self.log_dir = log_dir
+        self.build_dependencies = build_dependencies
+        self.before_install_commands = run_commands_before_install
         self.custom_apt_dependencies = apt_dependencies
         self.custom_pip_dependencies = pip_dependencies
         self.python_source = python_source
         self.config_txt = config_txt
+        self.modules = modules
         self.service_files = service_files
         self.bin_files = bin_files
         self.dtoverlay = dtoverlay
 
         self.parser = argparse.ArgumentParser(description=description)
+        self.parser.add_argument('--uninstall', action='store_true', help='Uninstall')
         self.parser.add_argument('--no-dep',
                                  action='store_true',
                                  help='Do not install dependencies')
@@ -156,6 +166,10 @@ class SF_Installer():
             self.parser.add_argument('--skip-dtoverlay',
                                      action='store_true',
                                      help='Skip dtoverlay')
+        if self.modules is not None:
+            self.parser.add_argument('--skip-modules',
+                                     action='store_true',
+                                     help='Skip probe modules')
 
         self.config_txt_handler = ConfigTxt()
         self.user = self.get_username()
@@ -220,7 +234,7 @@ class SF_Installer():
         sys.stdout.write('\033[?25h')  # cursor visible
         sys.stdout.flush()
 
-    def do(self, msg="", cmd=""):
+    def do(self, msg="", cmd="", ignore_error=False):
         print(f" - {msg}... ", end='', flush=True)
         if not self.args.plain_text:
             self.is_running = True
@@ -238,32 +252,43 @@ class SF_Installer():
         if status == 0:
             print('Done')
         else:
-            print('\033[1;35mError\033[0m')
-            self.errors.append(
-                f"{msg} error:\n  Command: {cmd}\n  Status: {status}\n  Result: {result}\n  Error: {error}"
-            )
-
-    def install_python_source(self, name, url='./'):
-        print(f'Installing {name}...')
-        self.do(f'Uninstall old package',
-                f'{self.venv_pip} uninstall -y {name}')
-        self.do(f'Install package',
-                f'{self.venv_pip} install {url}')
+            if ignore_error:
+                print('\033[1;35mError Ignored\033[0m')
+            else:
+                print('\033[1;35mError\033[0m')
+                self.errors.append(
+                    f"{msg} error:\n  Command: {cmd}\n  Status: {status}\n  Result: {result}\n  Error: {error}"
+                )
 
     def check_admin(self):
         if os.geteuid() != 0:
             print('This script must be run as root')
             sys.exit(1)
 
-    def install_apt_dep(self):
-        if not self.args.no_dep:
-            self.do('Update package list', 'apt-get update')
-            deps = [ *self.APT_DEPENDENCIES ]
-            if self.custom_apt_dependencies is not None:
-                deps += self.custom_apt_dependencies
+    def install_build_dep(self):
+        self.do('Update package list', 'apt-get update')
+        deps = [ *self.APT_DEPENDENCIES ]
 
-            for dep in deps:
-                self.do(f'Install {dep}', f'apt-get install -y {dep}')
+        if self.build_dependencies is not None:
+            deps += self.build_dependencies
+
+        deps = " ".join(deps)
+        self.do(f'Install build dependencies: {deps}',
+                f'apt-get install -y {deps}')
+
+    def run_commands_before_install(self):
+        for name in self.before_install_commands:
+            command = self.before_install_commands[name]
+            self.do(f'Run command before install: {name}', f'{command}')
+
+    def install_apt_dep(self):
+        if self.args.no_dep:
+            return
+        # for dep in self.custom_apt_dependencies:
+        #     self.do(f'Install {dep}', f'apt-get install -y {dep}')
+        deps = " ".join(self.custom_apt_dependencies)
+        self.do(f'Install APT dependencies: {deps}',
+                f'apt-get install -y {deps}')
 
     def create_working_dir(self):
         self.do('Create work directory', f'mkdir -p {self.work_dir}')
@@ -276,6 +301,19 @@ class SF_Installer():
             self.do('Remove old virtual environment', f'rm -r {self.venv_path}')
         self.do('Create virtual environment', f'python3 -m venv {self.venv_path} {" ".join(self.venv_options)}')
 
+    def install_python_source(self, name, url='./'):
+        print(f'Installing {name}...')
+        self.do(f'Uninstall old package',
+                f'{self.venv_pip} uninstall -y {name}')
+        self.do(f'Install package',
+                f'{self.venv_pip} install {url}')
+
+    def remove_work_dir(self):
+        if not os.path.exists(self.work_dir):
+            print(f" - Work directory {self.work_dir} already removed Skip")
+            return
+        self.do('Remove work directory', f'rm -r {self.work_dir}')
+
     def install_pip_dep(self):
         if not self.args.no_dep:
             deps = [ *self.PIP_DEPENDENCIES ]
@@ -283,7 +321,7 @@ class SF_Installer():
                 deps += self.custom_pip_dependencies
 
             for dep in deps:
-                self.do(f'Install {dep}', f'{self.venv_pip} install {dep}')
+                self.do(f'Install {dep}', f'{self.venv_pip} install --upgrade {dep}')
 
     def install_py_src_pkgs(self):
         for package, url in self.python_source.items():
@@ -298,8 +336,23 @@ class SF_Installer():
             for service in self.service_files:
                 self.do('Copy service file', f'cp bin/{service} /etc/systemd/system/')
                 self.do('Enable service', f'systemctl enable {service}')
-            self.do('Reload systemd', 'systemctl daemon-reload')
-            self.do('Start service', f'systemctl start {service}')
+                self.do('Reload systemd', 'systemctl daemon-reload')
+                self.do('Start service', f'systemctl start {service}')
+
+    def remove_auto_start(self):
+        for bin in self.bin_files:
+            if not os.path.exists(f'/usr/local/bin/{bin}'):
+                print(f" - Binary file {bin} not found Skip")
+                continue
+            self.do('Remove binary file', f'rm /usr/local/bin/{bin}')
+        for service in self.service_files:
+            if not os.path.exists(f'/etc/systemd/system/{service}'):
+                print(f" - Service file {service} not found Skip")
+                continue
+            self.do('Stop service', f'systemctl stop {service}')
+            self.do('Disable service', f'systemctl disable {service}')
+            self.do('Remove service file', f'rm /etc/systemd/system/{service}')
+        self.do('Reload systemd', 'systemctl daemon-reload')
 
     def setup_config_txt(self):
         if 'skip_config_txt' in self.args and not self.args.skip_config_txt:
@@ -307,15 +360,12 @@ class SF_Installer():
                 self.set_config(name, value)
             self.need_reboot = True
 
-    def copy_dtoverlay_to(self, dir):
-        if isinstance(self.dtoverlay, str):
-            self.dtoverlay = [self.dtoverlay]
-        for overlay in self.dtoverlay:
-            if not os.path.exists(overlay):
-                self.errors.append(f"Device tree overlay file {overlay} not found")
-                continue
-            self.do(f'Copy dtoverlay {overlay}', f'cp {overlay} {dir}/')
-        self.need_reboot = True
+    def modules_probe(self):
+        if 'skip_modules' in self.args and not self.args.skip_modules:
+            for module in self.modules:
+                self.do(f'add module: {module}',
+                    f'sh -c "echo {module} >> /etc/modules-load.d/modules.conf"'
+                )
 
     def copy_dtoverlay(self):
         # Copy device tree overlay
@@ -323,15 +373,44 @@ class SF_Installer():
             return
         OVERLAY_PATH_DEFAULT = '/boot/overlays'
         OVERLAY_PATH_BACKUP = '/boot/firmware/overlays'
-        success = False
-        if os.path.exists(OVERLAY_PATH_DEFAULT):
-            self.copy_dtoverlay_to(OVERLAY_PATH_DEFAULT)
-            success = True
-        if os.path.exists(OVERLAY_PATH_BACKUP):
-            self.copy_dtoverlay_to(OVERLAY_PATH_BACKUP)
-            success = True
-        if not success:
-            self.errors.append(f"Device tree overlay directory {OVERLAY_PATH_DEFAULT} or {OVERLAY_PATH_BACKUP} not found")
+        overlays_path = OVERLAY_PATH_DEFAULT
+        if not os.path.exists(overlays_path):
+            overlays_path = OVERLAY_PATH_BACKUP
+            if not os.path.exists(overlays_path):
+                self.errors.append(f"Device tree overlay directory {OVERLAY_PATH_DEFAULT} or {OVERLAY_PATH_BACKUP} not found")
+                return
+        
+        if isinstance(self.dtoverlay, str):
+            self.dtoverlay = [self.dtoverlay]
+        for overlay in self.dtoverlay:
+            if not os.path.exists(overlay):
+                self.errors.append(f"Device tree overlay file {overlay} not found")
+                continue
+            self.do(f'Copy dtoverlay {overlay}', f'cp {overlay} {overlays_path}/')
+
+        self.need_reboot = True
+
+    def remove_dtoverlay(self):
+        OVERLAY_PATH_DEFAULT = '/boot/overlays'
+        OVERLAY_PATH_BACKUP = '/boot/firmware/overlays'
+        overlays_path = OVERLAY_PATH_DEFAULT
+        if not os.path.exists(overlays_path):
+            overlays_path = OVERLAY_PATH_BACKUP
+            if not os.path.exists(overlays_path):
+                self.errors.append(f"Device tree overlay directory {OVERLAY_PATH_DEFAULT} or {OVERLAY_PATH_BACKUP} not found")
+                return
+        
+        if isinstance(self.dtoverlay, str):
+            self.dtoverlay = [self.dtoverlay]
+        for overlay in self.dtoverlay:
+            if not os.path.exists(f'{overlays_path}/{overlay}'):
+                print(f" - Device tree overlay {overlay} not found Skip")
+                continue
+            self.do(f'Remove dtoverlay {overlay}', f'rm {overlays_path}/{overlay}')
+            self.need_reboot = True
+
+    def change_work_dir_owner(self):
+        self.do('Change work directory owner', f'chown -R {self.user}:{self.user} {self.work_dir}')
 
     def reboot_prompt(self):
         print("\033[1;32mWhether to restart for the changes to take effect(Y/N): \033[0m", end='')
@@ -347,30 +426,38 @@ class SF_Installer():
                 continue
 
     def cleanup(self):
-        pass
-        # for package in self.python_source:
-        #     url = self.python_source[package]
-        #     if url.startswith("http"):
-        #         self.do(f'Remove {package}', f'rm -r {package}')
-        #     else:
-        #         self.do(f'Remove {package} build files',
-        #                 f'rm -r {url}/*.egg-info {url}/dist')
+        self.do(f'Remove build', f'rm -r ./build', ignore_error=True)
 
     def install(self):
-        print(f"{self.friendly_name} Insataller")
-        try:
-            self.check_admin()
-            self.args = self.parser.parse_args()
+        print(f"Installing pironman5 for {self.friendly_name}")
+        self.install_build_dep()
+        self.run_commands_before_install()
+        self.install_apt_dep()
+        self.create_working_dir()
+        self.install_pip_dep()
+        self.install_py_src_pkgs()
+        self.setup_auto_start()
+        self.setup_config_txt()
+        self.modules_probe()
+        self.copy_dtoverlay()
+        self.custom_install()
+        self.change_work_dir_owner()
+        print("Finished")
 
-            self.install_apt_dep()
-            self.create_working_dir()
-            self.install_pip_dep()
-            self.install_py_src_pkgs()
-            self.setup_auto_start()
-            self.setup_config_txt()
-            self.copy_dtoverlay()
-            self.custom_install()
-            print("Finished")
+    def uninstall(self):
+        print(f"Uninstall pironman5 for {self.friendly_name}")
+        self.remove_auto_start()
+        self.remove_work_dir()
+        self.remove_dtoverlay()
+
+    def main(self):
+        self.check_admin()
+        self.args = self.parser.parse_args()
+        try:
+            if self.args.uninstall:
+                self.uninstall()
+            else:
+                self.install()
         except KeyboardInterrupt:
             print("\n\nCanceled.")
         finally:
@@ -390,3 +477,4 @@ class SF_Installer():
                     "Try to fix it yourself, or contact service@sunfounder.com with this message"
                 )
                 sys.exit(1)
+
