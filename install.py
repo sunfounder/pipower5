@@ -56,7 +56,7 @@ settings = {
     # - Set bin files
     'bin_files': ['pipower5'],
     # - Copy device tree overlay to /boot/overlays
-    'dtoverlay': ['sunfounder-pipower5.dtbo'],
+    'dtoverlays': ['sunfounder-pipower5.dtbo'],
 }
 
 dashboard_settings = {
@@ -92,6 +92,6 @@ installer = SF_Installer(
 installer.parser.add_argument("--disable-dashboard", action='store_true', help="Disable dashboard")
 installer.update_settings(settings)
 args = installer.parser.parse_args()
-if not args.disable_dashboard:
+if args.disable_dashboard:
     installer.update_settings(dashboard_settings)
 installer.main()
