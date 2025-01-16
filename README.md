@@ -1,8 +1,29 @@
-# pipower5
-Python Library for PiPower5
+# PiPower 5
 
+## Installation
 
-### Debug
+Install the required packages:
+
+```bash
+sudo apt-get update
+sudo apt-get install git python3-pip python3-dev python3-setuptools
+```
+
+Install PiPower 5
+```bash
+sudo python install.py
+```
+
+> Note: This will also install a dashboard to monitor the PiPower 5 and your Raspberry Pi. If you don't need it, you can add a flag `--disable-dashboard` to the installation command.
+> ```bash
+> sudo python install.py --disable-dashboard
+> ```
+> Or you can uninstall the dashboard later by cli
+> ```bash
+> sudo pipower5 --remove-dashboard
+> ```
+
+## Debug
 
 Clone the dependency you want to debug or edit
 
