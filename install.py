@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 from tools.sf_installer import SF_Installer
-from pironman5.version import __version__
-from pironman5.variants import NAME, DT_OVERLAYS
+from pipower5.version import __version__
 
 installer = SF_Installer(
     name='pipower5',
@@ -51,8 +50,8 @@ installer = SF_Installer(
     python_source={
         'pipower5': './',
         'spc': 'git+http://github.com/sunfounder/spc.git',
-        'pm_dashboard': 'git+https://github.com/sunfounder/pm_dashboard.git',
-        'sf_rpi_status': 'git+https://github.com/sunfounder/sf_rpi_status.git',
+        'pm_dashboard': 'git+https://github.com/sunfounder/pm_dashboard.git@dev',
+        'sf_rpi_status': 'git+https://github.com/sunfounder/sf_rpi_status.git@dev',
     },
 
     # - Setup config txt

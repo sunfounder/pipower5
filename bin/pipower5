@@ -1,20 +1,29 @@
 #!/bin/bash
 
-# Pass all arguments to the pipower5 script
-background=false
-args=()
-for arg in "$@"; do
+args=("$@")
+new_args=()
+background_found=false
+restart_found=false
+
+for arg in "${args[@]}"; do
     if [ "$arg" == "--background" ]; then
-        background=true
+        background_found=true
+    elif [ "$arg" == "restart" ]; then
+        restart_found=true
+        new_args+=("start")
     else
-        args+=("$arg")
+        new_args+=("$arg")
     fi
 done
 
-if [ $background == true ]; then
-    echo "running at background"
-    /opt/pipower5/venv/bin/pipower5 "$args" 2>1 1>/dev/null &
+if $restart_found; then
+    /opt/pipower5/venv/bin/pipower5-service stop
+    sleep 5
+fi
+
+if $background_found; then
+    /opt/pipower5/venv/bin/pipower5-service "${new_args[@]}" 2>&1 1>/dev/null &
 else
-    /opt/pipower5/venv/bin/pipower5 "$@"
+    /opt/pipower5/venv/bin/pipower5-service "${new_args[@]}"
 fi
 

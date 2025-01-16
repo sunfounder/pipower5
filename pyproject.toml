@@ -20,7 +20,7 @@ dynamic = ["version"]
 dependencies = []
 
 [project.scripts]
-pipower5 = "pipower5:main"
+pipower5-service = "pipower5:main"
 
 [tool.setuptools]
 packages = ["pipower5"]
@@ -30,4 +30,4 @@ packages = ["pipower5"]
 "Bug Tracker" = "https://github.com/sunfounder/pipower5/issues"
 
 [tool.setuptools.dynamic]
-version = {attr = "pipower5.__version__"}
+version = {attr = "pipower5.version.__version__"}

@@ -27,3 +27,8 @@ class Logger(logging.Logger):
         # Add the handler to the logger
         self.addHandler(file_handler)
         self.addHandler(console_handler)
+
+def create_get_child_logger(app_name):
+    def get_child_logger(name):
+        return Logger(app_name, name)
+    return get_child_logger
