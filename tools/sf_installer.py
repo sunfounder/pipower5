@@ -149,6 +149,7 @@ class SF_Installer():
         self.parser.add_argument('--plain-text',
                                  action='store_true',
                                  help='Plain text mode')
+        self.parser_added = []
         self.config_txt_handler = ConfigTxt()
         self.user = self.get_username()
         self.errors = []
@@ -180,28 +181,32 @@ class SF_Installer():
             self.service_files.extend(settings['service_files'])
         if 'bin_files' in settings:
             self.bin_files.extend(settings['bin_files'])
-        if 'dtoverlay' in settings:
-            self.dtoverlay.extend(settings['dtoverlay'])
+        if 'dtoverlays' in settings:
+            self.dtoverlays.extend(settings['dtoverlays'])
         if 'venv_options' in settings:
             self.venv_options.extend(settings['venv_options'])
 
 
-        if len(self.service_files) > 0:
+        if len(self.service_files) > 0 and 'skip_auto_start' not in self.parser_added:
             self.parser.add_argument('--skip-auto-start',
                                      action='store_true',
                                      help='Skip auto start')
-        if len(self.config_txt) > 0:
+            self.parser_added.append('skip_auto_start')
+        if len(self.config_txt) > 0 and 'skip_config_txt' not in self.parser_added:
             self.parser.add_argument('--skip-config-txt',
                                      action='store_true',
                                      help='Skip config.txt')
-        if len(self.dtoverlays) > 0:
+            self.parser_added.append('skip_config_txt')
+        if len(self.dtoverlays) > 0 and 'skip_dtoverlay' not in self.parser_added:
             self.parser.add_argument('--skip-dtoverlay',
                                      action='store_true',
                                      help='Skip dtoverlay')
-        if len(self.modules) > 0:
+            self.parser_added.append('skip_dtoverlay')
+        if len(self.modules) > 0 and 'skip_modules' not in self.parser_added:
             self.parser.add_argument('--skip-modules',
                                      action='store_true',
                                      help='Skip probe modules')
+            self.parser_added.append('skip_modules')
 
     def set_config_txt(self, name="", value=""):
         msg = f"Setting config.txt: {name}={value}"
@@ -439,6 +444,9 @@ class SF_Installer():
         self.do('Reload systemd', 'systemctl daemon-reload')
 
     def remove_dtoverlay(self):
+        if len(self.dtoverlays) == 0:
+            return
+        print("Remove device tree overlay...")
         OVERLAY_PATH_DEFAULT = '/boot/overlays'
         OVERLAY_PATH_BACKUP = '/boot/firmware/overlays'
         overlays_path = OVERLAY_PATH_DEFAULT
