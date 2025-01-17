@@ -1,5 +1,5 @@
 # SunFounder PiPower 5
-This repository is for Pironman 5. you can buy it on [our website](https://www.sunfounder.com/), or search sunfounder in Amazon.
+This repository is for PiPower 5. you can buy it on [our website](https://www.sunfounder.com/), or search sunfounder in Amazon.
 
 Quick Links:
 
@@ -13,14 +13,12 @@ Quick Links:
 <a id="about_this_kit"></a>
 ## About this kit:
 
-Elevate your Raspberry Pi with the Pironman 5, our top-tier case designed for unmatched style and functionality. It's the perfect blend of aesthetics and performance:
+Document: https://docs.sunfounder.com/projects/pipower5/en/latest/
 
-
+PiPower 5 is a versatile UPS solution designed for seamless integration with Raspberry Pi devices. It features robust power path management, dual lithium battery charging and discharging capabilities, and essential protections against reverse polarity, overcharging, and over-discharging.
 
 <a id="update"></a>
 ## Update:
-
-
 
 <a id="trouble"></a>
 ## Trouble Shootings:
@@ -31,16 +29,17 @@ SunFounder is a company focused on STEAM education with products like open sourc
 
 <a id="license"></a>
 ## License
-This is the code for Pironman.
+This is the documentation for PiPower 5.
+
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied wa rranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-Pironman 5 comes with ABSOLUTELY NO WARRANTY; for details run ./show w. This is free software, and you are welcome to redistribute it under certain conditions; run ./show c for details.
+This resposity comes with ABSOLUTELY NO WARRANTY; for details run ./show w. This is free software, and you are welcome to redistribute it under certain conditions; run ./show c for details.
 
-SunFounder, Inc., hereby disclaims all copyright interest in the program 'pironman5' (which makes passes at compilers).
+SunFounder, Inc., hereby disclaims all copyright interest in the program 'PiPower 5' (which makes passes at compilers).
 
 Mike Huang, 21 August 2015
 
