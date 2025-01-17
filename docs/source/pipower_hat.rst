@@ -9,7 +9,7 @@ Overview
 
 
 1. **USB Type-C Power Input**: External power input for supplying power to the Raspberry Pi and charging the battery. Supports USB PD protocol, 5V–15V.
-2. **DC 5.5-2.1 Power Input**: External power input for powering the Raspberry Pi and charging the battery. Supports 5V–15V.
+2. **DC Power Input**: DC Power Jack, 5.5mm Outer Diameter, 2.1mm Inner Diameter. External power input for powering the Raspberry Pi and charging the battery. Supports 5V–15V.
 3. **Power Input Selector Switch**: Toggles between available power input sources. Details at: :ref:`power_input`
 4. :ref:`cap_onoff`: Determines whether the device powers on automatically when external power is connected while the device is off.
 5. :ref:`cap_sdsig` **(Shutdown Signal)**: GPIO26 short-circuit connection for Raspberry Pi shutdown signaling. After configuring the Raspberry Pi's shutdown signal, it informs the onboard microcontroller to cut off power during shutdown.
@@ -248,7 +248,7 @@ Four onboard LEDs indicate the battery level and charging status.
 * **1 LED lit**: 20%< Battery <40%
 * **First LED flashing**: Battery <20%
 * **LEDs light up sequentially in a cycle**: Charging in progress
-* **Middle two LEDs flashing**: WAwaiting shutdown signal
+* **Middle two LEDs flashing**: Waiting shutdown signal
 * **All LEDs off**: Unpowered or in sleep mode
 
 .. _battery_connector:
