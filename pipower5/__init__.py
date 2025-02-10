@@ -145,7 +145,7 @@ def main():
     if args.battery_voltage:
         print(f"Battery voltage: {spc.read_battery_voltage()} mV")
     if args.battery_current:
-        print(f"Battery current: {spc.read_battery_current()} mV")
+        print(f"Battery current: {spc.read_battery_current()} mA")
     if args.battery_percentage:
         print(f"Battery percentage: {spc.read_battery_percentage()} %")
     if args.battery_source:
