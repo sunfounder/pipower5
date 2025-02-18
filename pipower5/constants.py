@@ -29,7 +29,7 @@ PERIPHERALS = [
 
 SYSTEM_DEFAULT_CONFIG = {
     'temperature_unit': 'C',
-    'interval': 1,
+    'data_interval': 1,
 }
 
 CUSTOM_PERIPHERALS = {

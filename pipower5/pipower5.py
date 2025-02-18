@@ -15,8 +15,6 @@ log = get_child_logger('main')
 __package_name__ = __name__.split('.')[0]
 CONFIG_PATH = str(resource_files(__package_name__).joinpath('config.json'))
 
-
-
 PMDashboard = None
 try:
     from pm_dashboard.pm_dashboard import PMDashboard
