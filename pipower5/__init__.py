@@ -218,7 +218,7 @@ def main():
     if len(new_sys_config) > 0:
         new_config = {
             'system': new_sys_config,
-             'peripherals': current_config['peripherals']
+            'peripherals': current_config['peripherals']
         }
         
         from .pipower5 import PiPower5

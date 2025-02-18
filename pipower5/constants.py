@@ -31,3 +31,7 @@ SYSTEM_DEFAULT_CONFIG = {
     'temperature_unit': 'C',
     'interval': 1,
 }
+
+CUSTOM_PERIPHERALS = {
+    "pwm_fan": False
+}

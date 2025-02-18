@@ -6,7 +6,7 @@ from importlib.resources import files as resource_files
 from .logger import create_get_child_logger
 from .utils import merge_dict, log_error
 from .version import __version__ as pipower5_version
-from .constants import NAME, ID, PERIPHERALS, SYSTEM_DEFAULT_CONFIG
+from .constants import NAME, ID, PERIPHERALS, SYSTEM_DEFAULT_CONFIG, CUSTOM_PERIPHERALS
 
 from .shutdown_service import ShutdownService
 
@@ -14,6 +14,8 @@ get_child_logger = create_get_child_logger('pipower5')
 log = get_child_logger('main')
 __package_name__ = __name__.split('.')[0]
 CONFIG_PATH = str(resource_files(__package_name__).joinpath('config.json'))
+
+
 
 PMDashboard = None
 try:
@@ -27,6 +29,7 @@ class PiPower5:
         self.log = get_child_logger('main')
         self.config = {
             'system': SYSTEM_DEFAULT_CONFIG,
+            "peripherals": CUSTOM_PERIPHERALS,
         }
         if os.path.exists(CONFIG_PATH):
             with open(CONFIG_PATH, 'r') as f:

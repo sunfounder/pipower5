@@ -1,9 +1,0 @@
-{
-    "system": {
-        "temperature_unit": "C",
-        "interval": 1
-    },
-    "peripherals": {
-        "pwm_fan": false
-    }
-}
