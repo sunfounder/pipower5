@@ -1,4 +1,14 @@
 
+def update_config_file(config, config_path):
+    import json
+    from .utils import merge_dict
+    current = None
+    with open(config_path, 'r') as f:
+        current = json.load(f)
+    current = merge_dict(current, config)
+    with open(config_path, 'w') as f:
+        json.dump(current, f, indent=4)
+
 def main():
     import time
     from spc.spc import SPC
@@ -34,6 +44,7 @@ def main():
     parser.add_argument("-dl", "--debug-level", choices=['debug', 'info', 'warning', 'error', 'critical'], help="Debug level")
     parser.add_argument("--background", nargs='?', default='', help="Run in background")
     parser.add_argument("-rd", "--remove-dashboard", action="store_true", help="Remove dashboard")
+    parser.add_argument("-cp", "--config-path", nargs='?', default='', help="Config path")
 
     parser.add_argument('-sp', '--shutdown-percentage', nargs='?', default='', help='Set shutdown percentage, leave empty to read')
     parser.add_argument('-iv', '--input-voltage', action='store_true', help='Read input voltage')
@@ -61,12 +72,25 @@ def main():
         parser.print_help()
         quit()
 
-    if not path.exists(CONFIG_PATH):
-        with open(CONFIG_PATH, 'w') as f:
+    config_path = CONFIG_PATH
+    if args.config_path != '':
+        if args.config_path == None:
+            print(f"Config path: {config_path}")
+        else:
+            config_path = args.config_path
+    if not path.exists(config_path):
+        with open(config_path, 'w') as f:
             json.dump({'system': {}}, f, indent=4)
     else:
-        with open(CONFIG_PATH, 'r') as f:
-            current_config = json.load(f)
+        with open(config_path, 'r') as f:
+            try:
+                content = f.read()
+                if content == '':
+                    current_config = {'system': {}}
+                current_config = json.loads(content)
+            except json.JSONDecodeError:
+                print(f"Invalid config file: {config_path}")
+                quit()
 
     if args.config:
         print(json.dumps(current_config, indent=4))
@@ -202,30 +226,32 @@ def main():
 
     if args.enable_pwm_fan != '':
         if args.enable_pwm_fan == None:
-            enabled = "enabled" if current_config['peripherals']['pwm_fan'] else 'disabled'
+            if 'peripherals' not in current_config:
+                enabled = "disabled"
+            else:
+                enabled = "enabled" if current_config['peripherals']['pwm_fan'] else 'disabled'
             print(f"PWM Fan {enabled}")
         else:
             if args.enable_pwm_fan in TRUE_LIST:
-                new_peripheral_config['peripherals']['pwm_fan'] = True
+                new_peripheral_config['pwm_fan'] = True
                 print(f"Set PWM Fan enabled")
             elif args.enable_pwm_fan in FALSE_LIST:
-                new_peripheral_config['peripherals']['pwm_fan'] = False
+                new_peripheral_config['pwm_fan'] = False
                 print(f"Set PWM Fan disabled")
             else:
                 print(f"Invalid value for PWM Fan, it should be true or false")
                 quit()
 
-    if len(new_sys_config) > 0:
+    if len(new_sys_config) > 0 or len(new_peripheral_config) > 0:
         new_config = {
             'system': new_sys_config,
-            'peripherals': current_config['peripherals']
+            'peripherals': new_peripheral_config
         }
         
-        from .pipower5 import PiPower5
-        PiPower5.update_config_file(new_config)
+        update_config_file(new_config, config_path)
 
     if args.command == "start":
         from .pipower5 import PiPower5
-        pipower5 = PiPower5()
+        pipower5 = PiPower5(config_path=config_path)
         pipower5.set_debug_level(debug_level)
         pipower5.start()

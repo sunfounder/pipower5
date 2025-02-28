@@ -61,6 +61,6 @@ class ShutdownService():
     @log_error
     def stop(self):
         if self.running:
+            self.running = False
             self.thread.join()
-        self.running = False
         self.log.info("Shutdown service stoped")
