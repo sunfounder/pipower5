@@ -34,7 +34,7 @@ def main():
     new_peripheral_config = {}
 
     spc = SPC()
-    parser = argparse.ArgumentParser(description='PiPower 5')
+    parser = argparse.ArgumentParser(prog='pipower5', description='PiPower 5')
     parser.add_argument("command",
                         choices=["start", "restart", "stop"],
                         nargs="?",
