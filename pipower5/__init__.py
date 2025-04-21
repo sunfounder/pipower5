@@ -1,4 +1,3 @@
-
 def update_config_file(config, config_path):
     import json
     from .utils import merge_dict
@@ -12,6 +11,7 @@ def update_config_file(config, config_path):
 def main():
     import time
     from spc.spc import SPC
+    from .pipower5 import PiPower5
     import argparse
     from .constants import PERIPHERALS
     from .version import __version__
@@ -194,7 +194,7 @@ def main():
             shutdown_request_str = 'Unknown'
         print(f"Shutdown request: {shutdown_request} - {shutdown_request_str}")
     if args.charging_current:
-        print(f"Max charging current: {spc.i2c.read_byte_data(149)*100} mA")
+        print(f"Max charging current: {PiPower5.get_max_charge_current(spc)} mA")
     if args.all:
         data_buffer = spc.read_all()
         print(f"Input voltage: {data_buffer['input_voltage']} mV")
@@ -218,7 +218,7 @@ def main():
         else:
             shutdown_request_str = 'Unknown'
         print(f"Shutdown request: {data_buffer['shutdown_request']} - {shutdown_request_str}")
-        print(f"Max charging current: {spc.i2c.read_byte_data(149)*100} mA")
+        print(f"Max charging current: {PiPower5.get_max_charge_current(spc)} mA")
         print(f"Default on: {'on' if spc.read_default_on() else 'off'}")
         print(f"Shutdown percentage: {spc.read_shutdown_percentage()} %")
     if args.firmware:

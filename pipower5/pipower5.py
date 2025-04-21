@@ -26,6 +26,9 @@ except ImportError:
     pass
 
 class PiPower5:
+
+    REG_CHARGE_MAX_CURRENT = 150
+
     def __init__(self, config_path=CONFIG_PATH):
         self.log = get_child_logger('main')
         self.config = {
@@ -128,3 +131,7 @@ class PiPower5:
     def signal_handler(self, signum, frame):
         self.log.info(f'Received signal "{signal.strsignal(signum)}", cleaning up...')
         self.stop()
+
+    @staticmethod
+    def get_max_charge_current(spc):
+        return spc.i2c.read_byte_data(PiPower5.REG_CHARGE_MAX_CURRENT)*100
