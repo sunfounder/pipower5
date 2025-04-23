@@ -25,11 +25,15 @@ PERIPHERALS = [
     "shutdown_percentage",
     "default_on",
     "data_interval",
+    "power-failure-simulation",
 ]
 
 SYSTEM_DEFAULT_CONFIG = {
+    'enable_history': True,
     'temperature_unit': 'C',
     'data_interval': 1,
+    'power-failure-simulation': True,
+    'shutdown_percentage': 10,
 }
 
 CUSTOM_PERIPHERALS = {

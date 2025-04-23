@@ -60,7 +60,8 @@ def main():
     parser.add_argument('-sr', '--shutdown-request', action='store_true', help='Read shutdown request')
     parser.add_argument('-cc', '--charging-current', action='store_true', help='Max charging current')
     parser.add_argument('-a', '--all', action='store_true', help='Show all status')
-    parser.add_argument('-fv', '--firmware', action='store_true', help='pipower5 firmware version')
+    parser.add_argument('-fv', '--firmware', action='store_true', help='PiPower5 firmware version')
+    parser.add_argument('-pfs', '--power-failure-simulation', nargs='?', default='', help='Power failure simulation')
 
     if is_included(PERIPHERALS, "temperature_unit"):
         parser.add_argument("-u", "--temperature-unit", choices=["C", "F"], nargs='?', default='', help="Temperature unit")
@@ -160,6 +161,7 @@ def main():
                 time.sleep(0.5)
                 if spc.read_shutdown_percentage() == int(args.shutdown_percentage):
                     print(f"Success, shutdown battery percentage: {spc.read_shutdown_percentage()}%")
+    
     if args.input_voltage:
         print(f"Input voltage: {spc.read_input_voltage()} mV")
     if args.output_voltage:
@@ -255,3 +257,40 @@ def main():
         pipower5 = PiPower5(config_path=config_path)
         pipower5.set_debug_level(debug_level)
         pipower5.start()
+
+    if args.power_failure_simulation:
+        test_time = 60 # seconds
+        if args.power_failure_simulation != None:
+            test_time = int(args.power_failure_simulation)
+            if test_time < 10:
+                print(f"Blackout simulation time should be at least 10 seconds")
+                quit()
+            elif test_time > 600:
+                print(f"Blackout simulation time should be at most 600 seconds(10 minutes)")
+                quit()
+
+        print(f"Blackout simulation for {test_time} seconds")
+        report = PiPower5.power_failure_simulation(spc, test_time)
+        print(f'report:')
+        print(f'  average battery voltage : {report["bat_voltage_avg"]:.3f} V')
+        print(f'  average battery current : {report["bat_current_avg"]:.3f} A')
+        print(f'  average battery power : {report["bat_power_avg"]:.3f} W')
+        print(f'  average output voltage : {report["output_voltage_avg"]:.3f} V')
+        print(f'  average output current : {report["output_current_avg"]:.3f} A')
+        print(f'  average output power : {report["output_power_avg"]:.3f} W')
+        print(f'  ---')
+        print(f'  max battery voltage : {report["bat_voltage_max"]:.3f} V')
+        print(f'  max battery current : {report["bat_current_max"]:.3f}A')
+        print(f'  max battery power : {report["bat_power_max"]:.2f} W')
+        print(f'  max output voltage : {report["output_voltage_max"]:.3f} V')
+        print(f'  max output current : {report["output_current_max"]:.3f} A')
+        print(f'  max output power : {report["output_power_max"]:.3f} W')
+        print(f'  ---')
+        print(f'  battery precentage : {report["battery_percentage"]} %')
+        print(f'  shutdown percentage : {report["shutdown_percentage"]} %')
+        print(f'  available time: {report["available_time_str"]}')
+        print(f'  available time: {report["available_time"]} s')
+        print(f'  available_bat_capacity: {int(report["available_bat_capacity"])} mAh')
+
+
+        
