@@ -1,7 +1,18 @@
 #!/usr/bin/env python3
 
-from tools.sf_installer import SF_Installer
-from pipower5.version import __version__
+
+import os
+from os import path
+import sys
+
+here = path.abspath(path.dirname(__file__))
+os.chdir(here)
+sys.path.append('./pipower5')
+sys.path.append('./tools')
+
+from sf_installer import SF_Installer
+from version import __version__
+
 
 settings = {
     # - Setup venv options if needed, default to []
