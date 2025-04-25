@@ -60,7 +60,7 @@ class PiPower5(SPC):
         with open(self.config_path, 'w') as f:
             json.dump(self.config, f, indent=4)
         try:
-            os.chmod(self.config_path, 0o774)
+            os.chmod(self.config_path, 0o777)
         except:
             pass    
         
@@ -150,7 +150,7 @@ class PiPower5(SPC):
         with open(self.config_path, 'w') as f:
             json.dump(self.config, f, indent=4)
         try:
-            os.chmod(self.config_path, 0o774)
+            os.chmod(self.config_path, 0o777)
         except:
             pass
 
