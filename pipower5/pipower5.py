@@ -57,12 +57,13 @@ class PiPower5(SPC):
             with open(self.config_path, 'r') as f:
                 config = json.load(f)
                 self.config = merge_dict(self.config, config)
-        with open(self.config_path, 'w') as f:
-            json.dump(self.config, f, indent=4)
         try:
             os.chmod(self.config_path, 0o777)
         except:
-            pass    
+            pass
+        with open(self.config_path, 'w') as f:
+            json.dump(self.config, f, indent=4)
+
         
         # --- device_info ---
         self.device_info = {
@@ -147,12 +148,13 @@ class PiPower5(SPC):
         self.pm_auto.update_config(config['system'])
         self.shutdown_service.update_config(config['system'])
         merge_dict(self.config, config)
-        with open(self.config_path, 'w') as f:
-            json.dump(self.config, f, indent=4)
         try:
             os.chmod(self.config_path, 0o777)
         except:
             pass
+        with open(self.config_path, 'w') as f:
+            json.dump(self.config, f, indent=4)
+
 
     @log_error
     def start(self):
