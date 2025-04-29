@@ -260,11 +260,6 @@ def main():
 
     if args.power_failure_simulation != '':
         test_time = 60 # seconds
-        pipower5.set_debug_level(debug_level)
-        pipower5.start()
-
-    if args.power_failure_simulation != '':
-        test_time = 60 # seconds
         if args.power_failure_simulation != None:
             test_time = int(args.power_failure_simulation)
             if test_time < 10:
