@@ -50,6 +50,12 @@ settings = {
         'pm_auto': 'git+https://github.com/sunfounder/pm_auto.git@1.2.2',
     },
 
+    # create symbolic links from venv/bin/ to /usr/local/bin/
+    'symlinks':
+    [
+        'pipower5',
+    ],
+
     # - Setup config txt
     # 'config_txt':  {
     #     'dtparam=spi': 'on',
