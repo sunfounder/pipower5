@@ -76,15 +76,11 @@ class PiPower5(SPC):
         }
 
         #
-        self.pm_auto = None
         self.pm_dashboard = None
         self.shutdown_service = None
 
     def init_service(self):
         # --- import ---
-        from pm_auto.pm_auto import PMAuto
-        from pm_auto import __version__ as pm_auto_version
-
         has_pm_dashboard = False
         try:
             from pm_dashboard.pm_dashboard import PMDashboard
@@ -104,13 +100,6 @@ class PiPower5(SPC):
         if has_pm_dashboard:
             self.log.debug(f"PM_Dashboard version: {pm_dashboard_version}")
 
-        # --- init pm_auto ---
-        self.update_extra_peripherals()
-        #
-        self.pm_auto = PMAuto(self.config['system'],
-                              peripherals=PERIPHERALS,
-                              get_logger=get_child_logger)
-        self.pm_auto.set_debug_level(self.log_level)
         # --- init pm_dashboard ---
         if not has_pm_dashboard:
             self.pm_dashboard = None
@@ -122,7 +111,6 @@ class PiPower5(SPC):
                                             config=self.config,
                                             get_logger=get_child_logger)
             self.pm_dashboard.set_on_config_changed(self.update_config)
-            self.pm_auto.set_on_state_changed(self.pm_dashboard.update_status)
             self.pm_dashboard.set_debug_level(self.log_level)
         # --- init shutdown_service ---
         self.shutdown_service = ShutdownService(get_logger=get_child_logger)
@@ -140,14 +128,11 @@ class PiPower5(SPC):
     def set_debug_level(self, level):
         self.log.setLevel(level)
         self.log_level = level
-        if self.pm_auto:
-            self.pm_auto.set_debug_level(level)
         if self.pm_dashboard:
             self.pm_dashboard.set_debug_level(level)
 
     @log_error
     def update_config(self, config):
-        self.pm_auto.update_config(config['system'])
         self.shutdown_service.update_config(config['system'])
         merge_dict(self.config, config)
         try:
@@ -181,9 +166,6 @@ class PiPower5(SPC):
         if self.shutdown_service:
             self.shutdown_service.stop()
             self.log.debug('Stop Shutdown service.')
-        if self.pm_auto:
-            self.pm_auto.stop()
-            self.log.debug('Stop PM Auto.')
         if self.pm_dashboard:
             self.log.debug('Stop PM Dashboard.')
             self.pm_dashboard.stop()
