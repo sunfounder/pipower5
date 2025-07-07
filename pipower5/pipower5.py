@@ -23,6 +23,8 @@ class PiPower5(SPC):
     REG_PWR_BTN_STATE= 154
     REG_CHARGE_MAX_CURRENT = 155
 
+    REG_WRITE_POWER_BTN_STATE = 12
+
     BAT_MAX_CAPACITY = 2000 # mAh   
 
     ADV_CMD_START = 0xAC
@@ -165,7 +167,7 @@ class PiPower5(SPC):
         signal.signal(signal.SIGTERM, self.signal_handler)
         signal.signal(signal.SIGABRT, self.signal_handler)
         #
-        self.shutdown_service.start()
+        # self.shutdown_service.start()
         if self.pm_dashboard:
             self.pm_dashboard.start()
             self.log.info('PmDashboard started')
@@ -368,5 +370,20 @@ class PiPower5(SPC):
             #
             return result
     
+    def read_power_btn(self):
+        key_map = {
+            0: 'released',
+            1: 'single_click',
+            2: 'double_click',
+            3: 'long_press_2s',
+            4: 'long_press_2s_released',
+            5: 'long_press_5s',
+            6: 'long_press_5s_released',
+        }
+        val = self.i2c.read_byte_data(self.REG_PWR_BTN_STATE)
+        self.i2c.write_byte_data(self.REG_WRITE_POWER_BTN_STATE, 0) # reset state
 
-
+        if val in key_map:
+            return key_map[val]
+        else:
+            return val
