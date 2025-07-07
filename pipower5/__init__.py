@@ -54,8 +54,6 @@ def main():
     parser.add_argument('-ov', '--output-voltage', action='store_true', help='Read output voltage')
     parser.add_argument('-oc', '--output-current', action='store_true', help='Read output current')
     parser.add_argument('-bv', '--battery-voltage', action='store_true', help='Read battery voltage')
-    parser.add_argument('-b1v', '--battery-1-voltage', action='store_true', help='Read battery 1 voltage')
-    parser.add_argument('-b2v', '--battery-2-voltage', action='store_true', help='Read battery 2 voltage')
     parser.add_argument('-bc', '--battery-current', action='store_true', help='Read battery current')
     parser.add_argument('-bp', '--battery-percentage', action='store_true', help='Read battery percentage')
     parser.add_argument('-bs', '--battery-source', action='store_true', help='Read battery source')
@@ -206,19 +204,7 @@ def main():
         print(f"Max charging current: {pipower5.get_max_charge_current()} mA")
     if args.all:
         data_buffer = pipower5.read_all()
-        # print(f"Input voltage: {data_buffer['input_voltage']} mV")
-        # print(f"Output voltage: {data_buffer['output_voltage']} mV")
-        # print(f"Output current: {data_buffer['output_current']} mA")
-        # print(f"Battery voltage: {data_buffer['battery_voltage']} mV")
-        # print(f"Battery 1 voltage: {data_buffer['battery_1_voltage']} mV")
-        # print(f"Battery 2 voltage: {data_buffer['battery_2_voltage']} mV")
-        # print(f"Battery current: {data_buffer['battery_current']} mA")
-        # print(f"Battery percentage: {data_buffer['battery_percentage']} %")
-        # print(f"Power source: {data_buffer['power_source']} - {'Battery' if data_buffer['power_source'] == pipower5.BATTERY else 'External'}")
-        # print(f"Input plugged in: {data_buffer['is_input_plugged_in']}")
-        # print(f"Charging: {data_buffer['is_charging']}")
-        # print('')
-        # print(f"Internal data:")
+        #
         shutdown_request_str = 'None'
         if data_buffer['shutdown_request'] == pipower5.SHUTDOWN_REQUEST_NONE:
             shutdown_request_str = 'None'
@@ -228,10 +214,7 @@ def main():
             shutdown_request_str = 'Button'
         else:
             shutdown_request_str = 'Unknown'
-        # print(f"Shutdown request: {data_buffer['shutdown_request']} - {shutdown_request_str}")
-        # print(f"Max charging current: {PiPower5.get_max_charge_current(pipower5)} mA")
-        # print(f"Default on: {'on' if pipower5.read_default_on() else 'off'}")
-        # print(f"Shutdown percentage: {pipower5.read_shutdown_percentage()} %")
+        #
         print(f'''
 Input:
     voltage: {data_buffer['input_voltage']} mV
@@ -244,8 +227,6 @@ Output:
     power: {data_buffer['output_voltage'] * data_buffer['output_current'] * 0.000001:.3f} W
 Battery:
     voltage: {data_buffer['battery_voltage']} mV
-    bat1 voltage: {data_buffer['battery_1_voltage']} mV
-    bat2 voltage: {data_buffer['battery_2_voltage']} mV
     current: {data_buffer['battery_current']} mA
     power: {data_buffer['battery_voltage'] * data_buffer['battery_current'] * 0.000001:.3f} W
     percentage: {data_buffer['battery_percentage']} %
