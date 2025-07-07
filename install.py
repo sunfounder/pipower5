@@ -47,7 +47,6 @@ settings = {
     'python_source': {
         'pipower5': './',
         'spc': 'git+http://github.com/sunfounder/spc.git',
-        'pm_auto': 'git+https://github.com/sunfounder/pm_auto.git@1.2.2',
     },
 
     # create symbolic links from venv/bin/ to /usr/local/bin/
