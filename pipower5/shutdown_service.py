@@ -37,7 +37,10 @@ class ShutdownService():
                     self.log.info("Shutdown request: Button")
                     os.system("sudo shutdown -h now")
                 elif shutdown_request == self.spc.SHUTDOWN_REQUEST_LOW_BATTERY:
-                    self.log.info("Shutdown request: Low battery")
+                    self.log.info("Shutdown request: Low battery capacity")
+                    os.system("sudo shutdown -h now")
+                elif shutdown_request == self.spc.SHUTDOWN_REQUEST_LOW_BATTERY_VOLTAGE:
+                    self.log.info("Shutdown request: Low battery voltage")
                     os.system("sudo shutdown -h now")
                 self.last_shutdown_request = shutdown_request
             if is_input_plugged_in != self.last_is_input_plugged_in:
