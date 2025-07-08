@@ -49,8 +49,6 @@ class PiPower5(SPC):
             'system': SYSTEM_DEFAULT_CONFIG,
             "peripherals": CUSTOM_PERIPHERALS,
         }
-        # read shutdown_percentage
-        self.config['system']['shutdown_percentage'] = self.read_shutdown_percentage()
         # merge config
         self.config_path = config_path
         if os.path.exists(self.config_path):
@@ -61,6 +59,8 @@ class PiPower5(SPC):
             os.chmod(self.config_path, 0o777)
         except:
             pass
+        # read shutdown_percentage
+        self.config['system']['shutdown_percentage'] = self.read_shutdown_percentage()
         with open(self.config_path, 'w') as f:
             json.dump(self.config, f, indent=4)
 
