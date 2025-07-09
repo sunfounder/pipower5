@@ -20,7 +20,6 @@ dynamic = ["version"]
 dependencies = []
 
 [project.scripts]
-#pipower5-service = "pipower5:main"
 pipower5 = "pipower5:main"
 
 [tool.setuptools]
