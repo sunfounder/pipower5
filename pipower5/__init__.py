@@ -49,6 +49,7 @@ def main():
 
     parser.add_argument('-sp', '--shutdown-percentage', nargs='?', default='', help='Set shutdown percentage, leave empty to read')
     parser.add_argument('-iv', '--input-voltage', action='store_true', help='Read input voltage')
+    parser.add_argument('-ic', '--input-current', action='store_true', help='Read input current')
     parser.add_argument('-ov', '--output-voltage', action='store_true', help='Read output voltage')
     parser.add_argument('-oc', '--output-current', action='store_true', help='Read output current')
     parser.add_argument('-bv', '--battery-voltage', action='store_true', help='Read battery voltage')
@@ -170,6 +171,8 @@ def main():
     
     if args.input_voltage:
         print(f"Input voltage: {pipower5.read_input_voltage()} mV")
+    if args.input_current:
+        print(f"Input current: {pipower5.read_input_current()} mA")
     if args.output_voltage:
         print(f"Output voltage: {pipower5.read_output_voltage()} mV")
     if args.output_current:
@@ -219,6 +222,8 @@ def main():
         print(f'''
 Input:
     voltage: {data_buffer['input_voltage']} mV
+    current: {data_buffer['input_current']} mA
+    power: {data_buffer['input_voltage'] * data_buffer['input_current'] * 0.000001:.3f} W
     plugged in: {data_buffer['is_input_plugged_in']}
 Output: 
     voltage: {data_buffer['output_voltage']} mV
