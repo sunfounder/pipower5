@@ -14,7 +14,6 @@ def update_config_file(config, config_path):
 
 def main():
     import time
-    from .pipower5 import PiPower5
     import argparse
     from .constants import PERIPHERALS
     from .version import __version__
@@ -44,8 +43,7 @@ def main():
                         help="Command")
     parser.add_argument("-v", "--version", action="store_true", help="Show version")
     parser.add_argument("-c", "--config", action="store_true", help="Show config")
-    parser.add_argument("-dl", "--debug-level", choices=['debug', 'info', 'warning', 'error', 'critical'], help="Debug level")
-    parser.add_argument("--background", nargs='?', default='', help="Run in background")
+    parser.add_argument("-dl", "--debug-level", nargs='?', default='', choices=['debug', 'info', 'warning', 'error', 'critical'], help="Debug level")
     parser.add_argument("-rd", "--remove-dashboard", action="store_true", help="Remove dashboard")
     parser.add_argument("-cp", "--config-path", nargs='?', default='', help="Config path")
 
@@ -100,8 +98,19 @@ def main():
         print(json.dumps(current_config, indent=4))
         quit()
 
-    if args.debug_level != None:
-        debug_level = args.debug_level.upper()
+    # get or set debug level
+    # ----------------------------------------
+    if args.debug_level != '':
+        if args.debug_level == None:
+            print(f"Debug level: {current_config['system']['debug_level']}")
+        else:
+            if args.debug_level.lower() not in ['debug', 'info', 'warning', 'error', 'critical']:
+                print(f"Invalid debug level, it should be one of: debug, info, warning, error, critical")
+                quit()
+            else:
+                debug_level = args.debug_level.upper()
+                new_sys_config['debug_level'] = debug_level
+                print(f"Set debug level: {debug_level}")
 
     if args.command == "restart":
         print("This is a placeholder for pipower5 binary help, you should run pipower5 instead")
@@ -118,10 +127,6 @@ def main():
         print(__version__)
         quit()
 
-    if args.background != '':
-        print("This is a placeholder for pipower5 binary help, you should run pipower5 instead")
-        quit()
-    
     if args.remove_dashboard:
         import os
         print("Remove Dashboard")
@@ -171,10 +176,6 @@ def main():
         print(f"Output current: {pipower5.read_output_current()} mA")
     if args.battery_voltage:
         print(f"Battery voltage: {pipower5.read_battery_voltage()} mV")
-    if args.battery_1_voltage:
-        print(f"Battery 1 voltage: {pipower5.read_battery_1_voltage()} mV")
-    if args.battery_2_voltage:
-        print(f"Battery 2 voltage: {pipower5.read_battery_2_voltage()} mV")
     if args.battery_current:
         print(f"Battery current: {pipower5.read_battery_current()} mA")
     if args.battery_percentage:
@@ -218,8 +219,6 @@ def main():
         print(f'''
 Input:
     voltage: {data_buffer['input_voltage']} mV
-    current: {data_buffer['input_current']} mA
-    power: {data_buffer['input_voltage'] * data_buffer['input_current'] * 0.000001:.3f} W
     plugged in: {data_buffer['is_input_plugged_in']}
 Output: 
     voltage: {data_buffer['output_voltage']} mV
@@ -235,7 +234,7 @@ Battery:
 
 Internal:
     shutdown request: {data_buffer['shutdown_request']} - {shutdown_request_str}
-    max charging current: {PiPower5.get_max_charge_current(pipower5)} mA
+    max charging current: {pipower5.get_max_charge_current()} mA
     default on: {'on' if pipower5.read_default_on() else 'off'}
     shutdown percentage: {pipower5.read_shutdown_percentage()} %
 ''')
@@ -286,26 +285,27 @@ Internal:
 
         print(f"Blackout simulation for {test_time} seconds")
         report = pipower5.power_failure_simulation(test_time)
-        print(f'report:')
-        print(f'  average battery voltage : {report["bat_voltage_avg"]:.3f} V')
-        print(f'  average battery current : {report["bat_current_avg"]:.3f} A')
-        print(f'  average battery power : {report["bat_power_avg"]:.3f} W')
-        print(f'  average output voltage : {report["output_voltage_avg"]:.3f} V')
-        print(f'  average output current : {report["output_current_avg"]:.3f} A')
-        print(f'  average output power : {report["output_power_avg"]:.3f} W')
-        print(f'  ---')
-        print(f'  max battery voltage : {report["bat_voltage_max"]:.3f} V')
-        print(f'  max battery current : {report["bat_current_max"]:.3f}A')
-        print(f'  max battery power : {report["bat_power_max"]:.2f} W')
-        print(f'  max output voltage : {report["output_voltage_max"]:.3f} V')
-        print(f'  max output current : {report["output_current_max"]:.3f} A')
-        print(f'  max output power : {report["output_power_max"]:.3f} W')
-        print(f'  ---')
-        print(f'  battery precentage : {report["battery_percentage"]} %')
-        print(f'  shutdown percentage : {report["shutdown_percentage"]} %')
-        print(f'  available time: {report["available_time_str"]}')
-        print(f'  available time: {report["available_time"]} s')
-        print(f'  available_bat_capacity: {int(report["available_bat_capacity"])} mAh')
+        if report != None:
+            print(f'report:')
+            print(f'  average battery voltage : {report["bat_voltage_avg"]:.3f} V')
+            print(f'  average battery current : {report["bat_current_avg"]:.3f} A')
+            print(f'  average battery power : {report["bat_power_avg"]:.3f} W')
+            print(f'  average output voltage : {report["output_voltage_avg"]:.3f} V')
+            print(f'  average output current : {report["output_current_avg"]:.3f} A')
+            print(f'  average output power : {report["output_power_avg"]:.3f} W')
+            print(f'  ---')
+            print(f'  max battery voltage : {report["bat_voltage_max"]:.3f} V')
+            print(f'  max battery current : {report["bat_current_max"]:.3f}A')
+            print(f'  max battery power : {report["bat_power_max"]:.2f} W')
+            print(f'  max output voltage : {report["output_voltage_max"]:.3f} V')
+            print(f'  max output current : {report["output_current_max"]:.3f} A')
+            print(f'  max output power : {report["output_power_max"]:.3f} W')
+            print(f'  ---')
+            print(f'  battery precentage : {report["battery_percentage"]} %')
+            print(f'  shutdown percentage : {report["shutdown_percentage"]} %')
+            print(f'  available time: {report["available_time_str"]}')
+            print(f'  available time: {report["available_time"]} s')
+            print(f'  available_bat_capacity: {int(report["available_bat_capacity"])} mAh')
 
 
         

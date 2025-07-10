@@ -25,6 +25,9 @@ class ShutdownService():
         if 'shutdown_percentage' in config:
             self.spc.write_shutdown_percentage(config['shutdown_percentage'])
 
+    def set_debug_level(self, level):
+        self.log.setLevel(level)
+
     @log_error
     def loop(self):
         while self.running:
