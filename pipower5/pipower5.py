@@ -211,29 +211,53 @@ class PiPower5(SPC):
         return self.i2c.read_byte_data(self.REG_CHARGE_MAX_CURRENT)*100
 
     def disable_vbus(self):
-        time_out = 5 # seconds
+        time_out = 3 # seconds
         st = time.time()
         while time.time() - st < time_out:
             self.i2c.write_block_data(self.ADV_CMD_START, [self.ADV_CMD_VBUS_EN, 0, self.ADV_CMD_END])
-            if self.read_input_voltage() == 0:
+            status = self.i2c.read_byte()
+            if status == self.ADV_CMD_OK:
                 return True
-            time.sleep(0.5)
+            # !!! Don't add delay, otherwise status maybe error casued multiple process read data at the same time !!!
         else:
-            print(f'Failed to disable VBUS (timeout {time_out} s)')
             return False
 
     def enable_vbus(self):
-        time_out = 5 # seconds
+        time_out = 3 # seconds
         st = time.time()
         while time.time() - st < time_out:
             self.i2c.write_block_data(self.ADV_CMD_START, [self.ADV_CMD_VBUS_EN, 1, self.ADV_CMD_END])
-            if self.read_input_voltage() > 0:
-               return True
+            status = self.i2c.read_byte()
+            if status == self.ADV_CMD_OK:
+                return True
+            # !!! Don't add delay, otherwise status maybe error casued multiple process read data at the same time !!!
         else:
-            print(f'Failed to enable VBUS (timeout {time_out} s)')
             return False
 
     def power_failure_simulation(self, test_time):
+        # --- Protect VBUS when the program terminates. ---
+        def signal_handler(signum, frame):
+            if signum == signal.SIGINT:
+                print('\nCancelled by user.')
+            print('enable VBUS ... ', end='')
+            if self.enable_vbus():
+                print('OK')
+            else:
+                print('Failed')
+
+            print('exit')
+            quit()
+
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGABRT, signal_handler)
+    
+        # --- clear the report ---
+        with open('/opt/pipower5/blackout_simulation.json', 'w') as f:
+            # pass
+            json.dump({}, f, indent=4)
+
+        # --- checkout power status ---
         battery_percentage =  self.read_battery_percentage()
         is_input_plugged_in = self.read_is_input_plugged_in()
 
@@ -245,6 +269,7 @@ class PiPower5(SPC):
             print(f'{warn_emoji} Input must be plugged in')
             return None
 
+        # --- variables ---
         if test_time < 10:
             test_time = 10
         if test_time > 600:
@@ -279,18 +304,25 @@ class PiPower5(SPC):
         output_current_max = 0
         output_power_max = 0
 
-        # -----------------
+        # --- disable VBUS ---
         print('disable VBUS ... ', end='')
-        self.disable_vbus()
-        print('OK')
+        if self.disable_vbus():
+            print('OK')
+        else:
+            print('Failed')
 
-        # -----------------
+        # --- testing ---
         st = time.time()
+        i = 0
         while time.time() - st < test_time:
             #
-            count += 1
-            print(f'\r{count*interval:.1f}/{test_time}s', end='')
-            data_buffer = self.read_all()
+            i += 1
+            print(f'\r{i*interval:.1f}/{test_time}s', end='')
+            try:
+                data_buffer = self.read_all()
+                count += 1
+            except:
+                continue
             #
             bat_voltage = data_buffer['battery_voltage']
             bat_current = -data_buffer['battery_current'] # negative value
@@ -324,12 +356,15 @@ class PiPower5(SPC):
 
             time.sleep(interval)
 
-        # -----------------
+        # --- testing finished, enable VBUS ---
         print() # newline
         print('enable VBUS ... ', end='')
-        self.enable_vbus()
-        print('OK')
-        # -----------------
+        if self.enable_vbus():
+            print('OK')
+        else:
+            print('Failed')
+
+        # --- calculation ---
         bat_voltage_avg = round(bat_voltage_sum / count / 1000, 3)
         bat_current_avg = round(bat_current_sum / count / 1000, 3)
         bat_power_avg = round(bat_power_sum / count, 3)
@@ -385,7 +420,7 @@ class PiPower5(SPC):
             'available_time': available_time,
             'available_time_str': available_time_str,
         }
-        #
+        # --- save result ---
         with open('/opt/pipower5/blackout_simulation.json', 'w') as f:
             json.dump(result, f, indent=4)
         #
