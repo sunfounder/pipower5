@@ -114,7 +114,8 @@ def main():
                 print(f"Set debug level: {debug_level}")
 
     if args.command == "restart":
-        print("This is a placeholder for pipower5 binary help, you should run pipower5 instead")
+        import os
+        os.system('systemctl restart pipower5.service')
         quit()
 
     if args.command == "stop":
