@@ -52,3 +52,11 @@ sudo pipower5 start
 
 sudo /opt/pipower5/venv/bin/python3
 ```
+
+## Setting power-off singal for Pi 3B+ / Pi Zero
+edit `/boot/firmware/config.txt` and add the following line:
+```
+dtoverlay=gpio-poweroff,gpio_pin=26,active_low=1
+gpio=26=op,dh
+```
+
