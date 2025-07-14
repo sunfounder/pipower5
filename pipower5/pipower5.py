@@ -253,9 +253,12 @@ class PiPower5(SPC):
         signal.signal(signal.SIGABRT, signal_handler)
     
         # --- clear the report ---
-        with open('/opt/pipower5/blackout_simulation.json', 'w') as f:
+        file_path = '/opt/pipower5/blackout_simulation'
+        with open(file_path + '.json', 'w') as f:
             # pass
             json.dump({}, f, indent=4)
+        with open(file_path + ".lock", "w") as lock_file:
+            lock_file.write("writing")
 
         # --- checkout power status ---
         battery_percentage =  self.read_battery_percentage()
@@ -423,6 +426,7 @@ class PiPower5(SPC):
         # --- save result ---
         with open('/opt/pipower5/blackout_simulation.json', 'w') as f:
             json.dump(result, f, indent=4)
+        os.remove(file_path + ".lock")        
         #
         return result
     
