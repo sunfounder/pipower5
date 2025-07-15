@@ -43,12 +43,12 @@ SYSTEM_DEFAULT_CONFIG = {
         "battery_critical_shutdown",
         "battery_voltage_critical_shutdown",
     ],
-    "smtp_receiver": "381039379@qq.com",
-    "smtp_sender": "381039379@qq.com",
-    "smtp_password": "bjwkbepuzepebieb",
-    "smtp_server": "smtp.qq.com",
+    "smtp_receiver": "",
+    "smtp_sender": "",
+    "smtp_password": "",
+    "smtp_server": "",
     "smtp_port": 465,
-    "smtp_use_tls": False  # 465端口使用SSL，不需要TLS
+    "smtp_use_tls": False
 }
 
 CUSTOM_PERIPHERALS = {
