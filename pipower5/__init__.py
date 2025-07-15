@@ -1,6 +1,4 @@
 from .version import __version__
-from .pipower5 import PiPower5
-
 
 def update_config_file(config, config_path):
     import json
@@ -61,6 +59,7 @@ def main():
     parser.add_argument('-ichg', '--is-charging', action='store_true', help='Read is charging')
     parser.add_argument('-do', '--default-on', action='store_true', help='Read default on')
     parser.add_argument('-sr', '--shutdown-request', action='store_true', help='Read shutdown request')
+    parser.add_argument('-pb', '--power-btn', action='store_true', help='Read power button')
     parser.add_argument('-cc', '--charging-current', action='store_true', help='Max charging current')
     parser.add_argument('-a', '--all', action='store_true', help='Show all status')
     parser.add_argument('-fv', '--firmware', action='store_true', help='PiPower5 firmware version')
@@ -190,31 +189,17 @@ def main():
         print(f"Default on: {'on' if pipower5.read_default_on() else 'off'}")
     if args.shutdown_request:
         shutdown_request = pipower5.read_shutdown_request()
-        shutdown_request_str = 'None'
-        if shutdown_request == pipower5.SHUTDOWN_REQUEST_NONE:
-            shutdown_request_str = 'None'
-        elif shutdown_request == pipower5.SHUTDOWN_REQUEST_LOW_BATTERY:
-            shutdown_request_str = 'Low battery'
-        elif shutdown_request == pipower5.SHUTDOWN_REQUEST_BUTTON:
-            shutdown_request_str = 'Button'
-        else:
-            shutdown_request_str = 'Unknown'
-        print(f"Shutdown request: {shutdown_request} - {shutdown_request_str}")
+        print(f"Shutdown request: {int(shutdown_request)} - {shutdown_request.name}")
+    if args.power_btn:
+        button_state = pipower5.read_power_btn()
+        print(f"Power button: {int(button_state)} - {button_state.name}")
     if args.charging_current:
         print(f"Max charging current: {pipower5.get_max_charge_current()} mA")
     if args.all:
         data_buffer = pipower5.read_all()
         #
-        shutdown_request_str = 'None'
-        if data_buffer['shutdown_request'] == pipower5.SHUTDOWN_REQUEST_NONE:
-            shutdown_request_str = 'None'
-        elif data_buffer['shutdown_request'] == pipower5.SHUTDOWN_REQUEST_LOW_BATTERY:
-            shutdown_request_str = 'Low battery'
-        elif data_buffer['shutdown_request'] == pipower5.SHUTDOWN_REQUEST_BUTTON:
-            shutdown_request_str = 'Button'
-        else:
-            shutdown_request_str = 'Unknown'
-        #
+        shutdown_request = pipower5.read_shutdown_request()
+        button_state = pipower5.read_power_btn()
         print(f'''
 Input:
     voltage: {data_buffer['input_voltage']} mV
@@ -234,7 +219,8 @@ Battery:
     charging: {data_buffer['is_charging']}
 
 Internal:
-    shutdown request: {data_buffer['shutdown_request']} - {shutdown_request_str}
+    shutdown request: {int(shutdown_request)} - {shutdown_request.name}
+    power button: {int(button_state)} - {button_state.name}
     max charging current: {PiPower5.get_max_charge_current(pipower5)} mA
     default on: {'on' if pipower5.read_default_on() else 'off'}
     shutdown percentage: {pipower5.read_shutdown_percentage()} %
@@ -269,7 +255,7 @@ Internal:
         update_config_file(new_config, config_path)
 
     if args.command == "start":
-        pipower5 = PiPower5(config_path=config_path)
+        pipower5 = PiPower5Manager(config_path=config_path)
         pipower5.set_debug_level(debug_level)
         pipower5.start()
 

@@ -1,24 +1,24 @@
 import time
-import os
 import json
-import signal
-from importlib.resources import files as resource_files
-
+from enum import IntEnum
 from spc.spc import SPC
 
-from .logger import create_get_child_logger
-from .utils import merge_dict, log_error
-from .version import __version__ as pipower5_version
-from .constants import NAME, ID, PERIPHERALS, SYSTEM_DEFAULT_CONFIG, CUSTOM_PERIPHERALS
+class ButtonState(IntEnum):
+    RELEASED = 0
+    CLICK = 1
+    DOUBLE_CLICK = 2
+    LONG_PRESS_2S = 3
+    LONG_PRESS_2S_RELEASED = 4
+    LONG_PRESS_5S = 5
+    LONG_PRESS_5S_RELEASED = 6
 
-__package_name__ = __name__.split('.')[0]
-CONFIG_PATH = str(resource_files(__package_name__).joinpath('config.json'))
-
-get_child_logger = create_get_child_logger('pipower5')
-
+class ShutdownRequest(IntEnum):
+    NONE = 0
+    LOW_BATTERY = 1
+    BUTTON = 2
+    LOW_VOLTAGE = 3
 
 class PiPower5(SPC):
-
     # register address
     REG_PWR_BTN_STATE= 154
     REG_CHARGE_MAX_CURRENT = 155
@@ -38,148 +38,8 @@ class PiPower5(SPC):
     ADV_CMD_OUPUT_EN = 0x03
     ADV_CMD_ENTER_IAP = 0x04
 
-    def __init__(self, config_path=CONFIG_PATH):
-        # --- init SPC ---
+    def __init__(self):
         super().__init__()
-
-        # --- init logger ---
-        self.log = get_child_logger('main')
-        self.log_level = 'INFO'
-
-        # --- init config ---
-        self.config = {
-            'system': SYSTEM_DEFAULT_CONFIG,
-            "peripherals": CUSTOM_PERIPHERALS,
-        }
-        # merge config
-        self.config_path = config_path
-        if os.path.exists(self.config_path):
-            with open(self.config_path, 'r') as f:
-                config = json.load(f)
-                self.config = merge_dict(self.config, config)
-        try:
-            os.chmod(self.config_path, 0o777)
-        except:
-            pass
-        # read shutdown_percentage
-        self.config['system']['shutdown_percentage'] = self.read_shutdown_percentage()
-        with open(self.config_path, 'w') as f:
-            json.dump(self.config, f, indent=4)
-
-        
-        # --- device_info ---
-        self.device_info = {
-            'name': NAME,
-            'id': ID,
-            'peripherals': PERIPHERALS,
-            'version': pipower5_version,
-        }
-
-        #
-        self.pm_dashboard = None
-        self.shutdown_service = None
-
-    def init_service(self):
-        # --- import ---
-        has_pm_dashboard = False
-        try:
-            from pm_dashboard.pm_dashboard import PMDashboard
-            from pm_dashboard.version import __version__ as pm_dashboard_version
-            has_pm_dashboard = True
-        except ImportError:
-            has_pm_dashboard = False
-
-        from .shutdown_service import ShutdownService
-
-        # --- print ---
-        self.log.info(f'PiPower5 {pipower5_version} started')
-        self.log.debug(f"PiPower 5 version: {pipower5_version}")
-        self.log.debug(f"Config: {self.config}")
-        self.log.debug(f"Device info: {self.device_info}")
-        self.log.debug(f"PM_Auto version: {pm_auto_version}")
-        if has_pm_dashboard:
-            self.log.debug(f"PM_Dashboard version: {pm_dashboard_version}")
-
-        # --- init pm_dashboard ---
-        if not has_pm_dashboard:
-            self.pm_dashboard = None
-            self.log.warning('PM Dashboard not found skipping')
-        else:
-            self.pm_dashboard = PMDashboard(device_info=self.device_info,
-                                            database=ID,
-                                            spc_enabled=True if 'spc' in PERIPHERALS else False,
-                                            config=self.config,
-                                            get_logger=get_child_logger)
-            self.pm_dashboard.set_on_config_changed(self.update_config)
-            self.pm_dashboard.set_debug_level(self.log_level)
-        # --- init shutdown_service ---
-        self.shutdown_service = ShutdownService(get_logger=get_child_logger)
-            
-    @log_error
-    def update_extra_peripherals(self):
-        if 'peripherals' not in self.config:
-            return
-        for peripheral in self.config['peripherals']:
-            if peripheral == 'pwm_fan':
-                if self.config['peripherals'][peripheral]:
-                    PERIPHERALS.append("pwm_fan_speed")
-
-    @log_error
-    def set_debug_level(self, level):
-        self.log.setLevel(level)
-        self.log_level = level
-        if self.pm_dashboard:
-            self.pm_dashboard.set_debug_level(level)
-
-    @log_error
-    def update_config(self, config):
-        self.shutdown_service.update_config(config['system'])
-        merge_dict(self.config, config)
-        try:
-            os.chmod(self.config_path, 0o777)
-        except:
-            pass
-        with open(self.config_path, 'w') as f:
-            json.dump(self.config, f, indent=4)
-
-
-    @log_error
-    def start(self):
-        #
-        self.init_service()
-        #
-        signal.signal(signal.SIGINT, self.signal_handler)
-        signal.signal(signal.SIGTERM, self.signal_handler)
-        signal.signal(signal.SIGABRT, self.signal_handler)
-        #
-        # self.shutdown_service.start()
-        if self.pm_dashboard:
-            self.pm_dashboard.start()
-            self.log.info('PmDashboard started')
-        while True:
-            # time.sleep(1)
-            signal.pause()
-
-    @log_error
-    def stop(self):
-        self.log.debug('Stopping PiPower5...')
-        if self.shutdown_service:
-            self.shutdown_service.stop()
-            self.log.debug('Stop Shutdown service.')
-        if self.pm_dashboard:
-            self.log.debug('Stop PM Dashboard.')
-            self.pm_dashboard.stop()
-        # Check if there's any thread still alive
-        import threading
-        for t in threading.enumerate():
-            if t is not threading.main_thread():
-                self.log.warning(f"Thread {t.name} is still alive")
-        quit()
-
-    @log_error
-    def signal_handler(self, signum, frame):
-        self.log.info(f'Received signal "{signal.strsignal(signum)}", cleaning up...')
-        self.stop()
 
     def get_max_charge_current(self):
         return self.i2c.read_byte_data(self.REG_CHARGE_MAX_CURRENT)*100
@@ -353,19 +213,23 @@ class PiPower5(SPC):
             return result
     
     def read_power_btn(self):
-        key_map = {
-            0: 'released',
-            1: 'single_click',
-            2: 'double_click',
-            3: 'long_press_2s',
-            4: 'long_press_2s_released',
-            5: 'long_press_5s',
-            6: 'long_press_5s_released',
-        }
+        '''
+        Read power button state.
+
+        Returns:
+            ButtonState: Power button state.
+        '''
         val = self.i2c.read_byte_data(self.REG_PWR_BTN_STATE)
         self.i2c.write_byte_data(self.REG_WRITE_POWER_BTN_STATE, 0) # reset state
 
-        if val in key_map:
-            return key_map[val]
-        else:
-            return val
+        return ButtonState(val)
+
+    def read_shutdown_request(self):
+        '''
+        Read shutdown request.
+
+        Returns:
+            ShutdownRequest: Shutdown request.
+        '''
+        val = super().read_shutdown_request()
+        return ShutdownRequest(val)

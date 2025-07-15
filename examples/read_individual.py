@@ -21,16 +21,9 @@ def main():
         print('')
         print(f"Internal data:")
         shutdown_request = pipower5.read_shutdown_request()
-        shutdown_request_str = 'None'
-        if shutdown_request == pipower5.SHUTDOWN_REQUEST_NONE:
-            shutdown_request_str = 'None'
-        elif shutdown_request == pipower5.SHUTDOWN_REQUEST_LOW_BATTERY:
-            shutdown_request_str = 'Low battery'
-        elif shutdown_request == pipower5.SHUTDOWN_REQUEST_BUTTON:
-            shutdown_request_str = 'Button'
-        else:
-            shutdown_request_str = 'Unknown'
-        print(f"Shutdown request: {shutdown_request} - {shutdown_request_str}")
+        print(f"Shutdown request: {int(shutdown_request)} - {shutdown_request.name}")
+        button_state = pipower5.read_power_btn()
+        print(f"Button state: {int(button_state)} - {button_state.name}")
         print(f'Board id: {pipower5.read_board_id()}')
         print(f"read_always_on on: {pipower5.read_default_on()}")
         print(f"Shutdown percentage: {pipower5.read_shutdown_percentage()} %")

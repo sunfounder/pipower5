@@ -4,5 +4,6 @@ import time
 power = PiPower5()
 
 while True:
-    print(power.read_power_btn())
+    state = power.read_power_btn()
+    print(f"Button state: {int(state)} {state.name}")
     time.sleep(0.1)
