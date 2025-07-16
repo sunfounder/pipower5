@@ -210,8 +210,8 @@ class PiPower5(SPC):
     def get_max_charge_current(self):
         return self.i2c.read_byte_data(self.REG_CHARGE_MAX_CURRENT)*100
 
-    def disable_vbus(self):
-        time_out = 3 # seconds
+    def disable_input(self):
+        time_out = 5 # seconds
         st = time.time()
         while time.time() - st < time_out:
             self.i2c.write_block_data(self.ADV_CMD_START, [self.ADV_CMD_VBUS_EN, 0, self.ADV_CMD_END])
@@ -222,8 +222,8 @@ class PiPower5(SPC):
         else:
             return False
 
-    def enable_vbus(self):
-        time_out = 3 # seconds
+    def enable_input(self):
+        time_out = 5 # seconds
         st = time.time()
         while time.time() - st < time_out:
             self.i2c.write_block_data(self.ADV_CMD_START, [self.ADV_CMD_VBUS_EN, 1, self.ADV_CMD_END])
@@ -307,67 +307,77 @@ class PiPower5(SPC):
         output_current_max = 0
         output_power_max = 0
 
-        # --- disable VBUS ---
+        # -----------------
         print('disable VBUS ... ', end='')
-        if self.disable_vbus():
-            print('OK')
-        else:
-            print('Failed')
+        self.disable_input()
+        print('OK')
 
-        # --- testing ---
-        st = time.time()
-        i = 0
-        while time.time() - st < test_time:
-            #
-            i += 1
-            print(f'\r{i*interval:.1f}/{test_time}s', end='')
-            try:
-                data_buffer = self.read_all()
+        # -----------------
+        simulation_start = time.time()
+        mah_used = 0.0
+        mah_interval_start = None
+        try:
+            while True:
+                #
                 count += 1
-            except:
-                continue
-            #
-            bat_voltage = data_buffer['battery_voltage']
-            bat_current = -data_buffer['battery_current'] # negative value
-            bat_power = bat_voltage * bat_current / 1000 / 1000 # W
+                every_start = time.time()
+                dt = every_start - simulation_start
+                if dt > test_time:
+                    break
+                # print(f'\r{dt:.0f}/{test_time}s', end='')
+                #
+                data_buffer = self.read_all()
 
-            bat_voltage_sum += bat_voltage
-            bat_current_sum += bat_current
-            bat_power_sum += bat_power
+                bat_voltage = data_buffer['battery_voltage']
+                bat_current = -data_buffer['battery_current'] # negative value
+                bat_power = bat_voltage * bat_current / 1000 / 1000 # W
+                
+                if mah_interval_start is None:
+                    mah_interval_start = time.time()
+                else:
+                    duration = (time.time() - mah_interval_start) / 3600.0
+                    mah = bat_current * duration
+                    mah_used += mah
+                    mah_interval_start = time.time()
 
-            if bat_voltage > bat_voltage_max:
-                bat_voltage_max = bat_voltage
-            if bat_current > bat_current_max:
-                bat_current_max = bat_current
-            if bat_power > bat_power_max:
-                bat_power_max = bat_power
-            #
-            output_voltage = data_buffer['output_voltage']
-            output_current = data_buffer['output_current']
-            output_power = output_voltage * output_current / 1000 / 1000 # W
+                bat_voltage_sum += bat_voltage
+                bat_current_sum += bat_current
+                bat_power_sum += bat_power
 
-            output_voltage_sum += output_voltage
-            output_current_sum += output_current
-            output_power_sum += output_power
+                if bat_voltage > bat_voltage_max:
+                    bat_voltage_max = bat_voltage
+                if bat_current > bat_current_max:
+                    bat_current_max = bat_current
+                if bat_power > bat_power_max:
+                    bat_power_max = bat_power
+                #
+                output_voltage = data_buffer['output_voltage']
+                output_current = data_buffer['output_current']
+                output_power = output_voltage * output_current / 1000 / 1000 # W
 
-            if output_voltage > output_voltage_max:
-                output_voltage_max = output_voltage
-            if output_current > output_current_max:
-                output_current_max = output_current
-            if output_power > output_power_max:
-                output_power_max = output_power
+                output_voltage_sum += output_voltage
+                output_current_sum += output_current
+                output_power_sum += output_power
 
-            time.sleep(interval)
+                if output_voltage > output_voltage_max:
+                    output_voltage_max = output_voltage
+                if output_current > output_current_max:
+                    output_current_max = output_current
+                if output_power > output_power_max:
+                    output_power_max = output_power
 
-        # --- testing finished, enable VBUS ---
-        print() # newline
-        print('enable VBUS ... ', end='')
-        if self.enable_vbus():
+                every_delay = interval - (time.time() - every_start)
+                if every_delay > 0:
+                    time.sleep(every_delay)
+        finally:
+            print() # newline
+            print('enable Input ... ', end='')
+            self.enable_input()
             print('OK')
-        else:
-            print('Failed')
 
-        # --- calculation ---
+        # -----------------
+        bat_mah_used = round(mah_used, 3)
+        bat_percent_used = round(bat_voltage_avg / (self.BAT_MAX_CAPACITY*0.8) * 100, 3)
         bat_voltage_avg = round(bat_voltage_sum / count / 1000, 3)
         bat_current_avg = round(bat_current_sum / count / 1000, 3)
         bat_power_avg = round(bat_power_sum / count, 3)
@@ -405,6 +415,8 @@ class PiPower5(SPC):
 
         #
         result =  {
+            'bat_mah_used': bat_mah_used,
+            'bat_percent_used': bat_percent_used,
             'bat_voltage_avg': bat_voltage_avg,
             'bat_current_avg': bat_current_avg,
             'bat_power_avg': bat_power_avg,
