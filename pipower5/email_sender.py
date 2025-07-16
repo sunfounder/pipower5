@@ -36,8 +36,8 @@ EMAIL_MODES = [
     EmailModes.BATTERY_VOLTAGE_CRITICAL_SHUTDOWN,
 ]
 
-TEMPLATE_DIR = '/opt/pironman5/email_templates/'
-TEMPLATES = TEMPLATE_DIR + 'config.json'
+TEMPLATE_DIR = '/opt/pipower5/email_templates/'
+TEMPLATES = TEMPLATE_DIR + 'email_templates.json'
 
 class EmailSender():
     def __init__(self, config=None):
@@ -49,11 +49,14 @@ class EmailSender():
         if os.path.exists(TEMPLATES):
             with open(TEMPLATES, 'r') as f:
                 self.templates = json.load(f)
+        else:
+            raise FileNotFoundError(f"Email templates file {TEMPLATES} not found")
 
     def send_email(self, mode, data):
         template = self.templates[mode]
         subject = template['subject'].format(**data)
         body_path = template['body_path']
+        body_path = TEMPLATE_DIR + body_path
         with open(body_path, 'r') as f:
             body = f.read()
         body = body.format(**data)
@@ -73,13 +76,13 @@ class EmailSender():
         attachment_path: 附件路径(可选)
         """
 
-        send_email_to = self.config.get("send_email_to", "noreply@localhost")
-        smtp_email = self.config.get("smtp_email", "noreply@localhost")
-        smtp_password = self.config.get("smtp_password", "")
-        smtp_server = self.config.get("smtp_server", "localhost")
-        smtp_port = self.config.get("smtp_port", 25)
-        smtp_use_tls = self.config.get("smtp_use_tls", False)
-        
+        send_email_to = self.config.get("send_email_to", DEFAULT_CONFIG["send_email_to"])
+        smtp_email = self.config.get("smtp_email", DEFAULT_CONFIG["smtp_email"])
+        smtp_password = self.config.get("smtp_password", DEFAULT_CONFIG["smtp_password"])
+        smtp_server = self.config.get("smtp_server", DEFAULT_CONFIG["smtp_server"])
+        smtp_port = self.config.get("smtp_port", DEFAULT_CONFIG["smtp_port"])
+        smtp_use_tls = self.config.get("smtp_use_tls", DEFAULT_CONFIG["smtp_use_tls"])
+
         message = MIMEMultipart()
         message["From"] = smtp_email
         message["To"] = send_email_to
@@ -116,4 +119,4 @@ class EmailSender():
             server.quit()
             return True
         except Exception as e:
-            return False
+            return e
