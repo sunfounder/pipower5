@@ -9,8 +9,8 @@ import json
 
 # 默认配置字典 - 本地SMTP服务
 DEFAULT_CONFIG = {
-    "smtp_sender": "pipower5@localhost",
-    "smtp_receiver": "pipower5@localhost",
+    "smtp_email": "pipower5@localhost",
+    "send_email_to": "pipower5@localhost",
     "smtp_password": "",
     "smtp_server": "localhost",
     "smtp_port": 25,
@@ -73,16 +73,16 @@ class EmailSender():
         attachment_path: 附件路径(可选)
         """
 
-        smtp_receiver = self.config.get("smtp_receiver", "noreply@localhost")
-        smtp_sender = self.config.get("smtp_sender", "noreply@localhost")
+        send_email_to = self.config.get("send_email_to", "noreply@localhost")
+        smtp_email = self.config.get("smtp_email", "noreply@localhost")
         smtp_password = self.config.get("smtp_password", "")
         smtp_server = self.config.get("smtp_server", "localhost")
         smtp_port = self.config.get("smtp_port", 25)
         smtp_use_tls = self.config.get("smtp_use_tls", False)
         
         message = MIMEMultipart()
-        message["From"] = smtp_sender
-        message["To"] = smtp_receiver
+        message["From"] = smtp_email
+        message["To"] = send_email_to
         message["Subject"] = subject
         
         message.attach(MIMEText(body, 'html'))
@@ -109,10 +109,10 @@ class EmailSender():
                     server.starttls()
             
             if smtp_password:
-                server.login(smtp_sender, smtp_password)
+                server.login(smtp_email, smtp_password)
             
             text = message.as_string()
-            server.sendmail(message["From"], smtp_receiver, text)
+            server.sendmail(message["From"], send_email_to, text)
             server.quit()
             return True
         except Exception as e:
