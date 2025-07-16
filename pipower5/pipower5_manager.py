@@ -6,9 +6,9 @@ from importlib.resources import files as resource_files
 from .pipower5_service import PiPower5Service
 
 from .logger import Logger
-from .utils import merge_dict, log_error
+from .utils import merge_dict, log_error, get_varient_id_and_version
 from .version import __version__ as pipower5_version
-from .constants import NAME, ID, PERIPHERALS, SYSTEM_DEFAULT_CONFIG, CUSTOM_PERIPHERALS, get_varient_id_and_version
+from .constants import NAME, ID, PERIPHERALS, SYSTEM_DEFAULT_CONFIG, CUSTOM_PERIPHERALS
 
 __package_name__ = __name__.split('.')[0]
 CONFIG_PATH = str(resource_files(__package_name__).joinpath('config.json'))

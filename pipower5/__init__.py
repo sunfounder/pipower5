@@ -13,9 +13,9 @@ def update_config_file(config, config_path):
 def main():
     import time
     import argparse
-    from .constants import PERIPHERALS, get_varient_id_and_version
+    from .constants import PERIPHERALS
     from .version import __version__
-    from .utils import is_included
+    from .utils import is_included, get_varient_id_and_version
     from importlib.resources import files as resource_files
     from pipower5.email_sender import EmailModes
     import json
@@ -44,6 +44,7 @@ def main():
                         help="Command")
     parser.add_argument("-v", "--version", action="store_true", help="Show version")
     parser.add_argument("-c", "--config", action="store_true", help="Show config")
+    parser.add_argument("-drd", "--database-retention-days", nargs='?', default='', help="Database retention days")
     parser.add_argument("-dl", "--debug-level", nargs='?', default='', choices=['debug', 'info', 'warning', 'error', 'critical'], help="Debug level")
     parser.add_argument("-rd", "--remove-dashboard", action="store_true", help="Remove dashboard")
     parser.add_argument("-cp", "--config-path", nargs='?', default='', help="Config path")
@@ -124,6 +125,20 @@ def main():
                 debug_level = args.debug_level.upper()
                 new_sys_config['debug_level'] = debug_level
                 print(f"Set debug level: {debug_level}")
+
+    # Set database retention days
+    # ----------------------------------------
+    if args.database_retention_days != '':
+        if args.database_retention_days == None:
+            print(f"Database retention days: {current_config['system']['database_retention_days']}")
+        else:
+            try:
+                database_retention_days = int(args.database_retention_days)
+                new_sys_config['database_retention_days'] = database_retention_days
+                print(f"Set database retention days: {database_retention_days}")
+            except ValueError:
+                print(f"Invalid value for database retention days, it should be a number")
+                quit()
 
     if args.command == "stop":
         import os
