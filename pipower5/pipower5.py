@@ -44,7 +44,7 @@ class PiPower5(SPC):
     def get_max_charge_current(self):
         return self.i2c.read_byte_data(self.REG_CHARGE_MAX_CURRENT)*100
 
-    def disable_vbus(self):
+    def disable_input(self):
         time_out = 5 # seconds
         st = time.time()
         while time.time() - st < time_out:
@@ -55,7 +55,7 @@ class PiPower5(SPC):
         else:
             raise Exception(f'Failed to disable VBUS after {time_out} seconds')
 
-    def enable_vbus(self):
+    def enable_input(self):
         time_out = 5 # seconds
         st = time.time()
         while time.time() - st < time_out:
@@ -66,56 +66,72 @@ class PiPower5(SPC):
             raise Exception(f'Failed to enable VBUS after {time_out} seconds')
 
     def power_failure_simulation(self, test_time):
-            if test_time < 10:
-                test_time = 10
-            if test_time > 600:
-                test_time = 600
+        if test_time < 10:
+            test_time = 10
+        if test_time > 600:
+            test_time = 600
 
-            count = 0
-            interval = 0.5
+        count = 0
+        interval = 0.5
 
-            bat_voltage = 0
-            bat_current = 0
-            bat_power = 0
-            bat_voltage_sum = 0
-            bat_current_sum = 0
-            bat_power_sum = 0
-            bat_voltage_avg = 0
-            bat_current_avg = 0
-            bat_power_avg = 0
-            bat_voltage_max = 0
-            bat_current_max = 0
-            bat_power_max = 0
+        bat_voltage = 0
+        bat_current = 0
+        bat_power = 0
+        bat_voltage_sum = 0
+        bat_current_sum = 0
+        bat_power_sum = 0
+        bat_voltage_avg = 0
+        bat_current_avg = 0
+        bat_power_avg = 0
+        bat_voltage_max = 0
+        bat_current_max = 0
+        bat_power_max = 0
 
-            output_voltage = 0
-            output_current = 0
-            output_power = 0
-            output_voltage_sum = 0
-            output_current_sum = 0
-            output_power_sum = 0
-            output_voltage_avg = 0
-            output_current_avg = 0
-            output_power_avg = 0
-            output_voltage_max = 0
-            output_current_max = 0
-            output_power_max = 0
+        output_voltage = 0
+        output_current = 0
+        output_power = 0
+        output_voltage_sum = 0
+        output_current_sum = 0
+        output_power_sum = 0
+        output_voltage_avg = 0
+        output_current_avg = 0
+        output_power_avg = 0
+        output_voltage_max = 0
+        output_current_max = 0
+        output_power_max = 0
 
-            # -----------------
-            print('disable VBUS ... ', end='')
-            self.disable_vbus()
-            print('OK')
+        # -----------------
+        print('disable VBUS ... ', end='')
+        self.disable_input()
+        print('OK')
 
-            # -----------------
-            st = time.time()
-            while time.time() - st < test_time:
+        # -----------------
+        simulation_start = time.time()
+        mah_used = 0.0
+        mah_interval_start = None
+        try:
+            while True:
                 #
                 count += 1
-                print(f'\r{count*interval:.1f}/{test_time}s', end='')
-                data_buffer = self.read_all()
+                every_start = time.time()
+                dt = every_start - simulation_start
+                if dt > test_time:
+                    break
+                # print(f'\r{dt:.0f}/{test_time}s', end='')
                 #
+                data_buffer = self.read_all()
+
                 bat_voltage = data_buffer['battery_voltage']
                 bat_current = -data_buffer['battery_current'] # negative value
                 bat_power = bat_voltage * bat_current / 1000 / 1000 # W
+                
+                if mah_interval_start is None:
+                    mah_interval_start = time.time()
+                else:
+                    duration = (time.time() - mah_interval_start) / 3600.0
+                    mah = bat_current * duration
+                    mah_used += mah
+                    mah_interval_start = time.time()
 
                 bat_voltage_sum += bat_voltage
                 bat_current_sum += bat_current
@@ -143,74 +159,80 @@ class PiPower5(SPC):
                 if output_power > output_power_max:
                     output_power_max = output_power
 
-                time.sleep(interval)
-
-            # -----------------
+                every_delay = interval - (time.time() - every_start)
+                if every_delay > 0:
+                    time.sleep(every_delay)
+        finally:
             print() # newline
-            print('enable VBUS ... ', end='')
-            self.enable_vbus()
+            print('enable Input ... ', end='')
+            self.enable_input()
             print('OK')
-            # -----------------
-            bat_voltage_avg = round(bat_voltage_sum / count / 1000, 3)
-            bat_current_avg = round(bat_current_sum / count / 1000, 3)
-            bat_power_avg = round(bat_power_sum / count, 3)
 
-            output_voltage_avg = round(output_voltage_sum / count / 1000, 3)
-            output_current_avg = round(output_current_sum / count / 1000, 3)
-            output_power_avg = round(output_power_sum / count, 3)
+        # -----------------
+        bat_mah_used = round(mah_used, 3)
+        bat_percent_used = round(bat_voltage_avg / (self.BAT_MAX_CAPACITY*0.8) * 100, 3)
+        bat_voltage_avg = round(bat_voltage_sum / count / 1000, 3)
+        bat_current_avg = round(bat_current_sum / count / 1000, 3)
+        bat_power_avg = round(bat_power_sum / count, 3)
 
-            bat_voltage_max = round(bat_voltage_max / 1000, 3)
-            bat_current_max = round(bat_current_max / 1000, 3)
-            bat_power_max = round(bat_power_max, 3)
+        output_voltage_avg = round(output_voltage_sum / count / 1000, 3)
+        output_current_avg = round(output_current_sum / count / 1000, 3)
+        output_power_avg = round(output_power_sum / count, 3)
 
-            output_voltage_max = round(output_voltage_max / 1000, 3)
-            output_current_max = round(output_current_max / 1000, 3)
-            output_power_max = round(output_power_max, 3)
-            #
-            shutdown_percentage = self.read_shutdown_percentage()
-            #
-            data_buffer = self.read_all()
-            bat_prec = data_buffer['battery_percentage']
-            #
-            available_prec = bat_prec - shutdown_percentage
-            if available_prec < 0:
-                available_prec = 0
-            available_capacity = available_prec * self.BAT_MAX_CAPACITY / 100
-            available_capacity = available_capacity * 0.9 # 20% reserve
-            #
-            available_time = int(available_capacity / 1000 / bat_current_avg * 3600) # sec
-            available_time_hour = int(available_time / 3600)
-            available_time_min = int((available_time % 3600) / 60)
-            available_time_sec = int((available_time % 3600) % 60)
-            available_time_str = f"{available_time_hour} hour " if available_time_hour > 0 else ''
-            # available_time_str += f'{available_time_min} min {available_time_sec} sec'
-            available_time_str += f'{available_time_min} min'
+        bat_voltage_max = round(bat_voltage_max / 1000, 3)
+        bat_current_max = round(bat_current_max / 1000, 3)
+        bat_power_max = round(bat_power_max, 3)
 
-            #
-            result =  {
-                'bat_voltage_avg': bat_voltage_avg,
-                'bat_current_avg': bat_current_avg,
-                'bat_power_avg': bat_power_avg,
-                'bat_voltage_max': bat_voltage_max,
-                'bat_current_max': bat_current_max,
-                'bat_power_max': bat_power_max,
-                'output_voltage_avg': output_voltage_avg,
-                'output_current_avg': output_current_avg,
-                'output_power_avg': output_power_avg,
-                'output_voltage_max': output_voltage_max,
-                'output_current_max': output_current_max,
-                'output_power_max': output_power_max,
-                'available_bat_capacity': available_capacity,
-                'battery_percentage': bat_prec,
-                'shutdown_percentage': shutdown_percentage,
-                'available_time': available_time,
-                'available_time_str': available_time_str,
-            }
-            #
-            with open('/opt/pipower5/blackout_simulation.json', 'w') as f:
-                json.dump(result, f, indent=4)
-            #
-            return result
+        output_voltage_max = round(output_voltage_max / 1000, 3)
+        output_current_max = round(output_current_max / 1000, 3)
+        output_power_max = round(output_power_max, 3)
+        #
+        shutdown_percentage = self.read_shutdown_percentage()
+        #
+        data_buffer = self.read_all()
+        bat_prec = data_buffer['battery_percentage']
+        #
+        available_prec = bat_prec - shutdown_percentage
+        if available_prec < 0:
+            available_prec = 0
+        available_capacity = available_prec * self.BAT_MAX_CAPACITY / 100
+        available_capacity = available_capacity * 0.9 # 20% reserve
+        #
+        available_time = int(available_capacity / 1000 / bat_current_avg * 3600) # sec
+        available_time_hour = int(available_time / 3600)
+        available_time_min = int((available_time % 3600) / 60)
+        available_time_sec = int((available_time % 3600) % 60)
+        available_time_str = f"{available_time_hour} hour " if available_time_hour > 0 else ''
+        # available_time_str += f'{available_time_min} min {available_time_sec} sec'
+        available_time_str += f'{available_time_min} min'
+
+        #
+        result =  {
+            'bat_mah_used': bat_mah_used,
+            'bat_percent_used': bat_percent_used,
+            'bat_voltage_avg': bat_voltage_avg,
+            'bat_current_avg': bat_current_avg,
+            'bat_power_avg': bat_power_avg,
+            'bat_voltage_max': bat_voltage_max,
+            'bat_current_max': bat_current_max,
+            'bat_power_max': bat_power_max,
+            'output_voltage_avg': output_voltage_avg,
+            'output_current_avg': output_current_avg,
+            'output_power_avg': output_power_avg,
+            'output_voltage_max': output_voltage_max,
+            'output_current_max': output_current_max,
+            'output_power_max': output_power_max,
+            'available_bat_capacity': available_capacity,
+            'battery_percentage': bat_prec,
+            'shutdown_percentage': shutdown_percentage,
+            'available_time': available_time,
+            'available_time_str': available_time_str,
+        }
+        #
+        with open('/opt/pipower5/blackout_simulation.json', 'w') as f:
+            json.dump(result, f, indent=4)
+        #
+        return result
     
     def read_power_btn(self):
         '''

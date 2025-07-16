@@ -344,6 +344,8 @@ Internal:
         print(f"Blackout simulation for {test_time} seconds")
         report = pipower5.power_failure_simulation(test_time)
         print(f'report:')
+        print(f'  battery mah used : {report["bat_mah_used"]:.3f} mAh')
+        print(f'  battery percent used : {report["bat_percent_used"]:.3f} %')
         print(f'  average battery voltage : {report["bat_voltage_avg"]:.3f} V')
         print(f'  average battery current : {report["bat_current_avg"]:.3f} A')
         print(f'  average battery power : {report["bat_power_avg"]:.3f} W')
