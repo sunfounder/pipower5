@@ -12,7 +12,6 @@ def update_config_file(config, config_path):
 
 def main():
     import time
-    from .pipower5 import PiPower5
     import argparse
     from .constants import PERIPHERALS, get_varient_id_and_version
     from .version import __version__
@@ -45,13 +44,13 @@ def main():
                         help="Command")
     parser.add_argument("-v", "--version", action="store_true", help="Show version")
     parser.add_argument("-c", "--config", action="store_true", help="Show config")
-    parser.add_argument("-dl", "--debug-level", choices=['debug', 'info', 'warning', 'error', 'critical'], help="Debug level")
-    parser.add_argument("--background", nargs='?', default='', help="Run in background")
+    parser.add_argument("-dl", "--debug-level", nargs='?', default='', choices=['debug', 'info', 'warning', 'error', 'critical'], help="Debug level")
     parser.add_argument("-rd", "--remove-dashboard", action="store_true", help="Remove dashboard")
     parser.add_argument("-cp", "--config-path", nargs='?', default='', help="Config path")
 
     parser.add_argument('-sp', '--shutdown-percentage', nargs='?', default='', help='Set shutdown percentage, leave empty to read')
     parser.add_argument('-iv', '--input-voltage', action='store_true', help='Read input voltage')
+    parser.add_argument('-ic', '--input-current', action='store_true', help='Read input current')
     parser.add_argument('-ov', '--output-voltage', action='store_true', help='Read output voltage')
     parser.add_argument('-oc', '--output-current', action='store_true', help='Read output current')
     parser.add_argument('-bv', '--battery-voltage', action='store_true', help='Read battery voltage')
@@ -112,14 +111,24 @@ def main():
         print(json.dumps(current_config, indent=4))
         quit()
 
-    if args.debug_level != None:
-        debug_level = args.debug_level.upper()
+    # get or set debug level
+    # ----------------------------------------
+    if args.debug_level != '':
+        if args.debug_level == None:
+            print(f"Debug level: {current_config['system']['debug_level']}")
+        else:
+            if args.debug_level.lower() not in ['debug', 'info', 'warning', 'error', 'critical']:
+                print(f"Invalid debug level, it should be one of: debug, info, warning, error, critical")
+                quit()
+            else:
+                debug_level = args.debug_level.upper()
+                new_sys_config['debug_level'] = debug_level
+                print(f"Set debug level: {debug_level}")
 
     if args.command == "stop":
         import os
         os.system('kill -9 $(pgrep -f "pipower5 start")')
         os.system('kill -9 $(pgrep -f "pipower5-service start")')
-        pipower5.stop()
         quit()
 
     if args.version:
@@ -169,6 +178,8 @@ def main():
     
     if args.input_voltage:
         print(f"Input voltage: {pipower5.read_input_voltage()} mV")
+    if args.input_current:
+        print(f"Input current: {pipower5.read_input_current()} mA")
     if args.output_voltage:
         print(f"Output voltage: {pipower5.read_output_voltage()} mV")
     if args.output_current:

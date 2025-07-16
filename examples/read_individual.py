@@ -28,6 +28,7 @@ def main():
         print(f"read_always_on on: {pipower5.read_default_on()}")
         print(f"Shutdown percentage: {pipower5.read_shutdown_percentage()} %")
 
+
         print('')
         time.sleep(1)
 

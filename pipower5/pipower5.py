@@ -49,23 +49,64 @@ class PiPower5(SPC):
         st = time.time()
         while time.time() - st < time_out:
             self.i2c.write_block_data(self.ADV_CMD_START, [self.ADV_CMD_VBUS_EN, 0, self.ADV_CMD_END])
-            if self.read_input_voltage() == 0:
-                break
-            time.sleep(0.5)
+            status = self.i2c.read_byte()
+            if status == self.ADV_CMD_OK:
+                return True
+            # !!! Don't add delay, otherwise status maybe error casued multiple process read data at the same time !!!
         else:
-            raise Exception(f'Failed to disable VBUS after {time_out} seconds')
+            return False
 
     def enable_input(self):
         time_out = 5 # seconds
         st = time.time()
         while time.time() - st < time_out:
             self.i2c.write_block_data(self.ADV_CMD_START, [self.ADV_CMD_VBUS_EN, 1, self.ADV_CMD_END])
-            if self.read_input_voltage() > 0:
-                break
+            status = self.i2c.read_byte()
+            if status == self.ADV_CMD_OK:
+                return True
+            # !!! Don't add delay, otherwise status maybe error casued multiple process read data at the same time !!!
         else:
-            raise Exception(f'Failed to enable VBUS after {time_out} seconds')
+            return False
 
     def power_failure_simulation(self, test_time):
+        # --- Protect VBUS when the program terminates. ---
+        def signal_handler(signum, frame):
+            if signum == signal.SIGINT:
+                print('\nCancelled by user.')
+            print('enable VBUS ... ', end='')
+            if self.enable_vbus():
+                print('OK')
+            else:
+                print('Failed')
+
+            print('exit')
+            quit()
+
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGABRT, signal_handler)
+    
+        # --- clear the report ---
+        file_path = '/opt/pipower5/blackout_simulation'
+        with open(file_path + '.json', 'w') as f:
+            # pass
+            json.dump({}, f, indent=4)
+        with open(file_path + ".lock", "w") as lock_file:
+            lock_file.write("writing")
+
+        # --- checkout power status ---
+        battery_percentage =  self.read_battery_percentage()
+        is_input_plugged_in = self.read_is_input_plugged_in()
+
+        print(f'battery: {battery_percentage}%, input: {"plugged in" if is_input_plugged_in else "unplugged"}')
+
+        if battery_percentage < 80 or not is_input_plugged_in:
+            warn_emoji = '\U000026A0'
+            print(f'{warn_emoji} Battery must be greater than 80%')
+            print(f'{warn_emoji} Input must be plugged in')
+            return None
+
+        # --- variables ---
         if test_time < 10:
             test_time = 10
         if test_time > 600:
@@ -228,9 +269,10 @@ class PiPower5(SPC):
             'available_time': available_time,
             'available_time_str': available_time_str,
         }
-        #
+        # --- save result ---
         with open('/opt/pipower5/blackout_simulation.json', 'w') as f:
             json.dump(result, f, indent=4)
+        os.remove(file_path + ".lock")        
         #
         return result
     

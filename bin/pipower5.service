@@ -5,8 +5,7 @@ Description=pipower5 service
 After=multi-user.target
 
 [Service]
-Type=forking
-# WorkingDirectory=/opt/pipower5
+Type=simple
 ExecStart=/usr/local/bin/pipower5 start
 # PrivateTmp=False
 

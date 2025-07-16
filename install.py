@@ -71,7 +71,7 @@ settings = {
     # - Set service filenames
     'service_files': ['pipower5.service'],
     # - Set bin files
-    'bin_files': ['pipower5'],
+    'bin_files': [],
     # - Copy device tree overlay to /boot/overlays
     'dtoverlays': ['sunfounder-pipower5.dtbo'],
 }
@@ -91,7 +91,7 @@ dashboard_settings = {
         'lsof', # for pm_dashboard
     ],
     'python_source': {
-        'pm_dashboard': 'git+https://github.com/sunfounder/pm_dashboard.git@1.3.6',
+        'pm_dashboard': 'git+https://github.com/sunfounder/pm_dashboard.git@1.3.9',
         'sf_rpi_status': 'git+https://github.com/sunfounder/sf_rpi_status.git@1.1.4',
     },
 }
