@@ -18,12 +18,14 @@ def main():
     from .version import __version__
     from .utils import is_included
     from importlib.resources import files as resource_files
+    from pipower5.email_sender import EmailModes
     import json
     import sys
     from os import path
 
     TRUE_LIST = ['true', 'True', 'TRUE', '1', 'on', 'On', 'ON']
     FALSE_LIST = ['false', 'False', 'FALSE', '0', 'off', 'Off', 'OFF']
+    AVAILABLE_EMAIL_MODES = [i.value for i in EmailModes]
 
     __package_name__ = __name__.split('.')[0]
     CONFIG_PATH = str(resource_files(__package_name__).joinpath('config.json'))
@@ -64,6 +66,13 @@ def main():
     parser.add_argument('-a', '--all', action='store_true', help='Show all status')
     parser.add_argument('-fv', '--firmware', action='store_true', help='PiPower5 firmware version')
     parser.add_argument('-pfs', '--power-failure-simulation', nargs='?', default='', help='Power failure simulation')
+    parser.add_argument("-seo", '--send-email-on', nargs='?', default=[], help=f"Send email on: {AVAILABLE_EMAIL_MODES}")
+    parser.add_argument("-set", '--send-email-to', nargs='?', default='', help="Email address to send email to")
+    parser.add_argument("-ss", '--smtp-server', nargs='?', default='', help="SMTP server")
+    parser.add_argument("-sp", '--smtp-port', nargs='?', default='', help="SMTP port")
+    parser.add_argument("-se", '--smtp-email', nargs='?', default='', help="SMTP email")
+    parser.add_argument("-spw", '--smtp-password', nargs='?', default='', help="SMTP password")
+    parser.add_argument("-ssu", '--smtp-use-tls', nargs='?', default='', help="SMTP use tls")
 
     if is_included(PERIPHERALS, "temperature_unit"):
         parser.add_argument("-u", "--temperature-unit", choices=["C", "F"], nargs='?', default='', help="Temperature unit")
@@ -258,6 +267,70 @@ Internal:
         pipower5 = PiPower5Manager(config_path=config_path)
         pipower5.set_debug_level(debug_level)
         pipower5.start()
+
+    # send email on
+    if args.send_email_on != []:
+        if args.send_email_on == None:
+            send_email_on = [f' - {mode}' for mode in current_config['system']['send_email_on']]
+            send_email_on = '\n'.join(send_email_on)
+            print("Send email on:")
+            print(send_email_on)
+        else:
+            send_email_on = [p.replace(',', '') for p in args.send_email_on]
+            for mode in send_email_on:
+                if mode not in AVAILABLE_EMAIL_MODES:
+                    print(f"Invalid value for Send email on: '{mode}', it should be {', '.join(AVAILABLE_EMAIL_MODES)}")
+                    quit()
+            new_sys_config['send_email_on'] = send_email_on
+            print(f"Set Send email on: {send_email_on}")
+    # send email to
+    if args.send_email_to != '':
+        if args.send_email_to == None:
+            print(f"Send email to: {current_config['system']['send_email_to']}")
+        else:
+            new_sys_config['send_email_to'] = args.send_email_to
+            print(f"Set Send email to: {args.send_email_to}")
+    # SMTP server
+    if args.smtp_server != '':
+        if args.smtp_server == None:
+            print(f"SMTP server: {current_config['system']['smtp_server']}")
+        else:
+            new_sys_config['smtp_server'] = args.smtp_server
+            print(f"Set SMTP server: {args.smtp_server}")
+    # SMTP port
+    if args.smtp_port != '':
+        if args.smtp_port == None:
+            print(f"SMTP port: {current_config['system']['smtp_port']}")
+        else:
+            new_sys_config['smtp_port'] = args.smtp_port
+            print(f"Set SMTP port: {args.smtp_port}")
+    # SMTP user
+    if args.smtp_email != '':
+        if args.smtp_email == None:
+            print(f"SMTP user: {current_config['system']['smtp_email']}")
+        else:
+            new_sys_config['smtp_email'] = args.smtp_email
+            print(f"Set SMTP user: {args.smtp_email}")
+    # SMTP password
+    if args.smtp_password != '':
+        if args.smtp_password == None:
+            print(f"SMTP password: {current_config['system']['smtp_password']}")
+        else:
+            new_sys_config['smtp_password'] = args.smtp_password
+            print(f"Set SMTP password: {args.smtp_password}")
+    # SMTP use TLS
+    if args.smtp_use_tls != '':
+        if args.smtp_use_tls == None:
+            print(f"SMTP use TLS: {current_config['system']['smtp_use_tls']}")
+        else:
+            if args.smtp_use_tls in TRUE_LIST:
+                args.smtp_use_tls = True
+            elif args.smtp_use_tls in FALSE_LIST:
+                args.smtp_use_tls = False
+            else:
+                print(f"Invalid value for SMTP use TLS, it should be in {', '.join(TRUE_LIST + FALSE_LIST)}")
+                quit()
+            print(f"Set SMTP use TLS: {args.smtp_use_tls}")
 
     if args.power_failure_simulation != '':
         test_time = 60 # seconds
