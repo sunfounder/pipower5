@@ -224,7 +224,13 @@ class PiPower5Service():
 
             if battery_percentage < shutdown_percentage + 10 and \
                 EmailModes.LOW_BATTERY in self.send_email_on:
-                self.email_sender.send_email(EmailModes.LOW_BATTERY, data)
+                if EmailModes.LOW_BATTERY in self.send_email_on:
+                    self.log.debug("Sending low battery email")
+                    success = self.email_sender.send_email(EmailModes.LOW_BATTERY, data)
+                    if success:
+                        self.log.debug("Low battery email sent successfully")
+                    else:
+                        self.log.error("Failed to send low battery email")
                 if self.__on_low_power__:
                     self.__on_low_power__(data)
 
@@ -232,10 +238,20 @@ class PiPower5Service():
             if power_source == 'battery':
                 if is_input_plugged_in:
                     if EmailModes.POWER_INSUFFICIENT in self.send_email_on:
-                        self.email_sender.send_email(EmailModes.POWER_INSUFFICIENT, data)
+                        self.log.debug("Sending power insufficient email")
+                        success = self.email_sender.send_email(EmailModes.POWER_INSUFFICIENT, data)
+                        if success:
+                            self.log.debug("Power insufficient email sent successfully")
+                        else:
+                            self.log.error("Failed to send power insufficient email")
                     else:
                         if EmailModes.BATTERY_ACTIVATED in self.send_email_on:
-                            self.email_sender.send_email(EmailModes.BATTERY_ACTIVATED, data)
+                            self.log.debug("Sending battery activated email")
+                            success = self.email_sender.send_email(EmailModes.BATTERY_ACTIVATED, data)
+                            if success:
+                                self.log.debug("Battery activated email sent successfully")
+                            else:
+                                self.log.error("Failed to send battery activated email")
                     
                     if self.__on_power_insufficient__:
                         self.__on_power_insufficient__(data)
@@ -244,7 +260,12 @@ class PiPower5Service():
                             self.__on_battery_activated__(data)
                 else:
                     if EmailModes.BATTERY_ACTIVATED in self.send_email_on:
-                        self.email_sender.send_email(EmailModes.BATTERY_ACTIVATED, data)
+                        self.log.debug("Sending battery activated email")
+                        success = self.email_sender.send_email(EmailModes.BATTERY_ACTIVATED, data)
+                        if success:
+                            self.log.debug("Battery activated email sent successfully")
+                        else:
+                            self.log.error("Failed to send battery activated email")
                     else:
                         if self.__on_battery_activated__:
                             self.__on_battery_activated__(data)
@@ -269,13 +290,23 @@ class PiPower5Service():
                 if is_input_plugged_in:
                     self.log.info("Input plugged in")
                     if 'power_restored' in self.send_email_on:
-                        self.email_sender.send_email(EmailModes.POWER_RESTORED, {})
+                        self.log.debug("Sending power restored email")
+                        success = self.email_sender.send_email(EmailModes.POWER_RESTORED, {})
+                        if success:
+                            self.log.debug("Power restored email sent successfully")
+                        else:
+                            self.log.error("Failed to send power restored email")
                     if self.__on_input_plugged_in__:
                         self.__on_input_plugged_in__(data)
                 else:
                     self.log.info("Input unplugged")
                     if 'power_disconnected' in self.send_email_on:
-                        self.email_sender.send_email(EmailModes.POWER_DISCONNECTED, {})
+                        self.log.debug("Sending power disconnected email")
+                        success = self.email_sender.send_email(EmailModes.POWER_DISCONNECTED, {})
+                        if success:
+                            self.log.debug("Power disconnected email sent successfully")
+                        else:
+                            self.log.error("Failed to send power disconnected email")
                     if self.__on_input_unplugged__:
                         self.__on_input_unplugged__(data)
                 self.last_is_input_plugged_in = is_input_plugged_in
