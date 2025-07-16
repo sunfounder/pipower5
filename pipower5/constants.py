@@ -11,6 +11,7 @@ PERIPHERALS = [
     "spc",
     "cpu_temperature",
     "gpu_temperature",
+    "pwm_fan_speed",
     "temperature_unit",
     "input_voltage",
     "is_input_plugged_in",
@@ -32,10 +33,9 @@ SYSTEM_DEFAULT_CONFIG = {
     'enable_history': True,
     'temperature_unit': 'C',
     'data_interval': 1,
+    'database_retention_days': 30,
     'power-failure-simulation': True,
     'shutdown_percentage': 10,
 }
 
-CUSTOM_PERIPHERALS = {
-    "pwm_fan": False
-}
+CUSTOM_PERIPHERALS = {}
