@@ -7,8 +7,7 @@ After=multi-user.target
 [Service]
 Type=forking
 # WorkingDirectory=/opt/pipower5
-ExecStart=/usr/local/bin/pipower5 start --background --debug-level=debug
-ExecStop=/usr/local/bin/pipower5 stop
+ExecStart=/usr/local/bin/pipower5 start
 # PrivateTmp=False
 
 [Install]

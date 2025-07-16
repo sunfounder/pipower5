@@ -8,10 +8,11 @@ from .pipower5_service import PiPower5Service
 from .logger import Logger
 from .utils import merge_dict, log_error
 from .version import __version__ as pipower5_version
-from .constants import NAME, ID, PERIPHERALS, SYSTEM_DEFAULT_CONFIG, CUSTOM_PERIPHERALS
+from .constants import NAME, ID, PERIPHERALS, SYSTEM_DEFAULT_CONFIG, CUSTOM_PERIPHERALS, get_varient_id_and_version
 
 __package_name__ = __name__.split('.')[0]
 CONFIG_PATH = str(resource_files(__package_name__).joinpath('config.json'))
+_, BOARD_VERSION = get_varient_id_and_version()
 
 class PiPower5Manager():
 
@@ -36,6 +37,7 @@ class PiPower5Manager():
         except:
             pass
         
+
         # --- device_info ---
         self.device_info = {
             'name': NAME,
@@ -59,6 +61,7 @@ class PiPower5Manager():
 
         # --- print ---
         self.log.info(f'PiPower5 {pipower5_version} started')
+        self.log.info(f"Board version: {BOARD_VERSION}")
         self.log.debug(f"PiPower 5 version: {pipower5_version}")
         self.log.debug(f"Config: {self.config}")
         self.log.debug(f"Device info: {self.device_info}")

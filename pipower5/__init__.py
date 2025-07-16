@@ -14,7 +14,7 @@ def main():
     import time
     from .pipower5 import PiPower5
     import argparse
-    from .constants import PERIPHERALS
+    from .constants import PERIPHERALS, get_varient_id_and_version
     from .version import __version__
     from .utils import is_included
     from importlib.resources import files as resource_files
@@ -26,6 +26,7 @@ def main():
     TRUE_LIST = ['true', 'True', 'TRUE', '1', 'on', 'On', 'ON']
     FALSE_LIST = ['false', 'False', 'FALSE', '0', 'off', 'Off', 'OFF']
     AVAILABLE_EMAIL_MODES = [i.value for i in EmailModes]
+    _, BOARD_VERSION = get_varient_id_and_version()
 
     __package_name__ = __name__.split('.')[0]
     CONFIG_PATH = str(resource_files(__package_name__).joinpath('config.json'))
@@ -39,7 +40,7 @@ def main():
     pipower5 = PiPower5()
     parser = argparse.ArgumentParser(prog='pipower5', description='PiPower 5')
     parser.add_argument("command",
-                        choices=["start", "restart", "stop"],
+                        choices=["start", "stop"],
                         nargs="?",
                         help="Command")
     parser.add_argument("-v", "--version", action="store_true", help="Show version")
@@ -54,6 +55,9 @@ def main():
     parser.add_argument('-ov', '--output-voltage', action='store_true', help='Read output voltage')
     parser.add_argument('-oc', '--output-current', action='store_true', help='Read output current')
     parser.add_argument('-bv', '--battery-voltage', action='store_true', help='Read battery voltage')
+    if BOARD_VERSION == '50':
+        parser.add_argument('-b1v', '--battery-1-voltage', action='store_true', help='Read battery 1 voltage')
+        parser.add_argument('-b2v', '--battery-2-voltage', action='store_true', help='Read battery 2 voltage')
     parser.add_argument('-bc', '--battery-current', action='store_true', help='Read battery current')
     parser.add_argument('-bp', '--battery-percentage', action='store_true', help='Read battery percentage')
     parser.add_argument('-bs', '--battery-source', action='store_true', help='Read battery source')
@@ -69,7 +73,7 @@ def main():
     parser.add_argument("-seo", '--send-email-on', nargs='?', default=[], help=f"Send email on: {AVAILABLE_EMAIL_MODES}")
     parser.add_argument("-set", '--send-email-to', nargs='?', default='', help="Email address to send email to")
     parser.add_argument("-ss", '--smtp-server', nargs='?', default='', help="SMTP server")
-    parser.add_argument("-sp", '--smtp-port', nargs='?', default='', help="SMTP port")
+    parser.add_argument("-smp", '--smtp-port', nargs='?', default='', help="SMTP port")
     parser.add_argument("-se", '--smtp-email', nargs='?', default='', help="SMTP email")
     parser.add_argument("-spw", '--smtp-password', nargs='?', default='', help="SMTP password")
     parser.add_argument("-ssu", '--smtp-use-tls', nargs='?', default='', help="SMTP use tls")
@@ -111,10 +115,6 @@ def main():
     if args.debug_level != None:
         debug_level = args.debug_level.upper()
 
-    if args.command == "restart":
-        print("This is a placeholder for pipower5 binary help, you should run pipower5 instead")
-        quit()
-
     if args.command == "stop":
         import os
         os.system('kill -9 $(pgrep -f "pipower5 start")')
@@ -126,10 +126,6 @@ def main():
         print(__version__)
         quit()
 
-    if args.background != '':
-        print("This is a placeholder for pipower5 binary help, you should run pipower5 instead")
-        quit()
-    
     if args.remove_dashboard:
         import os
         print("Remove Dashboard")
@@ -179,10 +175,11 @@ def main():
         print(f"Output current: {pipower5.read_output_current()} mA")
     if args.battery_voltage:
         print(f"Battery voltage: {pipower5.read_battery_voltage()} mV")
-    if args.battery_1_voltage:
-        print(f"Battery 1 voltage: {pipower5.read_battery_1_voltage()} mV")
-    if args.battery_2_voltage:
-        print(f"Battery 2 voltage: {pipower5.read_battery_2_voltage()} mV")
+    if BOARD_VERSION == '50':
+        if args.battery_1_voltage:
+            print(f"Battery 1 voltage: {pipower5.read_battery_1_voltage()} mV")
+        if args.battery_2_voltage:
+            print(f"Battery 2 voltage: {pipower5.read_battery_2_voltage()} mV")
     if args.battery_current:
         print(f"Battery current: {pipower5.read_battery_current()} mA")
     if args.battery_percentage:
@@ -264,6 +261,7 @@ Internal:
         update_config_file(new_config, config_path)
 
     if args.command == "start":
+        from pipower5.pipower5_manager import PiPower5Manager
         pipower5 = PiPower5Manager(config_path=config_path)
         pipower5.set_debug_level(debug_level)
         pipower5.start()
