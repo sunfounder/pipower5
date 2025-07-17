@@ -200,14 +200,14 @@ class PiPower5Service():
     @log_error
     def send_email(self, mode, data):
         if not self.email_sender:
-            return "Email sender not ready"
+            self.log.debug("Email sender not ready")
         if mode not in self.send_email_on:
-            return f"Email {mode} not in send_email_on"
+            self.log.debug(f"Email {mode} not in send_email_on")
         status = self.email_sender.send_preset_email(mode, data)
         if status == True:
-            return f"Email {mode} sent successfully"
+            self.log.debug(f"Email {mode} sent successfully")
         else:
-            return f"Failed to send email {mode}: {status}"
+            self.log.error(f"Failed to send email {mode}: {status}")
 
     @log_error
     def call(self, callback, data):
