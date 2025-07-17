@@ -73,8 +73,8 @@ class PiPower5(SPC):
         def signal_handler(signum, frame):
             if signum == signal.SIGINT:
                 print('\nCancelled by user.')
-            print('enable VBUS ... ', end='')
-            if self.enable_vbus():
+            print('enable input ... ', end='')
+            if self.enable_input():
                 print('OK')
             else:
                 print('Failed')
@@ -142,7 +142,7 @@ class PiPower5(SPC):
         output_power_max = 0
 
         # -----------------
-        print('disable VBUS ... ', end='')
+        print('disable input ... ', end='')
         self.disable_input()
         print('OK')
 

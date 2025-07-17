@@ -80,7 +80,6 @@ def main():
 
     if is_included(PERIPHERALS, "temperature_unit"):
         parser.add_argument("-u", "--temperature-unit", choices=["C", "F"], nargs='?', default='', help="Temperature unit")
-    parser.add_argument('-ef', '--enable-pwm-fan', nargs='?', default='', help='Enable PWM fan, if you have one connected')
 
     args = parser.parse_args()
 
@@ -259,24 +258,6 @@ Internal:
 ''')
     if args.firmware:
         print(f"Pipower5 firmware version: {pipower5.read_firmware_version()}")
-
-    if args.enable_pwm_fan != '':
-        if args.enable_pwm_fan == None:
-            if 'peripherals' not in current_config:
-                enabled = "disabled"
-            else:
-                enabled = "enabled" if current_config['peripherals']['pwm_fan'] else 'disabled'
-            print(f"PWM Fan {enabled}")
-        else:
-            if args.enable_pwm_fan in TRUE_LIST:
-                new_peripheral_config['pwm_fan'] = True
-                print(f"Set PWM Fan enabled")
-            elif args.enable_pwm_fan in FALSE_LIST:
-                new_peripheral_config['pwm_fan'] = False
-                print(f"Set PWM Fan disabled")
-            else:
-                print(f"Invalid value for PWM Fan, it should be true or false")
-                quit()
 
     if len(new_sys_config) > 0 or len(new_peripheral_config) > 0:
         new_config = {
