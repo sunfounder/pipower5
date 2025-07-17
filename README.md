@@ -36,10 +36,10 @@ git clone https://github.com/sunfounder/sf_rpi_status.git
 Make adjustments, and manually install the package
 
 ```bash
-cd ~/pipower5 && sudo rm -rf build pipower5.egg-info && sudo /opt/pipower5/venv/bin/pip3 uninstall pipower5 -y && sudo /opt/pipower5/venv/bin/pip3 install .
-cd ~/pm_dashboard && sudo rm -rf build pm_dashboard.egg-info && sudo /opt/pipower5/venv/bin/pip3 uninstall pm_dashboard -y && sudo /opt/pipower5/venv/bin/pip3 install .
-cd ~/pm_auto && sudo rm -rf build pm_auto.egg-info && sudo /opt/pipower5/venv/bin/pip3 uninstall pm_auto -y && sudo /opt/pipower5/venv/bin/pip3 install .
-cd ~/sf_rpi_status && sudo rm -rf build sf_rpi_status.egg-info && sudo /opt/pipower5/venv/bin/pip3 uninstall sf_rpi_status -y && sudo /opt/pipower5/venv/bin/pip3 install .
+cd ~/pipower5 && sudo rm -rf build pipower5.egg-info && sudo /opt/pipower5/venv/bin/pip3 uninstall pipower5 -y && sudo /opt/pipower5/venv/bin/pip3 install . --no-build-isolation
+cd ~/pm_dashboard && sudo rm -rf build pm_dashboard.egg-info && sudo /opt/pipower5/venv/bin/pip3 uninstall pm_dashboard -y && sudo /opt/pipower5/venv/bin/pip3 install . --no-build-isolation
+cd ~/pm_auto && sudo rm -rf build pm_auto.egg-info && sudo /opt/pipower5/venv/bin/pip3 uninstall pm_auto -y && sudo /opt/pipower5/venv/bin/pip3 install . --no-build-isolation
+cd ~/sf_rpi_status && sudo rm -rf build sf_rpi_status.egg-info && sudo /opt/pipower5/venv/bin/pip3 uninstall sf_rpi_status -y && sudo /opt/pipower5/venv/bin/pip3 install . --no-build-isolation
 ```
 
 Start/stop the service for debug

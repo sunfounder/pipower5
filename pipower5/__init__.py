@@ -13,11 +13,14 @@ def update_config_file(config, config_path):
 def main():
     import time
     import argparse
+
     from .constants import PERIPHERALS
     from .version import __version__
     from .utils import is_included, get_varient_id_and_version
+    from .email_sender import EmailModes
+    from .pipower5 import PiPower5
+
     from importlib.resources import files as resource_files
-    from pipower5.email_sender import EmailModes
     import json
     import sys
     from os import path
@@ -252,7 +255,7 @@ Battery:
 Internal:
     shutdown request: {int(shutdown_request)} - {shutdown_request.name}
     power button: {int(button_state)} - {button_state.name}
-    max charging current: {PiPower5.get_max_charge_current(pipower5)} mA
+    max charging current: {pipower5.get_max_charge_current()} mA
     default on: {'on' if pipower5.read_default_on() else 'off'}
     shutdown percentage: {pipower5.read_shutdown_percentage()} %
 ''')

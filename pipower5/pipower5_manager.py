@@ -18,7 +18,7 @@ class PiPower5Manager():
 
     def __init__(self, config_path=CONFIG_PATH):
         # --- init logger ---
-        self.log = Logger('PiPower5')
+        self.log = Logger('pipower5')
         self.log_level = 'INFO'
 
         # --- init config ---
@@ -77,11 +77,11 @@ class PiPower5Manager():
                                             database=ID,
                                             spc_enabled=True if 'spc' in PERIPHERALS else False,
                                             config=self.config,
-                                            log=log)
+                                            log=self.log)
             self.pm_dashboard.set_on_config_changed(self.update_config)
             self.pm_dashboard.set_debug_level(self.log_level)
         # --- init service ---
-        self.service = PiPower5Service(config=self.config, log=log)
+        self.service = PiPower5Service(config=self.config, log=self.log)
         self.service.set_on_button_shutdown(self.handle_shutdown)
         self.service.set_on_low_battery_shutdown(self.handle_shutdown)
         self.service.set_on_low_voltage_shutdown(self.handle_shutdown)

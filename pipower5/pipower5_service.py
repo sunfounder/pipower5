@@ -4,6 +4,7 @@ from .pipower5 import PiPower5, ButtonState, ShutdownRequest
 from .utils import log_error
 from .email_sender import EmailSender, EmailModes
 from .battery_device import BatteryDevice
+import threading
 
 class PiPower5Service():
     @log_error
@@ -27,6 +28,8 @@ class PiPower5Service():
         self.interval = 1
         self.task = None
         self.running = False
+        self.loop = None
+        self.loop_thread = None
 
         self.last_shutdown_request = None
         self.last_is_input_plugged_in = None
@@ -220,7 +223,7 @@ class PiPower5Service():
             callback(data)
 
     @log_error
-    async def loop(self):
+    async def main(self):
         while self.running:
             data = self.pipower5.read_all()
             self.call(self.__on_data_changed__, data)
@@ -292,11 +295,29 @@ class PiPower5Service():
             return
         
         self.running = True
-        # 获取当前事件循环
-        loop = asyncio.get_running_loop()
+        # 创建新的事件循环
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
+        # 在新线程中运行事件循环
+        self.loop_thread = threading.Thread(target=self._run_loop, daemon=True)
+        self.loop_thread.start()
         # 在事件循环中创建并运行任务
-        self.task = loop.create_task(self.loop())
-        self.log.info("Shutdown service started")
+        self.loop.call_soon_threadsafe(self._start_loop_task)
+        self.log.info("PiPower5 service started")
+
+    def _run_loop(self):
+        """在线程中运行事件循环"""
+        try:
+            self.loop.run_forever()
+        except Exception as e:
+            self.log.error(f"Event loop error: {e}")
+        finally:
+            self.loop.close()
+            self.log.info("Event loop closed")
+
+    def _start_loop_task(self):
+        """在事件循环中创建并启动任务"""
+        self.task = self.loop.create_task(self.main())
 
     @log_error
     def stop(self):
@@ -310,25 +331,14 @@ class PiPower5Service():
         if self.task.done():
             return
             
-        # 取消任务并等待完成
-        self.task.cancel()
+        # 取消任务
+        self.loop.call_soon_threadsafe(self.task.cancel)
         
-        # 获取当前事件循环
-        loop = asyncio.get_running_loop()
+        # 停止事件循环
+        self.loop.call_soon_threadsafe(self.loop.stop)
         
-        # 如果在运行中，异步等待任务完成
-        if loop.is_running():
-            async def wait_for_task():
-                try:
-                    await self.task
-                except asyncio.CancelledError:
-                    pass
-            loop.create_task(wait_for_task())
-        else:
-            # 如果事件循环未运行，同步等待
-            try:
-                loop.run_until_complete(self.task)
-            except asyncio.CancelledError:
-                pass
+        # 等待线程结束
+        if self.loop_thread and self.loop_thread.is_alive():
+            self.loop_thread.join(timeout=2.0)
                 
-        self.log.info("Shutdown service stopped")
+        self.log.info("PiPower5 service stopped")

@@ -11,9 +11,17 @@ PERIPHERALS = [
     "spc",
     "cpu_temperature",
     "gpu_temperature",
-    "pwm_fan_speed",
     "temperature_unit",
+    'clear_history',
+    'delete_log_file',
+    'data_interval',
+    'debug_level',
+    'restart_service',
+
+    "pwm_fan_speed",
+
     "input_voltage",
+    'input_current',
     "is_input_plugged_in",
     "output_voltage",
     "output_current",
@@ -25,7 +33,6 @@ PERIPHERALS = [
     "is_charging",
     "shutdown_percentage",
     "default_on",
-    "data_interval",
     "power-failure-simulation",
 ]
 
