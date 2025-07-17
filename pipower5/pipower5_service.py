@@ -13,7 +13,12 @@ class PiPower5Service():
         self._is_ready = False
         
         self.pipower5 = PiPower5()
-        self.email_sender = EmailSender(config)
+        try:
+            self.email_sender = EmailSender(config)
+        except Exception as e:
+            self.log.error(f'Email sender init failed: {e}')
+            self.email_sender = None
+
         self.device = BatteryDevice()
 
         self.shutdown_percentage = self.pipower5.read_shutdown_percentage()
@@ -193,11 +198,27 @@ class PiPower5Service():
         return self._is_ready
 
     @log_error
+    def send_email(self, mode, data):
+        if not self.email_sender:
+            return "Email sender not ready"
+        if mode not in self.send_email_on:
+            return f"Email {mode} not in send_email_on"
+        status = self.email_sender.send_preset_email(mode, data)
+        if status == True:
+            return f"Email {mode} sent successfully"
+        else:
+            return f"Failed to send email {mode}: {status}"
+
+    @log_error
+    def call(self, callback, data):
+        if callback:
+            callback(data)
+
+    @log_error
     async def loop(self):
         while self.running:
             data = self.pipower5.read_all()
-            if self.__on_data_changed__:
-                self.__on_data_changed__(data)
+            self.call(self.__on_data_changed__, data)
             self.device.update_battery(data)
 
             battery_percentage = data['battery_percentage']
@@ -211,104 +232,51 @@ class PiPower5Service():
             # Check button state
             if button_state == ButtonState.CLICK:
                 self.log.debug(f'pipower5_button_click: {button_state}')
-                if self.__on_button_click__:
-                    self.__on_button_click__(button_state)
+                self.call(self.__on_button_click__, button_state)
             elif button_state == ButtonState.DOUBLE_CLICK:
                 self.log.debug(f'pipower5_button_double_click: {button_state}')
-                if self.__on_button_double_click__:
-                    self.__on_button_double_click__(button_state)
+                self.call(self.__on_button_double_click__, button_state)
             elif button_state == ButtonState.LONG_PRESS_2S:
                 self.log.debug(f'pipower5_button_long_click: {button_state}')
-                if self.__on_button_long_press__:
-                    self.__on_button_long_press__(button_state)
+                self.call(self.__on_button_long_press__, button_state)
 
-            if battery_percentage < shutdown_percentage + 10 and \
-                EmailModes.LOW_BATTERY in self.send_email_on:
-                if EmailModes.LOW_BATTERY in self.send_email_on:
-                    self.log.debug("Sending low battery email")
-                    status = self.email_sender.send_email(EmailModes.LOW_BATTERY, data)
-                    if status == True:
-                        self.log.debug("Low battery email sent successfully")
-                    else:
-                        self.log.error(f"Failed to send low battery email: {status}")
-                if self.__on_low_power__:
-                    self.__on_low_power__(data)
+            # Check low battery
+            if battery_percentage < shutdown_percentage + 10:
+                self.send_email(EmailModes.LOW_BATTERY, data)
+                self.call(self.__on_low_battery_shutdown__, data)
 
             # Check power status
             if power_source == 'battery':
                 if is_input_plugged_in:
-                    if EmailModes.POWER_INSUFFICIENT in self.send_email_on:
-                        self.log.debug("Sending power insufficient email")
-                        status = self.email_sender.send_email(EmailModes.POWER_INSUFFICIENT, data)
-                        if status == True:
-                            self.log.debug("Power insufficient email sent successfully")
-                        else:
-                            self.log.error(f"Failed to send power insufficient email: {status}")
-                    else:
-                        if EmailModes.BATTERY_ACTIVATED in self.send_email_on:
-                            self.log.debug("Sending battery activated email")
-                            status = self.email_sender.send_email(EmailModes.BATTERY_ACTIVATED, data)
-                            if status == True:
-                                self.log.debug("Battery activated email sent successfully")
-                            else:
-                                self.log.error(f"Failed to send battery activated email: {status}")
-                    
-                    if self.__on_power_insufficient__:
-                        self.__on_power_insufficient__(data)
-                    else:
-                        if self.__on_battery_activated__:
-                            self.__on_battery_activated__(data)
-                else:
-                    if EmailModes.BATTERY_ACTIVATED in self.send_email_on:
-                        self.log.debug("Sending battery activated email")
-                        status = self.email_sender.send_email(EmailModes.BATTERY_ACTIVATED, data)
-                        if status == True:
-                            self.log.debug("Battery activated email sent successfully")
-                        else:
-                            self.log.error(f"Failed to send battery activated email: {status}")
-                    else:
-                        if self.__on_battery_activated__:
-                            self.__on_battery_activated__(data)
+                    self.send_email(EmailModes.POWER_INSUFFICIENT, data)
+                    self.call(self.__on_power_insufficient__, data)
+                self.send_email(EmailModes.BATTERY_ACTIVATED, data)
+                self.call(self.__on_battery_activated__, data)
     
             # Check shutdown request
             if shutdown_request != self.last_shutdown_request:
                 if shutdown_request == ShutdownRequest.BUTTON:
                     self.log.info("Shutdown request: Button")
-                    if self.__on_button_shutdown__:
-                        self.__on_button_shutdown__(data)
+                    self.call(self.__on_button_shutdown__, data)
                 elif shutdown_request == ShutdownRequest.LOW_BATTERY:
                     self.log.info("Shutdown request: Low battery capacity")
-                    if self.__on_low_battery_shutdown__:
-                        self.__on_low_battery_shutdown__(data)
+                    self.call(self.__on_low_battery_shutdown__, data)
+                    self.send_email(EmailModes.BATTERY_CRITICAL_SHUTDOWN, data)
                 elif shutdown_request == ShutdownRequest.LOW_VOLTAGE:
                     self.log.info("Shutdown request: Low voltage")
-                    if self.__on_low_voltage_shutdown__:
-                        self.__on_low_voltage_shutdown__(data)
+                    self.call(self.__on_low_voltage_shutdown__, data)
+                    self.send_email(EmailModes.BATTERY_VOLTAGE_CRITICAL_SHUTDOWN, data)
                 self.last_shutdown_request = shutdown_request
 
             if is_input_plugged_in != self.last_is_input_plugged_in:
                 if is_input_plugged_in:
                     self.log.info("Input plugged in")
-                    if 'power_restored' in self.send_email_on:
-                        self.log.debug("Sending power restored email")
-                        status = self.email_sender.send_email(EmailModes.POWER_RESTORED, data)
-                        if status == True:
-                            self.log.debug("Power restored email sent successfully")
-                        else:
-                            self.log.error(f"Failed to send power restored email: {status}")
-                    if self.__on_input_plugged_in__:
-                        self.__on_input_plugged_in__(data)
+                    self.send_email(EmailModes.POWER_RESTORED, data)
+                    self.call(self.__on_input_plugged_in__, data)
                 else:
                     self.log.info("Input unplugged")
-                    if 'power_disconnected' in self.send_email_on:
-                        self.log.debug("Sending power disconnected email")
-                        status = self.email_sender.send_email(EmailModes.POWER_DISCONNECTED, data)
-                        if status == True:
-                            self.log.debug("Power disconnected email sent successfully")
-                        else:
-                            self.log.error(f"Failed to send power disconnected email: {status}")
-                    if self.__on_input_unplugged__:
-                        self.__on_input_unplugged__(data)
+                    self.send_email(EmailModes.POWER_DISCONNECTED, data)
+                    self.call(self.__on_input_unplugged__, data)
                 self.last_is_input_plugged_in = is_input_plugged_in
             await asyncio.sleep(self.interval)
 

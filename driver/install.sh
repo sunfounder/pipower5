@@ -1,4 +1,15 @@
 #!/bin/bash
+set -euo pipefail
+trap 'echo "Error occurred. Exiting..." >&2; exit 1' ERR
+
+if [ "$1" == "--uninstall" ]; then
+    echo "Uninstalling PiPower 5 driver"
+    rm -rf /lib/modules/$(uname -r)/kernel/drivers/misc/pipower5_driver.ko
+    rm -rf /etc/modules-load.d/pipower5_driver.conf
+    exit 0
+fi
+
+
 
 echo "Make driver"
 make

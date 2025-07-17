@@ -7,15 +7,8 @@ from email import encoders
 import os
 import json
 
-# 默认配置字典 - 本地SMTP服务
-DEFAULT_CONFIG = {
-    "smtp_email": "pipower5@localhost",
-    "send_email_to": "pipower5@localhost",
-    "smtp_password": "",
-    "smtp_server": "localhost",
-    "smtp_port": 25,
-    "smtp_use_tls": False
-}
+DEFAULT_SMTP_PORT = 465
+DEFAULT_SMTP_USE_TLS = False
 
 class EmailModes(StrEnum):
     BATTERY_ACTIVATED = 'battery_activated'
@@ -43,16 +36,24 @@ class EmailSender():
     def __init__(self, config=None):
         self.config = config
         self.templates = None
-        self._load_templates()
+        self.load_templates()
+        server = self.connect()
+        server.close()
+        self.ready = True
 
-    def _load_templates(self):
+    def is_ready(self):
+        return self.ready
+
+    def load_templates(self):
         if os.path.exists(TEMPLATES):
             with open(TEMPLATES, 'r') as f:
                 self.templates = json.load(f)
         else:
             raise FileNotFoundError(f"Email templates file {TEMPLATES} not found")
 
-    def send_email(self, mode, data):
+    def send_preset_email(self, mode, data):
+        if not self.is_ready():
+            return "Email sender not ready"
         template = self.templates[mode]
         subject = template['subject'].format(**data)
         body_path = template['body_path']
@@ -64,9 +65,38 @@ class EmailSender():
         if 'attachment_path' in template:
             attachment_path = template['attachment_path'].format(**data)
 
-        return self._send_email(subject, body, attachment_path)
+        return self.send_email(subject, body, attachment_path)
 
-    def _send_email(self, subject, body, attachment_path=None):
+    def connect(self):
+        """
+        连接SMTP服务器
+
+        Returns:
+            smtplib.SMTP: 连接成功返回SMTP服务器对象，否则返回None
+        """
+        
+        smtp_email = self.config.get("smtp_email", None)
+        smtp_password = self.config.get("smtp_password", None)
+        smtp_server = self.config.get("smtp_server", None)
+        smtp_port = self.config.get("smtp_port", DEFAULT_SMTP_PORT)
+        smtp_use_tls = self.config.get("smtp_use_tls", DEFAULT_SMTP_USE_TLS)
+
+        if not smtp_email or not smtp_server:
+            raise ValueError("SMTP email or server is not set")
+
+        if smtp_port == 465:
+            server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+        else:
+            server = smtplib.SMTP(smtp_server, smtp_port)
+            if smtp_use_tls:
+                server.starttls()
+        
+        if smtp_password:
+            server.login(smtp_email, smtp_password)
+        
+        return server
+
+    def send_email(self, subject, body, attachment_path=None):
         """
         使用配置字典发送邮件
         
@@ -78,10 +108,6 @@ class EmailSender():
 
         send_email_to = self.config.get("send_email_to", DEFAULT_CONFIG["send_email_to"])
         smtp_email = self.config.get("smtp_email", DEFAULT_CONFIG["smtp_email"])
-        smtp_password = self.config.get("smtp_password", DEFAULT_CONFIG["smtp_password"])
-        smtp_server = self.config.get("smtp_server", DEFAULT_CONFIG["smtp_server"])
-        smtp_port = self.config.get("smtp_port", DEFAULT_CONFIG["smtp_port"])
-        smtp_use_tls = self.config.get("smtp_use_tls", DEFAULT_CONFIG["smtp_use_tls"])
 
         message = MIMEMultipart()
         message["From"] = smtp_email
@@ -104,16 +130,7 @@ class EmailSender():
             message.attach(part)
         
         try:
-            if smtp_port == 465:
-                server = smtplib.SMTP_SSL(smtp_server, smtp_port)
-            else:
-                server = smtplib.SMTP(smtp_server, smtp_port)
-                if smtp_use_tls:
-                    server.starttls()
-            
-            if smtp_password:
-                server.login(smtp_email, smtp_password)
-            
+            server = self.connect()
             text = message.as_string()
             server.sendmail(message["From"], send_email_to, text)
             server.quit()
