@@ -16,7 +16,7 @@ class PiPower5Service():
         try:
             self.email_sender = EmailSender(config)
         except Exception as e:
-            self.log.error(f'Email sender init failed: {e}')
+            self.log.warning(f'Email sender init failed: {e}')
             self.email_sender = None
 
         self.device = BatteryDevice()
@@ -201,13 +201,18 @@ class PiPower5Service():
     def send_email(self, mode, data):
         if not self.email_sender:
             self.log.debug("Email sender not ready")
+            return False
         if mode not in self.send_email_on:
             self.log.debug(f"Email {mode} not in send_email_on")
+            return False
+        
         status = self.email_sender.send_preset_email(mode, data)
         if status == True:
             self.log.debug(f"Email {mode} sent successfully")
+            return True
         else:
             self.log.error(f"Failed to send email {mode}: {status}")
+            return False
 
     @log_error
     def call(self, callback, data):
