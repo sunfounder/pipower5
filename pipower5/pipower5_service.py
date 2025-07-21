@@ -194,8 +194,9 @@ class PiPower5Service():
             self.send_email_on = _send_email_on
             patch['send_email_on'] = _send_email_on
             self.log.debug(f'Set PiPower5 send email on: {_send_email_on}')
-        email_patch = self.email_sender.update_config(config)
-        patch.update(email_patch)
+        if self.email_sender:
+            email_patch = self.email_sender.update_config(config)
+            patch.update(email_patch)
 
         return patch
 

@@ -36,11 +36,18 @@ class EmailSender():
     def __init__(self, config=None):
         self.templates = None
         self.load_templates()
+
+        self.send_email_to = None
+        self.smtp_email = None
+        self.smtp_password = None
+        self.smtp_server = None
+        self.smtp_port = DEFAULT_SMTP_PORT
+        self.smtp_use_tls = DEFAULT_SMTP_USE_TLS
+
+        self.update_config(config)
         server = self.connect()
         server.close()
         self.ready = True
-
-        self.update_config(config)
 
     def is_ready(self):
         return self.ready
