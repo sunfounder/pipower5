@@ -21,9 +21,10 @@ class Logger(logging.Logger):
         console_handler.setLevel(level)
 
         # Define the output format of handler
-        formatter = logging.Formatter('%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s', datefmt='%y/%m/%d %H:%M:%S')
-        file_handler.setFormatter(formatter)
-        console_handler.setFormatter(formatter)
+        file_logger_formatter = logging.Formatter('%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s', datefmt='%y/%m/%d %H:%M:%S')
+        console_logger_formatter = logging.Formatter('[%(levelname)s] %(message)s')
+        file_handler.setFormatter(file_logger_formatter)
+        console_handler.setFormatter(console_logger_formatter)
 
         # Add the handler to the logger
         self.addHandler(file_handler)

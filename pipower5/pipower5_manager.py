@@ -119,19 +119,15 @@ class PiPower5Manager():
 
     @log_error
     def start(self):
-        #
         self.init_service()
-        #
         signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGTERM, self.signal_handler)
         signal.signal(signal.SIGABRT, self.signal_handler)
-        #
         self.service.start()
         if self.pm_dashboard:
             self.pm_dashboard.start()
             self.log.info('PmDashboard started')
         while True:
-            # time.sleep(1)
             signal.pause()
 
     @log_error
@@ -143,7 +139,6 @@ class PiPower5Manager():
         if self.pm_dashboard:
             self.log.debug('Stop PM Dashboard.')
             self.pm_dashboard.stop()
-        # Check if there's any thread still alive
         import threading
         for t in threading.enumerate():
             if t is not threading.main_thread():

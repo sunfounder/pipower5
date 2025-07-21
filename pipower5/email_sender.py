@@ -34,15 +34,44 @@ TEMPLATES = TEMPLATE_DIR + 'email_templates.json'
 
 class EmailSender():
     def __init__(self, config=None):
-        self.config = config
         self.templates = None
         self.load_templates()
         server = self.connect()
         server.close()
         self.ready = True
 
+        self.update_config(config)
+
     def is_ready(self):
         return self.ready
+
+    def update_config(self, config):
+        patch = {}
+        if 'send_email_to' in config:
+            to = config.get("send_email_to", None)
+            self.send_email_to = to
+            patch['send_email_to'] = to
+        if 'smtp_email' in config:
+            email = config.get("smtp_email", None)
+            self.smtp_email = email
+            patch['smtp_email'] = email
+        if 'smtp_password' in config:
+            password = config.get("smtp_password", None)
+            self.smtp_password = password
+            patch['smtp_password'] = password
+        if 'smtp_server' in config:
+            server = config.get("smtp_server", None)
+            self.smtp_server = server
+            patch['smtp_server'] = server
+        if 'smtp_port' in config:
+            port = config.get("smtp_port", DEFAULT_SMTP_PORT)
+            self.smtp_port = port
+            patch['smtp_port'] = port
+        if 'smtp_use_tls' in config:
+            use_tls = config.get("smtp_use_tls", DEFAULT_SMTP_USE_TLS)
+            self.smtp_use_tls = use_tls
+            patch['smtp_use_tls'] = use_tls
+        return patch
 
     def load_templates(self):
         if os.path.exists(TEMPLATES):
@@ -75,24 +104,18 @@ class EmailSender():
             smtplib.SMTP: 连接成功返回SMTP服务器对象，否则返回None
         """
         
-        smtp_email = self.config.get("smtp_email", None)
-        smtp_password = self.config.get("smtp_password", None)
-        smtp_server = self.config.get("smtp_server", None)
-        smtp_port = self.config.get("smtp_port", DEFAULT_SMTP_PORT)
-        smtp_use_tls = self.config.get("smtp_use_tls", DEFAULT_SMTP_USE_TLS)
-
-        if not smtp_email or not smtp_server:
+        if not self.smtp_email or not self.smtp_server:
             raise ValueError("SMTP email or server is not set")
 
-        if smtp_port == 465:
-            server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+        if self.smtp_port == 465:
+            server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port)
         else:
-            server = smtplib.SMTP(smtp_server, smtp_port)
-            if smtp_use_tls:
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
+            if self.smtp_use_tls:
                 server.starttls()
         
-        if smtp_password:
-            server.login(smtp_email, smtp_password)
+        if self.smtp_password:
+            server.login(self.smtp_email, self.smtp_password)
         
         return server
 
@@ -106,12 +129,9 @@ class EmailSender():
         attachment_path: 附件路径(可选)
         """
 
-        send_email_to = self.config.get("send_email_to", DEFAULT_CONFIG["send_email_to"])
-        smtp_email = self.config.get("smtp_email", DEFAULT_CONFIG["smtp_email"])
-
         message = MIMEMultipart()
-        message["From"] = smtp_email
-        message["To"] = send_email_to
+        message["From"] = self.smtp_email
+        message["To"] = self.send_email_to
         message["Subject"] = subject
         
         message.attach(MIMEText(body, 'html'))
@@ -132,7 +152,7 @@ class EmailSender():
         try:
             server = self.connect()
             text = message.as_string()
-            server.sendmail(message["From"], send_email_to, text)
+            server.sendmail(message["From"], self.send_email_to, text)
             server.quit()
             return True
         except Exception as e:

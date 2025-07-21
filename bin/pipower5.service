@@ -2,7 +2,8 @@
 [Unit]
 Description=pipower5 service
 # Need to start last to avoid gpio being occupied
-After=multi-user.target
+After=basic.target
+Before=multi-user.target
 
 [Service]
 Type=simple

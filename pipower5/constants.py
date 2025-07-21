@@ -34,6 +34,7 @@ PERIPHERALS = [
     "shutdown_percentage",
     "default_on",
     "power-failure-simulation",
+    'send_email',
 ]
 
 SYSTEM_DEFAULT_CONFIG = {
