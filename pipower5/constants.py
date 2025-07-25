@@ -8,7 +8,6 @@ PERIPHERALS = [
     "memory",
     "history",
     "log",
-    "spc",
     "cpu_temperature",
     "gpu_temperature",
     "temperature_unit",
@@ -16,10 +15,13 @@ PERIPHERALS = [
     'delete_log_file',
     'data_interval',
     'debug_level',
+    'ip_address',
+    'mac_address',
     'restart_service',
 
     "pwm_fan_speed",
 
+    'pipower5',
     "input_voltage",
     'input_current',
     "is_input_plugged_in",
@@ -39,6 +41,7 @@ PERIPHERALS = [
 
 SYSTEM_DEFAULT_CONFIG = {
     'enable_history': True,
+    'debug_level': 'INFO',
     'data_interval': 1,
     'database_retention_days': 30,
     'temperature_unit': 'C',
@@ -60,4 +63,3 @@ SYSTEM_DEFAULT_CONFIG = {
     "smtp_security": "ssl",
 }
 
-CUSTOM_PERIPHERALS = {}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from pipower5 import PiPower5
+from pipower5.pipower5 import PiPower5
 import time
 
 pipower5 = PiPower5()
@@ -30,7 +30,7 @@ def main():
 
 
         print('')
-        time.sleep(1)
+        time.sleep(0.5)
 
 if __name__ == '__main__':
     main()

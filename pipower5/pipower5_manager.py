@@ -4,11 +4,12 @@ import signal
 from importlib.resources import files as resource_files
 
 from .pipower5_service import PiPower5Service
+from .pipower5_system import PiPower5System
 
 from .logger import Logger
 from .utils import merge_dict, log_error, get_varient_id_and_version
 from .version import __version__ as pipower5_version
-from .constants import NAME, ID, PERIPHERALS, SYSTEM_DEFAULT_CONFIG, CUSTOM_PERIPHERALS
+from .constants import NAME, ID, PERIPHERALS, SYSTEM_DEFAULT_CONFIG
 
 __package_name__ = __name__.split('.')[0]
 CONFIG_PATH = str(resource_files(__package_name__).joinpath('config.json'))
@@ -24,7 +25,6 @@ class PiPower5Manager():
         # --- init config ---
         self.config = {
             'system': SYSTEM_DEFAULT_CONFIG,
-            "peripherals": CUSTOM_PERIPHERALS,
         }
         # merge config
         self.config_path = config_path
@@ -48,6 +48,7 @@ class PiPower5Manager():
 
         self.pm_dashboard = None
         self.service = None
+        self.data = {}
 
     def init_service(self):
         # --- import ---
@@ -59,14 +60,36 @@ class PiPower5Manager():
         except ImportError:
             has_pm_dashboard = False
 
+        # LOG HEADER
+        self.log.info(f"")
+        self.log.info(f"{'#'*60}")
+        self.log.debug(f"Config path: {CONFIG_PATH}")
+        self.log.info(f"Pironman5 Start")
+
         # --- print ---
         self.log.info(f'PiPower5 {pipower5_version} started')
         self.log.info(f"Board version: {BOARD_VERSION}")
-        self.log.debug(f"PiPower 5 version: {pipower5_version}")
-        self.log.debug(f"Config: {self.config}")
-        self.log.debug(f"Device info: {self.device_info}")
+        self.log.info(f"Config:")
+        _config_json = json.dumps(self.config, indent=4)
+        for line in _config_json.splitlines():
+            self.log.info(line)
+        _device_info_json = json.dumps(self.device_info, indent=4)
+        self.log.info(f"Device info:")
+        for line in _device_info_json.splitlines():
+            self.log.info(line)
         if has_pm_dashboard:
-            self.log.debug(f"PM_Dashboard version: {pm_dashboard_version}")
+            self.log.info(f"PM_Dashboard version: {pm_dashboard_version}")
+
+        # --- init system ---
+        self.system = PiPower5System(peripherals=PERIPHERALS, log=self.log)
+        self.system.set_on_data_changed(self.handle_data_changed)
+
+        # --- init service ---
+        self.service = PiPower5Service(config=self.config['system'], log=self.log)
+        self.service.set_on_data_changed(self.handle_data_changed)
+        self.service.set_on_button_shutdown(self.system.shutdown)
+        self.service.set_on_low_battery_shutdown(self.system.shutdown)
+        self.service.set_on_low_voltage_shutdown(self.system.shutdown)
 
         # --- init pm_dashboard ---
         if not has_pm_dashboard:
@@ -75,26 +98,26 @@ class PiPower5Manager():
         else:
             self.pm_dashboard = PMDashboard(device_info=self.device_info,
                                             database=ID,
-                                            spc_enabled=True if 'spc' in PERIPHERALS else False,
                                             config=self.config,
                                             log=self.log)
+            self.pm_dashboard.set_read_data(self.read_data)
             self.pm_dashboard.set_on_config_changed(self.update_config)
             self.pm_dashboard.set_debug_level(self.log_level)
-            self.pm_dashboard.set_test_smtp(self.pm_auto.test_smtp)
-        # --- init service ---
-        self.service = PiPower5Service(config=self.config, log=self.log)
-        self.service.set_on_button_shutdown(self.handle_shutdown)
-        self.service.set_on_low_battery_shutdown(self.handle_shutdown)
-        self.service.set_on_low_voltage_shutdown(self.handle_shutdown)
-            
+            self.pm_dashboard.set_test_smtp(self.service.test_smtp)
+            self.pm_dashboard.set_on_restart_service(self.restart_service)
+
     @log_error
-    def update_extra_peripherals(self):
-        if 'peripherals' not in self.config:
-            return
-        for peripheral in self.config['peripherals']:
-            if peripheral == 'pwm_fan':
-                if self.config['peripherals'][peripheral]:
-                    PERIPHERALS.append("pwm_fan_speed")
+    def read_data(self):
+        return self.data
+
+    @log_error
+    def handle_data_changed(self, data) -> None:
+        self.data.update(data)
+
+    @log_error
+    def restart_service(self):
+        self.log.info('Restarting PiPower5 service')
+        os.system('sudo systemctl restart pipower5.service')
 
     @log_error
     def set_debug_level(self, level):
@@ -124,6 +147,7 @@ class PiPower5Manager():
         signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGTERM, self.signal_handler)
         signal.signal(signal.SIGABRT, self.signal_handler)
+        self.system.start()
         self.service.start()
         if self.pm_dashboard:
             self.pm_dashboard.start()
@@ -134,9 +158,12 @@ class PiPower5Manager():
     @log_error
     def stop(self):
         self.log.debug('Stopping PiPower5...')
+        if self.system:
+            self.system.stop()
+            self.log.debug('Stop PiPower5 system.')
         if self.service:
             self.service.stop()
-            self.log.debug('Stop Shutdown service.')
+            self.log.debug('Stop PiPower5 service.')
         if self.pm_dashboard:
             self.log.debug('Stop PM Dashboard.')
             self.pm_dashboard.stop()

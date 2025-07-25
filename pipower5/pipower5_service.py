@@ -12,7 +12,7 @@ class PiPower5Service():
         self.device_name = device_name
         self._is_ready = False
         self.log = log or logging.getLogger(__name__)
-        self._is_ready = False
+        self.update_config(config, init=True)
         
         self.pipower5 = PiPower5()
         try:
@@ -33,7 +33,7 @@ class PiPower5Service():
         self.loop_thread = None
 
         self.last_shutdown_request = None
-        self.last_is_input_plugged_in = None
+        self.last_is_input_plugged_in = True
         self.is_power_insufficient = False
 
         self.__on_button_click__ = None
@@ -48,8 +48,6 @@ class PiPower5Service():
         self.__on_input_plugged_in__ = None
         self.__on_input_unplugged__ = None
         self.__on_data_changed__ = None
-
-        self.update_config(config)
 
         self._is_ready = True
 
@@ -196,7 +194,7 @@ class PiPower5Service():
             self.send_email_on = _send_email_on
             patch['send_email_on'] = _send_email_on
             self.log.debug(f'Set PiPower5 send email on: {_send_email_on}')
-        if self.email_sender:
+        if not init and self.email_sender:
             email_patch = self.email_sender.update_config(config)
             patch.update(email_patch)
         return patch

@@ -49,34 +49,34 @@ class EmailSender():
             to = config.get("send_email_to", None)
             self.send_email_to = to
             patch['send_email_to'] = to
-            self.log.info(f"Set send email to: {to}")
+            self.log.debug(f"Set send email to: {to}")
         if 'smtp_email' in config:
             email = config.get("smtp_email", None)
             self.smtp_email = email
             patch['smtp_email'] = email
-            self.log.info(f"Set smtp email: {email}")
+            self.log.debug(f"Set smtp email: {email}")
         if 'smtp_password' in config:
             password = config.get("smtp_password", None)
             self.smtp_password = password
             patch['smtp_password'] = password
-            self.log.info(f"Set smtp password.")
+            self.log.debug(f"Set smtp password.")
         if 'smtp_server' in config:
             server = config.get("smtp_server", None)
             self.smtp_server = server
             patch['smtp_server'] = server
-            self.log.info(f"Set smtp server: {server}")
+            self.log.debug(f"Set smtp server: {server}")
         if 'smtp_port' in config:
             port = config.get("smtp_port", DEFAULT_SMTP_PORT)
             self.smtp_port = port
             patch['smtp_port'] = port
-            self.log.info(f"Set smtp port: {port}")
+            self.log.debug(f"Set smtp port: {port}")
         if 'smtp_security' in config:
             security = config.get("smtp_security", None)
             if security not in ['none', 'ssl', 'tls']:
                 raise ValueError(f"smtp_security must be 'none', 'ssl' or 'tls', not {security}")
             self.smtp_security = security
             patch['smtp_security'] = security
-            self.log.info(f"Set smtp security: {security}")
+            self.log.debug(f"Set smtp security: {security}")
         return patch
 
     def load_templates(self):

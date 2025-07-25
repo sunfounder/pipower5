@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from pipower5 import PiPower5
+from pipower5.pipower5 import PiPower5, ShutdownRequest
 import time
 
 pipower5 = PiPower5()
@@ -10,17 +10,10 @@ def main():
 
     while True:
         data_buffer = pipower5.read_all()
-        #
-        shutdown_request_str = 'None'
-        if data_buffer['shutdown_request'] == pipower5.SHUTDOWN_REQUEST_NONE:
-            shutdown_request_str = 'None'
-        elif data_buffer['shutdown_request'] == pipower5.SHUTDOWN_REQUEST_LOW_BATTERY:
-            shutdown_request_str = 'Low battery'
-        elif data_buffer['shutdown_request'] == pipower5.SHUTDOWN_REQUEST_BUTTON:
-            shutdown_request_str = 'Button'
-        else:
-            shutdown_request_str = 'Unknown'
-        #
+
+        shutdown_request = pipower5.read_shutdown_request()
+        button_state = pipower5.read_power_btn()
+
         print(f'''
 Input:
     voltage: {data_buffer['input_voltage']} mV
@@ -40,14 +33,15 @@ Battery:
     charging: {data_buffer['is_charging']}
 
 Internal:
-    shutdown request: {data_buffer['shutdown_request']} - {shutdown_request_str}
+    shutdown request: {int(shutdown_request)} - {shutdown_request.name}
+    button state: {int(button_state)} - {button_state.name}
     max charging current: {pipower5.get_max_charge_current()} mA
     default on: {'on' if pipower5.read_default_on() else 'off'}
     shutdown percentage: {pipower5.read_shutdown_percentage()} %
 ''')
         print('')
         print('')
-        time.sleep(1)
+        time.sleep(0.5)
 
 if __name__ == '__main__':
     main()

@@ -17,7 +17,9 @@ classifiers = [
 ]
 dynamic = ["version"]
 
-dependencies = []
+dependencies = [
+  'spc @ git+https://github.com/sunfounder/spc@main',
+]
 
 [project.scripts]
 pipower5 = "pipower5:main"

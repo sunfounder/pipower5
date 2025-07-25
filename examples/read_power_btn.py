@@ -1,4 +1,4 @@
-from pipower5 import PiPower5
+from pipower5.pipower5 import PiPower5
 import time
 
 power = PiPower5()
