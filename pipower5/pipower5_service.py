@@ -8,14 +8,15 @@ import threading
 
 class PiPower5Service():
     @log_error
-    def __init__(self, config, log=None):
+    def __init__(self, config, device_name='PiPower5', log=None):
+        self.device_name = device_name
         self._is_ready = False
         self.log = log or logging.getLogger(__name__)
         self._is_ready = False
         
         self.pipower5 = PiPower5()
         try:
-            self.email_sender = EmailSender(config)
+            self.email_sender = EmailSender(config, log=self.log)
         except Exception as e:
             self.log.warning(f'Email sender init failed: {e}')
             self.email_sender = None
@@ -33,6 +34,7 @@ class PiPower5Service():
 
         self.last_shutdown_request = None
         self.last_is_input_plugged_in = None
+        self.is_power_insufficient = False
 
         self.__on_button_click__ = None
         self.__on_button_double_click__ = None
@@ -197,7 +199,6 @@ class PiPower5Service():
         if self.email_sender:
             email_patch = self.email_sender.update_config(config)
             patch.update(email_patch)
-
         return patch
 
     @log_error
@@ -222,6 +223,21 @@ class PiPower5Service():
             return False
 
     @log_error
+    def test_smtp(self):
+        '''
+        Test SMTP connection.
+
+        Returns:
+            bool: True if connection is successful, False otherwise.
+        '''
+        try:
+            self.email_sender.connect()
+            return True, None
+        except Exception as e:
+            self.log.warning(f"Failed to connect SMTP server: {e}")
+            return False, str(e)
+
+    @log_error
     def call(self, callback, data):
         if callback:
             callback(data)
@@ -230,6 +246,7 @@ class PiPower5Service():
     async def main(self):
         while self.running:
             data = self.pipower5.read_all()
+            data['device_name'] = self.device_name
             self.call(self.__on_data_changed__, data)
             self.device.update_battery(data)
 
@@ -257,13 +274,11 @@ class PiPower5Service():
                 self.send_email(EmailModes.LOW_BATTERY, data)
                 self.call(self.__on_low_battery_shutdown__, data)
 
-            # Check power status
-            if power_source == 'battery':
-                if is_input_plugged_in:
-                    self.send_email(EmailModes.POWER_INSUFFICIENT, data)
-                    self.call(self.__on_power_insufficient__, data)
-                self.send_email(EmailModes.BATTERY_ACTIVATED, data)
-                self.call(self.__on_battery_activated__, data)
+            # Check power insufficient
+            if self.is_power_insufficient is False and power_source == 'battery' and is_input_plugged_in:
+                self.is_power_insufficient = True
+                self.send_email(EmailModes.POWER_INSUFFICIENT, data)
+                self.call(self.__on_power_insufficient__, data)
     
             # Check shutdown request
             if shutdown_request != self.last_shutdown_request:
@@ -287,8 +302,21 @@ class PiPower5Service():
                     self.call(self.__on_input_plugged_in__, data)
                 else:
                     self.log.info("Input unplugged")
+                    try:
+                        remain_percentage = data['battery_percentage'] - shutdown_percentage
+                        remain_mAh = self.pipower5.BAT_MAX_CAPACITY * remain_percentage / 100
+                        current = -data['battery_current']
+                        estimated_time = remain_mAh / current
+                        estimated_time = round(estimated_time, 2)
+                    except Exception as e:
+                        self.log.error(f"Failed to estimate time until shutdown: {e}")
+                        estimated_time = "Unknown"
+                    data['battery_current_output'] = current
+                    data['shutdown_percentage'] = shutdown_percentage
+                    data['estimated_time'] = estimated_time
                     self.send_email(EmailModes.POWER_DISCONNECTED, data)
                     self.call(self.__on_input_unplugged__, data)
+                    self.is_power_insufficient = False
                 self.last_is_input_plugged_in = is_input_plugged_in
             await asyncio.sleep(self.interval)
 

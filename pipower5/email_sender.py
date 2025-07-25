@@ -6,12 +6,12 @@ from email.mime.base import MIMEBase
 from email import encoders
 import os
 import json
+import logging
 
 DEFAULT_SMTP_PORT = 465
-DEFAULT_SMTP_USE_TLS = False
+DEFAULT_SMTP_SECURITY = 'ssl'
 
 class EmailModes(StrEnum):
-    BATTERY_ACTIVATED = 'battery_activated'
     LOW_BATTERY = 'low_battery'
     POWER_DISCONNECTED = 'power_disconnected'
     POWER_RESTORED = 'power_restored'
@@ -19,21 +19,12 @@ class EmailModes(StrEnum):
     BATTERY_CRITICAL_SHUTDOWN = 'battery_critical_shutdown'
     BATTERY_VOLTAGE_CRITICAL_SHUTDOWN = 'battery_voltage_critical_shutdown'
 
-EMAIL_MODES = [
-    EmailModes.BATTERY_ACTIVATED,
-    EmailModes.LOW_BATTERY,
-    EmailModes.POWER_DISCONNECTED,
-    EmailModes.POWER_RESTORED,
-    EmailModes.POWER_INSUFFICIENT,
-    EmailModes.BATTERY_CRITICAL_SHUTDOWN,
-    EmailModes.BATTERY_VOLTAGE_CRITICAL_SHUTDOWN,
-]
-
 TEMPLATE_DIR = '/opt/pipower5/email_templates/'
 TEMPLATES = TEMPLATE_DIR + 'email_templates.json'
 
 class EmailSender():
-    def __init__(self, config=None):
+    def __init__(self, config=None, log=None):
+        self.log = log or logging.getLogger(__name__)
         self.templates = None
         self.load_templates()
 
@@ -42,11 +33,11 @@ class EmailSender():
         self.smtp_password = None
         self.smtp_server = None
         self.smtp_port = DEFAULT_SMTP_PORT
-        self.smtp_use_tls = DEFAULT_SMTP_USE_TLS
+        self.smtp_security = DEFAULT_SMTP_SECURITY
 
         self.update_config(config)
-        server = self.connect()
-        server.close()
+        # server = self.connect()
+        # server.close()
         self.ready = True
 
     def is_ready(self):
@@ -58,26 +49,34 @@ class EmailSender():
             to = config.get("send_email_to", None)
             self.send_email_to = to
             patch['send_email_to'] = to
+            self.log.info(f"Set send email to: {to}")
         if 'smtp_email' in config:
             email = config.get("smtp_email", None)
             self.smtp_email = email
             patch['smtp_email'] = email
+            self.log.info(f"Set smtp email: {email}")
         if 'smtp_password' in config:
             password = config.get("smtp_password", None)
             self.smtp_password = password
             patch['smtp_password'] = password
+            self.log.info(f"Set smtp password.")
         if 'smtp_server' in config:
             server = config.get("smtp_server", None)
             self.smtp_server = server
             patch['smtp_server'] = server
+            self.log.info(f"Set smtp server: {server}")
         if 'smtp_port' in config:
             port = config.get("smtp_port", DEFAULT_SMTP_PORT)
             self.smtp_port = port
             patch['smtp_port'] = port
-        if 'smtp_use_tls' in config:
-            use_tls = config.get("smtp_use_tls", DEFAULT_SMTP_USE_TLS)
-            self.smtp_use_tls = use_tls
-            patch['smtp_use_tls'] = use_tls
+            self.log.info(f"Set smtp port: {port}")
+        if 'smtp_security' in config:
+            security = config.get("smtp_security", None)
+            if security not in ['none', 'ssl', 'tls']:
+                raise ValueError(f"smtp_security must be 'none', 'ssl' or 'tls', not {security}")
+            self.smtp_security = security
+            patch['smtp_security'] = security
+            self.log.info(f"Set smtp security: {security}")
         return patch
 
     def load_templates(self):
@@ -114,12 +113,16 @@ class EmailSender():
         if not self.smtp_email or not self.smtp_server:
             raise ValueError("SMTP email or server is not set")
 
-        if self.smtp_port == 465:
-            server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port)
-        else:
+        self.log.debug(f"Connecting to smtp server: {self.smtp_server}:{self.smtp_port}, security: {self.smtp_security}")
+        self.log.debug(f"SMTP email: {self.smtp_email}")
+        
+        if self.smtp_security == 'none':
             server = smtplib.SMTP(self.smtp_server, self.smtp_port)
-            if self.smtp_use_tls:
-                server.starttls()
+        elif self.smtp_security == 'ssl':
+            server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port)
+        elif self.smtp_security == 'tls':
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
+            server.starttls()
         
         if self.smtp_password:
             server.login(self.smtp_email, self.smtp_password)

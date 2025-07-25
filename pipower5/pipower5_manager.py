@@ -80,6 +80,7 @@ class PiPower5Manager():
                                             log=self.log)
             self.pm_dashboard.set_on_config_changed(self.update_config)
             self.pm_dashboard.set_debug_level(self.log_level)
+            self.pm_dashboard.set_test_smtp(self.pm_auto.test_smtp)
         # --- init service ---
         self.service = PiPower5Service(config=self.config, log=self.log)
         self.service.set_on_button_shutdown(self.handle_shutdown)

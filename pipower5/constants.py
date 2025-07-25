@@ -45,7 +45,6 @@ SYSTEM_DEFAULT_CONFIG = {
     'power-failure-simulation': True,
     'shutdown_percentage': 10,
     'send_email_on': [
-        "battery_activated",
         "low_battery",
         "power_disconnected",
         "power_restored",
@@ -58,7 +57,7 @@ SYSTEM_DEFAULT_CONFIG = {
     "smtp_password": "",
     "smtp_server": "",
     "smtp_port": 465,
-    "smtp_use_tls": False
+    "smtp_security": "ssl",
 }
 
 CUSTOM_PERIPHERALS = {}
