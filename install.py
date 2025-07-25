@@ -46,7 +46,7 @@ settings = {
     # - Install python source code from git
     'python_source': {
         'pipower5': './',
-        'spc': 'git+http://github.com/sunfounder/spc.git',
+        'sf_rpi_status': 'git+https://github.com/sunfounder/sf_rpi_status.git@1.1.4',
     },
 
     # create symbolic links from venv/bin/ to /usr/local/bin/
@@ -93,7 +93,6 @@ dashboard_settings = {
     ],
     'python_source': {
         'pm_dashboard': 'git+https://github.com/sunfounder/pm_dashboard.git@1.3.12',
-        'sf_rpi_status': 'git+https://github.com/sunfounder/sf_rpi_status.git@1.1.4',
     },
 }
 
