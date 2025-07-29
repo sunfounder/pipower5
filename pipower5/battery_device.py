@@ -159,7 +159,7 @@ class BatteryDevice:
         current_now = int(round(current_now))
         energy_now = data['battery_percentage'] * self.props.energy_full_design / 100
         energy_now = int(round(energy_now))
-        power_now = data['battery_voltage'] * data['battery_current'] / 1000
+        power_now = data['battery_voltage'] * data['battery_current']
         power_now = int(round(power_now))
 
         # Update properties

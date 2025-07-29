@@ -10,6 +10,9 @@ if [ $# -ge 1 ] && [ "$1" == "--uninstall" ]; then
     exit 0
 fi
 
+apt-get update
+apt-get install linux-headers-$(uname -r) -y
+
 echo "Make driver"
 make
 sudo cp pipower5_driver.ko /lib/modules/$(uname -r)/kernel/drivers/misc/
