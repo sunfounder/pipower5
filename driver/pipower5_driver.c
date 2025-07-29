@@ -24,7 +24,7 @@ MODULE_VERSION("1.0");
 
 struct virtual_battery_props {
     char name[32];
-    int type;
+    int type; // Battery type, 0: Unknown, 1: Battery, 2:UPS
     int technology; // Technology, 0: Unknown, 1: NiMH, 2: Li-ion, 3: LiPo, 4: LiFe, 5: NiCd, 6: LiMn
     // Basic
     int status; // Battery status, 0: unknown, 1: charging, 2: discharging, 3: full
@@ -43,6 +43,16 @@ struct virtual_battery_props {
     long energy_full_design; // Full energy design in microjoule
     // Energy rate
     long power_now; // Current power in microwatt
+    
+    // ===== 新增属性 =====
+    long charge_full;           // 满电量 (微安时)
+    long charge_full_design;    // 设计满电量 (微安时)
+    long charge_now;            // 当前电量 (微安时)
+    long temp;                  // 温度 (0.1°C)
+    long temp_ambient;          // 环境温度 (0.1°C)
+    long time_to_empty;         // 空电剩余时间 (秒)
+    long time_to_full;          // 充满剩余时间 (秒)
+    int cycle_count;            // 循环次数
 };
 
 static struct power_supply *battery;
@@ -79,6 +89,7 @@ static long battery_ioctl(struct file *file, unsigned int cmd, unsigned long arg
             return -EFAULT;
             
         memcpy(&current_props, &props, sizeof(props));
+        power_supply_changed(battery);
         return 0;
         
     default:
@@ -92,21 +103,35 @@ static const struct file_operations fops = {
 };
 
 static enum power_supply_property virtual_battery_properties[] = {
+    // 基本属性
     POWER_SUPPLY_PROP_STATUS,
     POWER_SUPPLY_PROP_PRESENT,
     POWER_SUPPLY_PROP_ONLINE,
     POWER_SUPPLY_PROP_TECHNOLOGY,
     POWER_SUPPLY_PROP_CAPACITY,
+    POWER_SUPPLY_PROP_CAPACITY_LEVEL,
+    
+    // 电压/电流
     POWER_SUPPLY_PROP_VOLTAGE_MAX_DESIGN,
     POWER_SUPPLY_PROP_VOLTAGE_MIN_DESIGN,
     POWER_SUPPLY_PROP_VOLTAGE_NOW,
     POWER_SUPPLY_PROP_CURRENT_NOW,
+    
+    // 能量相关
     POWER_SUPPLY_PROP_ENERGY_FULL,
     POWER_SUPPLY_PROP_ENERGY_NOW,
     POWER_SUPPLY_PROP_ENERGY_FULL_DESIGN,
-    // Energy rate
     POWER_SUPPLY_PROP_POWER_NOW,
-
+    
+    // ===== 新增属性 =====
+    POWER_SUPPLY_PROP_CHARGE_FULL,
+    POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN,
+    POWER_SUPPLY_PROP_CHARGE_NOW,
+    POWER_SUPPLY_PROP_TEMP,
+    POWER_SUPPLY_PROP_TEMP_AMBIENT,
+    POWER_SUPPLY_PROP_TIME_TO_EMPTY_NOW,
+    POWER_SUPPLY_PROP_TIME_TO_FULL_NOW,
+    POWER_SUPPLY_PROP_CYCLE_COUNT,
 };
 
 static int virtual_battery_get_property(struct power_supply *psy,
@@ -117,6 +142,7 @@ static int virtual_battery_get_property(struct power_supply *psy,
         return -ENODEV;
         
     switch (psp) {
+    // 基本属性
     case POWER_SUPPLY_PROP_STATUS:
         val->intval = current_props.status;
         break;
@@ -132,6 +158,11 @@ static int virtual_battery_get_property(struct power_supply *psy,
     case POWER_SUPPLY_PROP_CAPACITY:
         val->intval = current_props.capacity;
         break;
+    case POWER_SUPPLY_PROP_CAPACITY_LEVEL:
+        val->intval = current_props.capacity_level;
+        break;
+        
+    // 电压/电流
     case POWER_SUPPLY_PROP_VOLTAGE_MAX_DESIGN:
         val->intval = current_props.voltage_max_design;
         break;
@@ -144,6 +175,8 @@ static int virtual_battery_get_property(struct power_supply *psy,
     case POWER_SUPPLY_PROP_CURRENT_NOW:
         val->intval = current_props.current_now;
         break;
+        
+    // 能量相关
     case POWER_SUPPLY_PROP_ENERGY_FULL:
         val->intval = current_props.energy_full;
         break;
@@ -153,9 +186,34 @@ static int virtual_battery_get_property(struct power_supply *psy,
     case POWER_SUPPLY_PROP_ENERGY_FULL_DESIGN:
         val->intval = current_props.energy_full_design;
         break;
-    // Energy rate
     case POWER_SUPPLY_PROP_POWER_NOW:
         val->intval = current_props.power_now;
+        break;
+        
+    // ===== 新增属性处理 =====
+    case POWER_SUPPLY_PROP_CHARGE_FULL:
+        val->intval = current_props.charge_full;
+        break;
+    case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
+        val->intval = current_props.charge_full_design;
+        break;
+    case POWER_SUPPLY_PROP_CHARGE_NOW:
+        val->intval = current_props.charge_now;
+        break;
+    case POWER_SUPPLY_PROP_TEMP:
+        val->intval = current_props.temp;
+        break;
+    case POWER_SUPPLY_PROP_TEMP_AMBIENT:
+        val->intval = current_props.temp_ambient;
+        break;
+    case POWER_SUPPLY_PROP_TIME_TO_EMPTY_NOW:
+        val->intval = current_props.time_to_empty;
+        break;
+    case POWER_SUPPLY_PROP_TIME_TO_FULL_NOW:
+        val->intval = current_props.time_to_full;
+        break;
+    case POWER_SUPPLY_PROP_CYCLE_COUNT:
+        val->intval = current_props.cycle_count;
         break;
     default:
         return -EINVAL;
@@ -219,6 +277,11 @@ static int __init virtual_battery_init(void)
         ret = PTR_ERR(battery);
         goto err_psy;
     }
+    
+    // 初始化字符串属性
+    // strncpy(current_props.manufacturer, "SunFounder", sizeof(current_props.manufacturer));
+    // strncpy(current_props.model_name, "PiPower5", sizeof(current_props.model_name));
+    // strncpy(current_props.serial_number, "SN123456", sizeof(current_props.serial_number));
     
     printk(KERN_INFO "Virtual battery driver loaded\n");
     return 0;

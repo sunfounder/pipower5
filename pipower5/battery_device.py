@@ -50,6 +50,14 @@ class PowerSupplyProperties(ctypes.Structure):
         ('energy_now', ctypes.c_long),
         ('energy_full_design', ctypes.c_long),
         ('power_now', ctypes.c_long),
+        ('charge_full', ctypes.c_long),
+        ('charge_full_design', ctypes.c_long),
+        ('charge_now', ctypes.c_long),
+        ('temp', ctypes.c_long),
+        ('temp_ambient', ctypes.c_long),
+        ('time_to_full', ctypes.c_long),
+        ('time_to_empty', ctypes.c_long),
+        ('cycle_count', ctypes.c_int),
     ]
 
 # Define ioctl commands
@@ -58,8 +66,14 @@ PIPOWER_5_UNREGISTER = _IOW('V', 0x11, ctypes.sizeof(ctypes.c_int))
 PIPOWER_5_UPDATE = _IOW('V', 0x12, ctypes.sizeof(PowerSupplyProperties))
 
 # Other constant definitions
-_POWER_SUPPLY_TYPE_BATTERY = 1
-_POWER_SUPPLY_TYPE_USB = 2
+POWER_SUPPLY_TYPE_UNKNOWN = 0
+POWER_SUPPLY_TYPE_BATTERY = 1
+POWER_SUPPLY_TYPE_UPS = 2
+POWER_SUPPLY_TYPE_MAINS = 3
+POWER_SUPPLY_TYPE_USB = 4
+POWER_SUPPLY_TYPE_USB_DCP = 5
+POWER_SUPPLY_TYPE_USB_CDP = 6
+POWER_SUPPLY_TYPE_USB_ACA = 7
 
 class BatteryDevice:
     def __init__(self, log=None):
@@ -95,7 +109,7 @@ class BatteryDevice:
     def register_battery(self):
         # Initialize battery properties
         self.props.name = b"PiPower 5"
-        self.props.type = _POWER_SUPPLY_TYPE_BATTERY
+        self.props.type = POWER_SUPPLY_TYPE_UPS
         self.props.present = 1
         self.props.online = 1
         self.props.technology = 2  # Li-ion
@@ -106,16 +120,29 @@ class BatteryDevice:
         self.props.voltage_now = 8400000  # 8.4V
         self.props.current_now = 1500000  # 1.5A
         self.props.status = 1  # Discharging
-        self.props.energy_full = 14800000  # 14.8Wh
+        # On Ubuntu energy_full is in mAh
+        # self.props.energy_full = 14800000  # 14800mAh
+        self.props.energy_full = 2000000  # 2000mAh
         self.props.energy_now = 0  # 0
-        self.props.energy_full_design = 14800000  # 14.8Wh
+        # On Ubuntu Power now is in fact the current
+        # self.props.energy_full_design = 14800000  # 14800mAh
+        self.props.energy_full_design = 2000000  # 2000mAh
         self.props.power_now = 1500000  # 1.5W
+        self.props.charge_full = 2000000  # 2000mAh
+        self.props.charge_full_design = 2000000  # 2000mAh
+        self.props.charge_now = 0  # 0
+        self.props.temp = 0  # 0
+        self.props.temp_ambient = 0  # 0
+        self.props.time_to_full = 0  # 0
+        self.props.time_to_empty = 0  # 0
+        self.props.cycle_count = 0  # 0
+        
         
         try:
             fcntl.ioctl(self.device_fd, PIPOWER_5_REGISTER, self.props)
-            self.log.info("Virtual battery registered successfully")
+            self.log.info("Battery device registered successfully")
         except OSError as e:
-            self.log.exception(f"Battery registration failed: {e}")
+            self.log.exception(f"Battery device registration failed: {e}")
             sys.exit(1)
                 
     def unregister_battery(self):
@@ -159,8 +186,12 @@ class BatteryDevice:
         current_now = int(round(current_now))
         energy_now = data['battery_percentage'] * self.props.energy_full_design / 100
         energy_now = int(round(energy_now))
-        power_now = data['battery_voltage'] * data['battery_current']
+        # On Ubuntu Power now is in fact the current
+        # power_now = data['battery_voltage'] * data['battery_current']
+        power_now = data['battery_current'] * 1000
         power_now = int(round(power_now))
+        charge_now = data['battery_percentage'] * self.props.charge_full_design / 100
+        charge_now = int(round(charge_now))
 
         # Update properties
         self.props.present = present
