@@ -11,6 +11,7 @@ PERIPHERALS = [
     "spc",
     "cpu_temperature",
     "gpu_temperature",
+    "pwm_fan_speed",
     "temperature_unit",
     "input_voltage",
     "is_input_plugged_in",
@@ -52,6 +53,4 @@ SYSTEM_DEFAULT_CONFIG = {
     "smtp_use_tls": False
 }
 
-CUSTOM_PERIPHERALS = {
-    "pwm_fan": False
-}
+CUSTOM_PERIPHERALS = {}
