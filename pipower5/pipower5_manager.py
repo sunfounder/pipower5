@@ -88,8 +88,8 @@ class PiPower5Manager():
         self.service = PiPower5Service(config=self.config['system'], log=self.log)
         self.service.set_on_data_changed(self.handle_data_changed)
         self.service.set_on_button_shutdown(self.system.shutdown)
-        self.service.set_on_low_battery_shutdown(self.system.shutdown)
-        self.service.set_on_low_voltage_shutdown(self.system.shutdown)
+        self.service.set_on_battery_critical_shutdown(self.system.shutdown)
+        self.service.set_on_battery_voltage_critical_shutdown(self.system.shutdown)
 
         # --- init pm_dashboard ---
         if not has_pm_dashboard:
@@ -136,10 +136,6 @@ class PiPower5Manager():
             pass
         with open(self.config_path, 'w') as f:
             json.dump(self.config, f, indent=4)
-
-    @log_error
-    def handle_shutdown(self):
-        os.system(' hutdown -h now')
 
     @log_error
     def start(self):

@@ -121,15 +121,13 @@ class BatteryDevice:
         self.props.current_now = 1500000  # 1.5A
         self.props.status = 1  # Discharging
         # On Ubuntu energy_full is in mAh
-        # self.props.energy_full = 14800000  # 14800mAh
-        self.props.energy_full = 2000000  # 2000mAh
+        self.props.energy_full_design = 14800000  # 14800wh
+        # self.props.energy_full_design = 2000000  # 2000mAh
+        self.props.energy_full = self.props.energy_full_design
         self.props.energy_now = 0  # 0
-        # On Ubuntu Power now is in fact the current
-        # self.props.energy_full_design = 14800000  # 14800mAh
-        self.props.energy_full_design = 2000000  # 2000mAh
         self.props.power_now = 1500000  # 1.5W
-        self.props.charge_full = 2000000  # 2000mAh
-        self.props.charge_full_design = 2000000  # 2000mAh
+        self.props.charge_full = self.props.energy_full_design
+        self.props.charge_full_design = self.props.energy_full_design
         self.props.charge_now = 0  # 0
         self.props.temp = 0  # 0
         self.props.temp_ambient = 0  # 0
@@ -188,10 +186,21 @@ class BatteryDevice:
         energy_now = int(round(energy_now))
         # On Ubuntu Power now is in fact the current
         # power_now = data['battery_voltage'] * data['battery_current']
-        power_now = data['battery_current'] * 1000
+        power_now = data['battery_current'] * 10000
         power_now = int(round(power_now))
-        charge_now = data['battery_percentage'] * self.props.charge_full_design / 100
-        charge_now = int(round(charge_now))
+        charge_now = energy_now
+
+        time_to_empty = 0
+        if data['battery_current'] > 0:
+            time_to_empty = int(round(energy_now / power_now))
+        else:
+            time_to_empty = 0
+
+        time_to_full = 0
+        if data['battery_current'] < 0:
+            time_to_full = int(round((self.props.energy_full_design - energy_now) / -data['battery_current']))
+        else:
+            time_to_full = 0
 
         # Update properties
         self.props.present = present
@@ -202,7 +211,10 @@ class BatteryDevice:
         self.props.voltage_now = voltage_now
         self.props.current_now = current_now
         self.props.energy_now = energy_now
+        self.props.charge_now = charge_now
         self.props.power_now = power_now
+        self.props.time_to_empty = time_to_empty
+        self.props.time_to_full = time_to_full
 
         try:
             fcntl.ioctl(self.device_fd, PIPOWER_5_UPDATE, self.props)

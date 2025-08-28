@@ -5,6 +5,7 @@ from .utils import log_error
 from .email_sender import EmailSender, EmailModes
 from .battery_device import BatteryDevice
 import threading
+from .utils import LazyCaller
 
 class PiPower5Service():
     @log_error
@@ -34,20 +35,26 @@ class PiPower5Service():
 
         self.last_shutdown_request = None
         self.last_is_input_plugged_in = True
-        self.is_power_insufficient = False
 
-        self.__on_button_click__ = None
-        self.__on_button_double_click__ = None
-        self.__on_button_long_press__ = None
-        self.__on_low_battery_shutdown__ = None
-        self.__on_button_shutdown__ = None
-        self.__on_low_voltage_shutdown__ = None
-        self.__on_low_power__ = None
-        self.__on_power_insufficient__ = None
-        self.__on_battery_activated__ = None
-        self.__on_input_plugged_in__ = None
-        self.__on_input_unplugged__ = None
+        self.__on_user_button_click__ = None
+        self.__on_user_button_double_click__ = None
+        self.__on_user_button_long_press__ = None
+        self.__on_user_battery_critical_shutdown__ = None
+        self.__on_user_button_shutdown__ = None
+        self.__on_user_battery_critical_shutdown__ = None
+        self.__on_user_low_battery__ = None
+        self.__on_user_power_insufficient__ = None
+        self.__on_user_battery_activated__ = None
+        self.__on_user_power_restore__ = None
+        self.__on_user_power_disconnected__ = None
         self.__on_data_changed__ = None
+
+        self.on_low_battery = LazyCaller(self._on_low_battery, interval=10*60) # 10 minutes
+        self.on_power_insufficient = LazyCaller(self._on_power_insufficient, interval=10*60) # 10 minutes
+        self.on_battery_critical_shutdown = LazyCaller(self._on_battery_critical_shutdown, interval=10*60) # 10 minutes
+        self.on_battery_voltage_critical_shutdown = LazyCaller(self._on_battery_voltage_critical_shutdown, interval=10*60) # 10 minutes
+        self.on_power_restore = LazyCaller(self._on_power_restore, oneshot=True) # 10 minutes
+        self.on_power_disconnected = LazyCaller(self._on_power_disconnected, oneshot=True) # 10 minutes
 
         self._is_ready = True
 
@@ -59,7 +66,7 @@ class PiPower5Service():
         Args:
             callback (function): Callback function.
         '''
-        self.__on_button_click__ = callback
+        self.__on_user_button_click__ = callback
 
     @log_error
     def set_on_button_double_click(self, callback):
@@ -69,7 +76,7 @@ class PiPower5Service():
         Args:
             callback (function): Callback function.
         '''
-        self.__on_button_double_click__ = callback
+        self.__on_user_button_double_click__ = callback
 
     @log_error
     def set_on_button_long_press(self, callback):
@@ -79,17 +86,17 @@ class PiPower5Service():
         Args:
             callback (function): Callback function.
         '''
-        self.__on_button_long_press__ = callback
+        self.__on_user_button_long_press__ = callback
 
     @log_error
-    def set_on_low_battery_shutdown(self, callback):
+    def set_on_battery_critical_shutdown(self, callback):
         '''
         Set callback for low battery shutdown
 
         Args:
             callback (function): Callback function.
         '''
-        self.__on_low_battery_shutdown__ = callback
+        self.__on_user_battery_critical_shutdown__ = callback
 
     @log_error
     def set_on_button_shutdown(self, callback):
@@ -99,27 +106,27 @@ class PiPower5Service():
         Args:
             callback (function): Callback function.
         '''
-        self.__on_button_shutdown__ = callback
+        self.__on_user_button_shutdown__ = callback
 
     @log_error
-    def set_on_low_voltage_shutdown(self, callback):
+    def set_on_battery_voltage_critical_shutdown(self, callback):
         '''
         Set callback for low voltage shutdown
 
         Args:
             callback (function): Callback function.
         '''
-        self.__on_low_voltage_shutdown__ = callback
+        self.__on_user_battery_critical_shutdown__ = callback
 
     @log_error
-    def set_on_low_power(self, callback):
+    def set_on_low_battery(self, callback):
         '''
         Set callback for low power.
 
         Args:
             callback (function): Callback function.
         '''
-        self.__on_low_power__ = callback
+        self.__on_user_low_battery__ = callback
 
     @log_error
     def set_on_power_insufficient(self, callback):
@@ -129,7 +136,7 @@ class PiPower5Service():
         Args:
             callback (function): Callback function.
         '''
-        self.__on_power_insufficient__ = callback
+        self.__on_user_power_insufficient__ = callback
 
     @log_error
     def set_on_battery_activated(self, callback):
@@ -139,27 +146,27 @@ class PiPower5Service():
         Args:
             callback (function): Callback function.
         '''
-        self.__on_battery_activated__ = callback
+        self.__on_user_battery_activated__ = callback
 
     @log_error
-    def set_on_input_plugged_in(self, callback):
+    def set_on_power_restore(self, callback):
         '''
         Set callback for input plugged in.
 
         Args:
             callback (function): Callback function.
         '''
-        self.__on_input_plugged_in__ = callback
+        self.__on_user_power_restore__ = callback
 
     @log_error
-    def set_on_input_unplugged(self, callback):
+    def set_on_power_disconnected(self, callback):
         '''
         Set callback for input unplugged.
 
         Args:
             callback (function): Callback function.
         '''
-        self.__on_input_unplugged__ = callback
+        self.__on_user_power_disconnected__ = callback
 
     @log_error
     def set_on_data_changed(self, callback):
@@ -241,6 +248,63 @@ class PiPower5Service():
             callback(data)
 
     @log_error
+    def _on_low_battery(self, data):
+        self.log.info("Low Battery")
+        if self.__on_user_low_battery__:
+            self.__on_user_low_battery__("Low Battery")
+        self.send_email(EmailModes.LOW_BATTERY, data)
+
+    @log_error
+    def _on_power_insufficient(self, data):
+        self.log.info("Power Insufficient")
+        if self.__on_user_power_insufficient__:
+            self.__on_user_power_insufficient__("Power Insufficient")
+        self.send_email(EmailModes.POWER_INSUFFICIENT, data)
+
+    @log_error
+    def _on_battery_critical_shutdown(self, data):
+        self.log.info("Battery Critical Shutdown")
+        if self.__on_user_battery_critical_shutdown__:
+            self.__on_user_battery_critical_shutdown__("Battery Critical Shutdown")
+        self.send_email(EmailModes.BATTERY_CRITICAL_SHUTDOWN, data)
+
+    @log_error
+    def _on_battery_voltage_critical_shutdown(self, data):
+        self.log.info("Battery Voltage Critical Shutdown")
+        if self.__on_user_battery_critical_shutdown__:
+            self.__on_user_battery_critical_shutdown__("Battery Voltage Critical Shutdown")
+        self.send_email(EmailModes.BATTERY_VOLTAGE_CRITICAL_SHUTDOWN, data)
+
+    @log_error
+    def _on_power_restore(self, data):
+        self.log.info("Power Restore")
+        if self.__on_user_power_restore__:
+            self.__on_user_power_restore__("Power Restore")
+        self.send_email(EmailModes.POWER_RESTORED, data)
+        self.on_power_insufficient.reset()
+
+    @log_error
+    def _on_power_disconnected(self, data, shutdown_percentage):
+        self.log.info("Power Disconnected")
+        try:
+            remain_percentage = data['battery_percentage'] - shutdown_percentage
+            remain_mAh = self.pipower5.BAT_MAX_CAPACITY * remain_percentage / 100
+            current = -data['battery_current']
+            estimated_time = remain_mAh / current
+            estimated_time = round(estimated_time, 2)
+        except Exception as e:
+            self.log.error(f"Failed to estimate time until shutdown: {e}")
+            estimated_time = "Unknown"
+        data['battery_current_output'] = current
+        data['shutdown_percentage'] = shutdown_percentage
+        data['estimated_time'] = estimated_time
+        if self.__on_user_power_disconnected__:
+            self.__on_user_power_disconnected__("Power Disconnected")
+        self.send_email(EmailModes.POWER_DISCONNECTED, data)
+        self.on_power_insufficient.reset()
+        self.on_power_restore.reset()
+
+    @log_error
     async def main(self):
         while self.running:
             data = self.pipower5.read_all()
@@ -259,63 +323,38 @@ class PiPower5Service():
             # Check button state
             if button_state == ButtonState.CLICK:
                 self.log.debug(f'pipower5_button_click: {button_state}')
-                self.call(self.__on_button_click__, button_state)
+                self.call(self.__on_user_button_click__, button_state)
             elif button_state == ButtonState.DOUBLE_CLICK:
                 self.log.debug(f'pipower5_button_double_click: {button_state}')
-                self.call(self.__on_button_double_click__, button_state)
+                self.call(self.__on_user_button_double_click__, button_state)
             elif button_state == ButtonState.LONG_PRESS_2S:
                 self.log.debug(f'pipower5_button_long_click: {button_state}')
-                self.call(self.__on_button_long_press__, button_state)
+                self.call(self.__on_user_button_long_press__, button_state)
 
             # Check low battery
-            if battery_percentage < shutdown_percentage + 10:
-                self.send_email(EmailModes.LOW_BATTERY, data)
-                self.call(self.__on_low_battery_shutdown__, data)
+            if battery_percentage < shutdown_percentage:
+                self.on_low_battery(data)
+            elif battery_percentage > shutdown_percentage + 5:
+                self.on_low_battery.reset()
 
-            # Check power insufficient
-            if self.is_power_insufficient is False and power_source == 'battery' and is_input_plugged_in:
-                self.is_power_insufficient = True
-                self.send_email(EmailModes.POWER_INSUFFICIENT, data)
-                self.call(self.__on_power_insufficient__, data)
-    
             # Check shutdown request
             if shutdown_request != self.last_shutdown_request:
                 if shutdown_request == ShutdownRequest.BUTTON:
                     self.log.info("Shutdown request: Button")
-                    self.call(self.__on_button_shutdown__, data)
+                    self.call(self.__on_user_button_shutdown__, data, shutdown_percentage)
                 elif shutdown_request == ShutdownRequest.LOW_BATTERY:
-                    self.log.info("Shutdown request: Low battery capacity")
-                    self.call(self.__on_low_battery_shutdown__, data)
-                    self.send_email(EmailModes.BATTERY_CRITICAL_SHUTDOWN, data)
+                    self.on_battery_critical_shutdown(data)
                 elif shutdown_request == ShutdownRequest.LOW_VOLTAGE:
-                    self.log.info("Shutdown request: Low voltage")
-                    self.call(self.__on_low_voltage_shutdown__, data)
-                    self.send_email(EmailModes.BATTERY_VOLTAGE_CRITICAL_SHUTDOWN, data)
+                    self.on_battery_voltage_critical_shutdown(data)
                 self.last_shutdown_request = shutdown_request
 
-            if is_input_plugged_in != self.last_is_input_plugged_in:
-                if is_input_plugged_in:
-                    self.log.info("Input plugged in")
-                    self.send_email(EmailModes.POWER_RESTORED, data)
-                    self.call(self.__on_input_plugged_in__, data)
-                else:
-                    self.log.info("Input unplugged")
-                    try:
-                        remain_percentage = data['battery_percentage'] - shutdown_percentage
-                        remain_mAh = self.pipower5.BAT_MAX_CAPACITY * remain_percentage / 100
-                        current = -data['battery_current']
-                        estimated_time = remain_mAh / current
-                        estimated_time = round(estimated_time, 2)
-                    except Exception as e:
-                        self.log.error(f"Failed to estimate time until shutdown: {e}")
-                        estimated_time = "Unknown"
-                    data['battery_current_output'] = current
-                    data['shutdown_percentage'] = shutdown_percentage
-                    data['estimated_time'] = estimated_time
-                    self.send_email(EmailModes.POWER_DISCONNECTED, data)
-                    self.call(self.__on_input_unplugged__, data)
-                    self.is_power_insufficient = False
-                self.last_is_input_plugged_in = is_input_plugged_in
+            if is_input_plugged_in:
+                self.on_power_restore(data)
+                # Check power insufficient
+                if  power_source == 'battery' and is_input_plugged_in:
+                    self.on_power_insufficient(data)
+            else:
+                self.on_power_disconnected(data)
             await asyncio.sleep(self.interval)
 
     @log_error
