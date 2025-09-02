@@ -7,7 +7,7 @@ from .pipower5_service import PiPower5Service
 from .pipower5_system import PiPower5System
 
 from .logger import Logger
-from .utils import merge_dict, log_error, get_varient_id_and_version
+from .utils import log_error, get_varient_id_and_version
 from .version import __version__ as pipower5_version
 from .constants import NAME, ID, PERIPHERALS, SYSTEM_DEFAULT_CONFIG
 
@@ -22,22 +22,20 @@ class PiPower5Manager():
         self.log = Logger('pipower5')
         self.log_level = 'INFO'
 
-        # --- init config ---
-        self.config = {
-            'system': SYSTEM_DEFAULT_CONFIG,
-        }
-        # merge config
+        # read config
         self.config_path = config_path
         if os.path.exists(self.config_path):
             with open(self.config_path, 'r') as f:
-                config = json.load(f)
-                self.config = merge_dict(self.config, config)
+                self.config = json.load(f)
+        else:
+            self.config = {'system': SYSTEM_DEFAULT_CONFIG,}
+            with open(self.config_path, 'w') as f:
+                json.dump(self.config, f, indent=4)
         try:
             os.chmod(self.config_path, 0o777)
         except:
             pass
         
-
         # --- device_info ---
         self.device_info = {
             'name': NAME,
@@ -69,14 +67,8 @@ class PiPower5Manager():
         # --- print ---
         self.log.info(f'PiPower5 {pipower5_version} started')
         self.log.info(f"Board version: {BOARD_VERSION}")
-        self.log.info(f"Config:")
-        _config_json = json.dumps(self.config, indent=4)
-        for line in _config_json.splitlines():
-            self.log.info(line)
-        _device_info_json = json.dumps(self.device_info, indent=4)
-        self.log.info(f"Device info:")
-        for line in _device_info_json.splitlines():
-            self.log.info(line)
+        self.log.info(f"Config: {self.config}")
+        self.log.info(f"Device info: {self.device_info}")
         if has_pm_dashboard:
             self.log.info(f"PM_Dashboard version: {pm_dashboard_version}")
 
@@ -87,6 +79,7 @@ class PiPower5Manager():
         # --- init service ---
         self.service = PiPower5Service(config=self.config['system'], log=self.log)
         self.service.set_on_data_changed(self.handle_data_changed)
+        self.service.set_on_config_changed(self.update_config)
         self.service.set_on_button_shutdown(self.system.shutdown)
         self.service.set_on_battery_critical_shutdown(self.system.shutdown)
         self.service.set_on_battery_voltage_critical_shutdown(self.system.shutdown)
@@ -105,6 +98,7 @@ class PiPower5Manager():
             self.pm_dashboard.set_debug_level(self.log_level)
             self.pm_dashboard.set_test_smtp(self.service.test_smtp)
             self.pm_dashboard.set_on_restart_service(self.restart_service)
+            self.pm_dashboard.set_play_pipower5_buzzer(self.play_pipower5_buzzer)
 
     @log_error
     def read_data(self):
@@ -113,6 +107,10 @@ class PiPower5Manager():
     @log_error
     def handle_data_changed(self, data) -> None:
         self.data.update(data)
+
+    @log_error
+    def play_pipower5_buzzer(self, event):
+        self.service.buzz_event(event)
 
     @log_error
     def restart_service(self):
@@ -129,13 +127,14 @@ class PiPower5Manager():
     @log_error
     def update_config(self, config):
         patch = self.service.update_config(config['system'])
-        self.config.update(patch)
+        self.config["system"].update(patch)
         try:
             os.chmod(self.config_path, 0o777)
         except:
             pass
         with open(self.config_path, 'w') as f:
             json.dump(self.config, f, indent=4)
+        return self.config
 
     @log_error
     def start(self):

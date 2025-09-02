@@ -264,7 +264,7 @@ class PiPower5System():
         self.loop_thread.start()
         # 在事件循环中创建并运行任务
         self.loop.call_soon_threadsafe(self._start_loop_task)
-        self.log.info("PiPower5 service started")
+        self.log.info("PiPower5 system started")
 
     def _run_loop(self):
         """在线程中运行事件循环"""

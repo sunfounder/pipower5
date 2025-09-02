@@ -1,4 +1,4 @@
-from enum import StrEnum
+
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -10,14 +10,6 @@ import logging
 
 DEFAULT_SMTP_PORT = 465
 DEFAULT_SMTP_SECURITY = 'ssl'
-
-class EmailModes(StrEnum):
-    LOW_BATTERY = 'low_battery'
-    POWER_DISCONNECTED = 'power_disconnected'
-    POWER_RESTORED = 'power_restored'
-    POWER_INSUFFICIENT = 'power_insufficient'
-    BATTERY_CRITICAL_SHUTDOWN = 'battery_critical_shutdown'
-    BATTERY_VOLTAGE_CRITICAL_SHUTDOWN = 'battery_voltage_critical_shutdown'
 
 TEMPLATE_DIR = '/opt/pipower5/email_templates/'
 TEMPLATES = TEMPLATE_DIR + 'email_templates.json'
@@ -86,10 +78,10 @@ class EmailSender():
         else:
             raise FileNotFoundError(f"Email templates file {TEMPLATES} not found")
 
-    def send_preset_email(self, mode, data):
+    def send_preset_email(self, event, data):
         if not self.is_ready():
             return "Email sender not ready"
-        template = self.templates[mode]
+        template = self.templates[event]
         subject = template['subject'].format(**data)
         body_path = template['body_path']
         body_path = TEMPLATE_DIR + body_path

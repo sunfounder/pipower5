@@ -14,20 +14,19 @@ def main():
     import time
     import argparse
 
-    from .constants import PERIPHERALS
+    from .constants import PERIPHERALS, SYSTEM_DEFAULT_CONFIG
     from .version import __version__
     from .utils import is_included, get_varient_id_and_version
-    from .email_sender import EmailModes
-    from .pipower5 import PiPower5
+    from .pipower5 import PiPower5, Event
 
     from importlib.resources import files as resource_files
     import json
     import sys
-    from os import path
+    import os
 
     TRUE_LIST = ['true', 'True', 'TRUE', '1', 'on', 'On', 'ON']
     FALSE_LIST = ['false', 'False', 'FALSE', '0', 'off', 'Off', 'OFF']
-    AVAILABLE_EMAIL_MODES = [i.value for i in EmailModes]
+    AVAILABLE_EVENTS = [i.value for i in Event]
     _, BOARD_VERSION = get_varient_id_and_version()
 
     __package_name__ = __name__.split('.')[0]
@@ -73,13 +72,16 @@ def main():
     parser.add_argument('-a', '--all', action='store_true', help='Show all status')
     parser.add_argument('-fv', '--firmware', action='store_true', help='PiPower5 firmware version')
     parser.add_argument('-pfs', '--power-failure-simulation', nargs='?', default='', help='Power failure simulation')
-    parser.add_argument("-seo", '--send-email-on', nargs='?', default=[], help=f"Send email on: {AVAILABLE_EMAIL_MODES}")
+    parser.add_argument("-seo", '--send-email-on', nargs='?', default=[], help=f"Send email on: {AVAILABLE_EVENTS}")
     parser.add_argument("-set", '--send-email-to', nargs='?', default='', help="Email address to send email to")
     parser.add_argument("-ss", '--smtp-server', nargs='?', default='', help="SMTP server")
     parser.add_argument("-smp", '--smtp-port', nargs='?', default='', help="SMTP port")
     parser.add_argument("-se", '--smtp-email', nargs='?', default='', help="SMTP email")
     parser.add_argument("-spw", '--smtp-password', nargs='?', default='', help="SMTP password")
-    parser.add_argument("-ssu", '--smtp-use-tls', nargs='?', default='', help="SMTP use tls")
+    parser.add_argument("-ssc", '--smtp-security', nargs='?', default='', help="SMTP security, 'none', 'ssl' or 'tls'")
+    parser.add_argument("-bzo", '--buzz-on', nargs='?', default=[], help=f"Buzz on: {AVAILABLE_EVENTS}")
+    parser.add_argument("-bzv", '--buzzer-volume', nargs='?', default='', help="Buzz volume")
+    parser.add_argument("-bzt", '--buzzer-test', nargs='?', default='', help="Test buzzer on selected event.")
 
     if is_included(PERIPHERALS, "temperature_unit"):
         parser.add_argument("-u", "--temperature-unit", choices=["C", "F"], nargs='?', default='', help="Temperature unit")
@@ -90,25 +92,30 @@ def main():
         parser.print_help()
         quit()
 
+    current_config = {
+        "system": SYSTEM_DEFAULT_CONFIG,
+    }
+
     config_path = CONFIG_PATH
     if args.config_path != '':
         if args.config_path == None:
             print(f"Config path: {config_path}")
         else:
             config_path = args.config_path
-    if not path.exists(config_path):
-        with open(config_path, 'w') as f:
-            json.dump({'system': {}}, f, indent=4)
-    else:
+
+    # read config
+    if os.path.exists(config_path):
         with open(config_path, 'r') as f:
-            try:
-                content = f.read()
-                if content == '':
-                    current_config = {'system': {}}
-                current_config = json.loads(content)
-            except json.JSONDecodeError:
-                print(f"Invalid config file: {config_path}")
-                quit()
+            current_config = json.load(f)
+    else:
+        current_config = {'system': SYSTEM_DEFAULT_CONFIG,}
+        with open(config_path, 'w') as f:
+            json.dump(current_config, f, indent=4)
+    try:
+        os.chmod(config_path, 0o777)
+    except:
+        pass
+        
 
     if args.config:
         print(json.dumps(current_config, indent=4))
@@ -262,32 +269,18 @@ Internal:
     if args.firmware:
         print(f"Pipower5 firmware version: {pipower5.read_firmware_version()}")
 
-    if len(new_sys_config) > 0 or len(new_peripheral_config) > 0:
-        new_config = {
-            'system': new_sys_config,
-            'peripherals': new_peripheral_config
-        }
-        
-        update_config_file(new_config, config_path)
-
-    if args.command == "start":
-        from pipower5.pipower5_manager import PiPower5Manager
-        pipower5 = PiPower5Manager(config_path=config_path)
-        pipower5.set_debug_level(debug_level)
-        pipower5.start()
-
     # send email on
     if args.send_email_on != []:
         if args.send_email_on == None:
-            send_email_on = [f' - {mode}' for mode in current_config['system']['send_email_on']]
+            send_email_on = [f' - {event}' for event in current_config['system']['send_email_on']]
             send_email_on = '\n'.join(send_email_on)
             print("Send email on:")
             print(send_email_on)
         else:
             send_email_on = [p.replace(',', '') for p in args.send_email_on]
-            for mode in send_email_on:
-                if mode not in AVAILABLE_EMAIL_MODES:
-                    print(f"Invalid value for Send email on: '{mode}', it should be {', '.join(AVAILABLE_EMAIL_MODES)}")
+            for event in send_email_on:
+                if event not in AVAILABLE_EVENTS:
+                    print(f"Invalid event for Send email on: '{event}', it should be {', '.join(AVAILABLE_EVENTS)}")
                     quit()
             new_sys_config['send_email_on'] = send_email_on
             print(f"Set Send email on: {send_email_on}")
@@ -326,33 +319,34 @@ Internal:
         else:
             new_sys_config['smtp_password'] = args.smtp_password
             print(f"Set SMTP password: {args.smtp_password}")
-    # SMTP use TLS
-    if args.smtp_use_tls != '':
-        if args.smtp_use_tls == None:
-            print(f"SMTP use TLS: {current_config['system']['smtp_use_tls']}")
+    # SMTP security
+    if args.smtp_security != '':
+        if args.smtp_security == None:
+            print(f"SMTP security: {current_config['system']['smtp_security']}")
         else:
-            if args.smtp_use_tls in TRUE_LIST:
-                args.smtp_use_tls = True
-            elif args.smtp_use_tls in FALSE_LIST:
-                args.smtp_use_tls = False
-            else:
-                print(f"Invalid value for SMTP use TLS, it should be in {', '.join(TRUE_LIST + FALSE_LIST)}")
+            security = args.smtp_security.lower()
+            if security not in ['none', 'tls', 'ssl']:
+                print(f"Invalid value for SMTP security, it should be in 'none', 'tls' or 'ssl'")
                 quit()
-            print(f"Set SMTP use TLS: {args.smtp_use_tls}")
+            new_sys_config['smtp_security'] = security
+            print(f"Set SMTP security: {security}")
 
     if args.power_failure_simulation != '':
         test_time = 60 # seconds
         if args.power_failure_simulation != None:
             test_time = int(args.power_failure_simulation)
             if test_time < 10:
-                print(f"Blackout simulation time should be at least 10 seconds")
+                print(f"Power failure simulation time should be at least 10 seconds")
                 quit()
             elif test_time > 600:
-                print(f"Blackout simulation time should be at most 600 seconds(10 minutes)")
+                print(f"Power failure simulation time should be at most 600 seconds(10 minutes)")
                 quit()
 
-        print(f"Blackout simulation for {test_time} seconds")
+        print(f"Power failure simulation for {test_time} seconds")
         report = pipower5.power_failure_simulation(test_time)
+        if report == None:
+            print(f'Power failure simulation failed')
+            quit()
         print(f'report:')
         print(f'  battery mah used : {report["bat_mah_used"]:.3f} mAh')
         print(f'  battery percent used : {report["bat_percent_used"]:.3f} %')
@@ -376,5 +370,56 @@ Internal:
         print(f'  available time: {report["available_time"]} s')
         print(f'  available_bat_capacity: {int(report["available_bat_capacity"])} mAh')
 
+    # buzzer
+    if args.buzz_on != []:
+        if args.buzz_on == None:
+            buzz_on = [f' - {event}' for event in current_config['system']['pipower5_buzz_on']]
+            buzz_on = '\n'.join(buzz_on)
+            print("Buzz on:")
+            print(buzz_on)
+        else:
+            buzz_on = [p.replace(',', '') for p in args.buzz_on]
+            for event in buzz_on:
+                if event not in AVAILABLE_EVENTS:
+                    print(f"Invalid event for Buzz on: '{event}', it should be {', '.join(AVAILABLE_EVENTS)}")
+                    quit()
+            new_sys_config['pipower5_buzz_on'] = buzz_on
+            print(f"Set Buzz on: {buzz_on}")
+    if args.buzzer_volume != '':
+        if args.buzzer_volume == None:
+            print(f"Buzz volume: {pipower5.get_buzzer_volume()}")
+        else:
+            volume = int(args.buzzer_volume)
+            if volume < 0 or volume > 10:
+                print(f"Invalid value for Buzz volume, it should be in 0-10")
+                quit()
+            new_sys_config['pipower5_buzzer_volume'] = volume
+            pipower5.set_buzzer_volume(volume)
+            print(f"Set Buzz volume: {volume}")
+    # test buzz on
+    if args.buzzer_test != '':
+        if args.buzzer_test == None:
+            print(f"Invalid event for Test buzz on: '{args.buzzer_test}', it should be {', '.join(AVAILABLE_EVENTS)}")
+            quit()
+        else:
+            event = args.buzzer_test
+            if event in AVAILABLE_EVENTS:
+                sequence = current_config['system']['pipower5_buzz_sequence'][event]
+                pipower5.buzz_sequence(sequence)
+            else:
+                print(f"Invalid event for Test buzz on: '{event}', it should be {', '.join(AVAILABLE_EVENTS)}")
+                quit()
 
+    if len(new_sys_config) > 0 or len(new_peripheral_config) > 0:
+        new_config = {
+            'system': new_sys_config,
+            'peripherals': new_peripheral_config
+        }
         
+        update_config_file(new_config, config_path)
+
+    if args.command == "start":
+        from pipower5.pipower5_manager import PiPower5Manager
+        pipower5 = PiPower5Manager(config_path=config_path)
+        pipower5.set_debug_level(debug_level)
+        pipower5.start()

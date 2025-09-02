@@ -1,9 +1,14 @@
 {
+    "battery_activated": {
+        "subject": "🔋 {device_name} Battery Activated",
+        "body_path": "battery_activated.html"
+    },
+
     "low_battery": {
         "subject": "🚨 {device_name} Critical Battery Level - Only {battery_percentage}% Remaining",
         "body_path": "low_battery.html"
     },
-    
+ 
     "battery_critical_shutdown": {
         "subject": "🔥 {device_name} Critical Battery Level - Shutting Down Immediately",
         "body_path": "battery_critical_shutdown.html"
