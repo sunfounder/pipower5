@@ -1,7 +1,8 @@
 import time
 import json
-from enum import IntEnum
+from enum import IntEnum, StrEnum
 from spc.spc import SPC
+from .note import NOTES, get_note_freq
 
 class ButtonState(IntEnum):
     RELEASED = 0
@@ -17,6 +18,15 @@ class ShutdownRequest(IntEnum):
     LOW_BATTERY = 1
     BUTTON = 2
     LOW_VOLTAGE = 3
+
+class Event(StrEnum):
+    BATTERY_ACTIVATED = 'battery_activated'
+    LOW_BATTERY = 'low_battery'
+    POWER_DISCONNECTED = 'power_disconnected'
+    POWER_RESTORED = 'power_restored'
+    POWER_INSUFFICIENT = 'power_insufficient'
+    BATTERY_CRITICAL_SHUTDOWN = 'battery_critical_shutdown'
+    BATTERY_VOLTAGE_CRITICAL_SHUTDOWN = 'battery_voltage_critical_shutdown'
 
 class PiPower5(SPC):
     # register address
@@ -37,6 +47,8 @@ class PiPower5(SPC):
     ADV_CMD_BAT_EN = 0x02
     ADV_CMD_OUPUT_EN = 0x03
     ADV_CMD_ENTER_IAP = 0x04
+
+    PAUSE_ACTIONS = ['pause', 'PAUSE', 'Pause', 'P', 'p']
 
     def __init__(self):
         super().__init__()
@@ -69,6 +81,7 @@ class PiPower5(SPC):
             return False
 
     def power_failure_simulation(self, test_time):
+        import signal, os
         # --- Protect VBUS when the program terminates. ---
         def signal_handler(signum, frame):
             if signum == signal.SIGINT:
@@ -100,9 +113,11 @@ class PiPower5(SPC):
 
         print(f'battery: {battery_percentage}%, input: {"plugged in" if is_input_plugged_in else "unplugged"}')
 
-        if battery_percentage < 80 or not is_input_plugged_in:
-            warn_emoji = '\U000026A0'
+        warn_emoji = '\U000026A0'
+        if battery_percentage < 80:
             print(f'{warn_emoji} Battery must be greater than 80%')
+            return None
+        if not is_input_plugged_in:
             print(f'{warn_emoji} Input must be plugged in')
             return None
 
@@ -201,6 +216,7 @@ class PiPower5(SPC):
                     output_power_max = output_power
 
                 every_delay = interval - (time.time() - every_start)
+                print(f'\r{dt:.0f}/{test_time}s, {bat_voltage/1000:.2f} V, {bat_current/1000:.2f} A, {bat_power:.2f} W', end='', flush=True)
                 if every_delay > 0:
                     time.sleep(every_delay)
         finally:
@@ -297,3 +313,57 @@ class PiPower5(SPC):
         '''
         val = super().read_shutdown_request()
         return ShutdownRequest(val)
+
+    def _buzz_action(self, action):
+        if action in self.PAUSE_ACTIONS:
+            self.write_buzzer_freq(0)
+        elif isinstance(action, str):
+            if action is not None and action in NOTES:
+                freq = get_note_freq(action)
+                freq = int(freq)
+                self.write_buzzer_freq(freq)
+            else:
+                raise ValueError(f"Invalid note: {action}")
+        elif isinstance(action, int):
+            if action > 0 and action < 65535:
+                self.write_buzzer_freq(action)
+            else:
+                raise ValueError(f"Invalid frequency: {action}")
+        else:
+            raise ValueError(f"Invalid action: {action}")
+
+    def buzz_sequence(self, sequence):
+        '''
+        Buzz according to the sequence, every value is a list of [action, duration]
+        Actions:
+        - Tone note string like 'C5', 'D3', 'C#1'
+        - Frequency integer like 440, 880
+        - Pause string like 'pause', 'PAUSE', 'Pause', 'P', 'p', 'stop', 'STOP'
+        Duration:
+        - Integer like 1000, 2000 in milisecond
+
+        Args:
+            sequence (list): A list of [action, duration]
+        '''
+        for action, duration in sequence:
+            self._buzz_action(action)
+            time.sleep(duration / 1000)
+        self.write_buzzer_freq(0)
+
+    async def buzz_sequence_async(self, sequence):
+        '''
+        Buzz according to the sequence, every value is a list of [action, duration]
+        Actions:
+        - Tone note string like 'C5', 'D3', 'C#1'
+        - Frequency integer like 440, 880
+        - Pause string like 'pause', 'PAUSE', 'Pause', 'P', 'p', 'stop', 'STOP'
+        Duration:
+        - Integer like 1000, 2000 in milisecond
+
+        Args:
+            sequence (list): A list of [action, duration]
+        '''
+        for action, duration in sequence:
+            self._buzz_action(action)
+            await asyncio.sleep(duration / 1000)
+        self.write_buzzer_freq(0)

@@ -391,7 +391,7 @@ class PiPower5Service():
             if shutdown_request != self.last_shutdown_request:
                 if shutdown_request == ShutdownRequest.BUTTON:
                     self.log.info("Shutdown request: Button")
-                    self.call(self.__on_user_button_shutdown__, data, shutdown_percentage)
+                    self.call(self.__on_user_button_shutdown__, data)
                 elif shutdown_request == ShutdownRequest.LOW_BATTERY:
                     self.on_battery_critical_shutdown(data)
                 elif shutdown_request == ShutdownRequest.LOW_VOLTAGE:
