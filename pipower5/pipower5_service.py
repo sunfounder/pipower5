@@ -37,6 +37,7 @@ class PiPower5Service():
         self.__on_user_button_click__ = None
         self.__on_user_button_double_click__ = None
         self.__on_user_button_long_press__ = None
+        self.__on_user_button_long_press_released__ = None
         self.__on_user_battery_critical_shutdown__ = None
         self.__on_user_button_shutdown__ = None
         self.__on_user_battery_critical_shutdown__ = None
@@ -95,6 +96,16 @@ class PiPower5Service():
             callback (function): Callback function.
         '''
         self.__on_user_button_long_press__ = callback
+
+    @log_error
+    def set_on_button_long_press_released(self, callback):
+        '''
+        Set callback for button long press released.
+
+        Args:
+            callback (function): Callback function.
+        '''
+        self.__on_user_button_long_press_released__ = callback
 
     @log_error
     def set_on_battery_critical_shutdown(self, callback):
@@ -378,8 +389,11 @@ class PiPower5Service():
                 self.log.debug(f'pipower5_button_double_click: {button_state}')
                 self.call(self.__on_user_button_double_click__, button_state)
             elif button_state == ButtonState.LONG_PRESS_2S:
-                self.log.debug(f'pipower5_button_long_click: {button_state}')
+                self.log.debug(f'pipower5_button_long_press_2s: {button_state}')
                 self.call(self.__on_user_button_long_press__, button_state)
+            elif button_state == ButtonState.LONG_PRESS_2S_RELEASED:
+                self.log.debug(f'pipower5_button_long_press_2s_released: {button_state}')
+                self.call(self.__on_user_button_long_press_released__, button_state)
 
             # Check low battery
             if battery_percentage < shutdown_percentage:
