@@ -15,6 +15,8 @@ __package_name__ = __name__.split('.')[0]
 CONFIG_PATH = str(resource_files(__package_name__).joinpath('config.json'))
 _, BOARD_VERSION = get_varient_id_and_version()
 
+DEFAULT_DEBUG_LEVEL = 'INFO' # 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL'
+
 class PiPower5Manager():
 
     def __init__(self, config_path=CONFIG_PATH):
@@ -58,11 +60,18 @@ class PiPower5Manager():
         except ImportError:
             has_pm_dashboard = False
 
+        # Set debug level
+        # -----------------------------------------
+        _debug_level = self.config['system']['debug_level'].upper()
+        if _debug_level not in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
+            self.log.warning(f"Invalid debug level '{_debug_level}', using default '{DEFAULT_DEBUG_LEVEL}'")
+            _debug_level = DEFAULT_DEBUG_LEVEL
+        self.set_debug_level(_debug_level)
+
         # LOG HEADER
         self.log.info(f"")
         self.log.info(f"{'#'*60}")
         self.log.debug(f"Config path: {CONFIG_PATH}")
-        self.log.info(f"Pironman5 Start")
 
         # --- print ---
         self.log.info(f'PiPower5 {pipower5_version} started')

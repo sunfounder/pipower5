@@ -5,7 +5,7 @@ from .utils import log_error
 from .email_sender import EmailSender
 from .battery_device import BatteryDevice
 import threading
-from .utils import LazyCaller
+from .lazy_caller import LazyCaller
 
 class PiPower5Service():
     @log_error
@@ -334,20 +334,8 @@ class PiPower5Service():
         self.on_power_insufficient.reset()
 
     @log_error
-    def _on_power_disconnected(self, data, shutdown_percentage):
+    def _on_power_disconnected(self, data):
         self.log.info("Power Disconnected")
-        try:
-            remain_percentage = data['battery_percentage'] - shutdown_percentage
-            remain_mAh = self.pipower5.BAT_MAX_CAPACITY * remain_percentage / 100
-            current = -data['battery_current']
-            estimated_time = remain_mAh / current
-            estimated_time = round(estimated_time, 2)
-        except Exception as e:
-            self.log.error(f"Failed to estimate time until shutdown: {e}")
-            estimated_time = "Unknown"
-        data['battery_current_output'] = current
-        data['shutdown_percentage'] = shutdown_percentage
-        data['estimated_time'] = estimated_time
         if self.__on_user_power_disconnected__:
             self.__on_user_power_disconnected__("Power Disconnected")
         self.send_email(Event.POWER_DISCONNECTED, data)
@@ -377,6 +365,7 @@ class PiPower5Service():
             is_input_plugged_in = data['is_input_plugged_in']
             power_source = data['power_source']
             shutdown_percentage = self.pipower5.read_shutdown_percentage()
+            data['shutdown_percentage'] = shutdown_percentage
 
             button_state = self.pipower5.read_power_btn()
             shutdown_request = self.pipower5.read_shutdown_request()
