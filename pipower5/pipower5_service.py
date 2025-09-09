@@ -6,6 +6,7 @@ from .email_sender import EmailSender
 from .battery_device import BatteryDevice
 import threading
 from .lazy_caller import LazyCaller
+from .debounce import Debounce
 
 class PiPower5Service():
     @log_error
@@ -54,6 +55,8 @@ class PiPower5Service():
         self.on_battery_voltage_critical_shutdown = LazyCaller(self._on_battery_voltage_critical_shutdown, interval=10*60) # 10 minutes
         self.on_power_restore = LazyCaller(self._on_power_restore, oneshot=True) # 10 minutes
         self.on_power_disconnected = LazyCaller(self._on_power_disconnected, oneshot=True) # 10 minutes
+
+        self.check_input_plugged_in = Debounce(timeout=3)
 
         self._is_ready = True
 
@@ -331,7 +334,7 @@ class PiPower5Service():
             self.__on_user_power_restore__("Power Restore")
         self.send_email(Event.POWER_RESTORED, data)
         self.buzz_event(Event.POWER_RESTORED)
-        self.on_power_insufficient.reset()
+        self.on_power_disconnected.reset()
 
     @log_error
     def _on_power_disconnected(self, data):
@@ -342,6 +345,10 @@ class PiPower5Service():
         self.buzz_event(Event.POWER_DISCONNECTED)
         self.on_power_insufficient.reset()
         self.on_power_restore.reset()
+
+    @log_error
+    def is_unplugged(self, data):
+        self._on_low_battery(data)
 
     @log_error
     async def main(self):
@@ -361,16 +368,25 @@ class PiPower5Service():
             self.call(self.__on_data_changed__, data)
             self.device.update_battery(data)
 
-            battery_percentage = data['battery_percentage']
-            is_input_plugged_in = data['is_input_plugged_in']
-            power_source = data['power_source']
             shutdown_percentage = self.pipower5.read_shutdown_percentage()
             data['shutdown_percentage'] = shutdown_percentage
 
-            button_state = self.pipower5.read_power_btn()
-            shutdown_request = self.pipower5.read_shutdown_request()
+            # Estimate time until shutdown
+            try:
+                remain_percentage = data['battery_percentage'] - shutdown_percentage
+                remain_mAh = self.pipower5.BAT_MAX_CAPACITY * remain_percentage / 100
+                current = -data['battery_current']
+                estimated_time = remain_mAh / current
+                estimated_time = round(estimated_time, 2)
+            except Exception as e:
+                self.log.error(f"Failed to estimate time until shutdown: {e}")
+                estimated_time = "Unknown"
+            data['battery_current_output'] = current
+            data['shutdown_percentage'] = shutdown_percentage
+            data['estimated_time'] = estimated_time
 
             # Check button state
+            button_state = self.pipower5.read_power_btn()
             if button_state == ButtonState.CLICK:
                 self.log.debug(f'pipower5_button_click: {button_state}')
                 self.call(self.__on_user_button_click__, button_state)
@@ -385,12 +401,14 @@ class PiPower5Service():
                 self.call(self.__on_user_button_long_press_released__, button_state)
 
             # Check low battery
+            battery_percentage = data['battery_percentage']
             if battery_percentage < shutdown_percentage:
                 self.on_low_battery(data)
             elif battery_percentage > shutdown_percentage + 5:
                 self.on_low_battery.reset()
 
             # Check shutdown request
+            shutdown_request = self.pipower5.read_shutdown_request()
             if shutdown_request != self.last_shutdown_request:
                 if shutdown_request == ShutdownRequest.BUTTON:
                     self.log.info("Shutdown request: Button")
@@ -401,7 +419,10 @@ class PiPower5Service():
                     self.on_battery_voltage_critical_shutdown(data)
                 self.last_shutdown_request = shutdown_request
 
-            if is_input_plugged_in:
+            # Check power state
+            is_input_plugged_in = data['is_input_plugged_in']
+            power_source = data['power_source']
+            if self.check_input_plugged_in(is_input_plugged_in):
                 self.on_power_restore(data)
                 # Check power insufficient
                 if  power_source == 'battery' and is_input_plugged_in:
