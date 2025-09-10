@@ -42,6 +42,8 @@ cd ~/pm_auto && sudo rm -rf build pm_auto.egg-info && sudo /opt/pipower5/venv/bi
 cd ~/sf_rpi_status && sudo rm -rf build sf_rpi_status.egg-info && sudo /opt/pipower5/venv/bin/pip3 uninstall sf_rpi_status -y && sudo /opt/pipower5/venv/bin/pip3 install . --no-build-isolation
 sudo /opt/pipower5/venv/bin/pip3 uninstall spc -y && sudo /opt/pipower5/venv/bin/pip3 install git+https://github.com/sunfounder/spc.git --no-build-isolation
 
+sudo rm -r /opt/pipower5/email_templates/ && sudo cp -r ~/pipower5/email_templates/ /opt/pipower5/
+journalctl -xefu pipower5.service
 ```
 
 Start/stop the service for debug

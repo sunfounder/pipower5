@@ -1,12 +1,13 @@
 import asyncio
 import logging
-from .pipower5 import PiPower5, ButtonState, ShutdownRequest, Event
+from .pipower5 import PiPower5, ButtonState, ShutdownRequest, Event, PowerSource
 from .utils import log_error
 from .email_sender import EmailSender
 from .battery_device import BatteryDevice
-import threading
 from .lazy_caller import LazyCaller
 from .debounce import Debounce
+import threading
+import math
 
 class PiPower5Service():
     @log_error
@@ -32,7 +33,6 @@ class PiPower5Service():
         self.loop_thread = None
 
         self.last_shutdown_request = None
-        self.last_is_input_plugged_in = True
 
         self.__on_user_config_changed__ = None
         self.__on_user_button_click__ = None
@@ -53,10 +53,12 @@ class PiPower5Service():
         self.on_power_insufficient = LazyCaller(self._on_power_insufficient, interval=10*60) # 10 minutes
         self.on_battery_critical_shutdown = LazyCaller(self._on_battery_critical_shutdown, interval=10*60) # 10 minutes
         self.on_battery_voltage_critical_shutdown = LazyCaller(self._on_battery_voltage_critical_shutdown, interval=10*60) # 10 minutes
-        self.on_power_restore = LazyCaller(self._on_power_restore, oneshot=True) # 10 minutes
-        self.on_power_disconnected = LazyCaller(self._on_power_disconnected, oneshot=True) # 10 minutes
+        self.on_power_restore = LazyCaller(self._on_power_restore, oneshot=True)
+        self.on_power_disconnected = LazyCaller(self._on_power_disconnected, oneshot=True)
+        self.on_battery_activated = LazyCaller(self._on_battery_activated, oneshot=True)
 
-        self.check_input_plugged_in = Debounce(timeout=3)
+        self.is_input_plugged_in_debounced = Debounce(timeout=3)
+        self.is_battery_activated_debounced = Debounce(timeout=3)
 
         self._is_ready = True
 
@@ -272,7 +274,9 @@ class PiPower5Service():
         else:
             self.log.debug(f"Event {event} not in buzz_sequence")
             return
+
         self.pipower5.buzz_sequence(sequence)
+
         self.log.debug(f"Event {event} buzz sequence: {sequence}")
 
     @log_error
@@ -347,8 +351,12 @@ class PiPower5Service():
         self.on_power_restore.reset()
 
     @log_error
-    def is_unplugged(self, data):
-        self._on_low_battery(data)
+    def _on_battery_activated(self, data):
+        self.log.info("Battery Activated")
+        if self.__on_user_battery_activated__:
+            self.__on_user_battery_activated__("Battery Activated")
+        self.send_email(Event.BATTERY_ACTIVATED, data)
+        self.buzz_event(Event.BATTERY_ACTIVATED)
 
     @log_error
     async def main(self):
@@ -369,6 +377,12 @@ class PiPower5Service():
             self.device.update_battery(data)
 
             shutdown_percentage = self.pipower5.read_shutdown_percentage()
+            shutdown_request = self.pipower5.read_shutdown_request()
+            button_state = self.pipower5.read_power_btn()
+            is_input_plugged_in = data['is_input_plugged_in']
+            power_source = data['power_source']
+            battery_percentage = data['battery_percentage']
+            is_battery_activated = power_source == PowerSource.BATTERY
             data['shutdown_percentage'] = shutdown_percentage
 
             # Estimate time until shutdown
@@ -376,17 +390,18 @@ class PiPower5Service():
                 remain_percentage = data['battery_percentage'] - shutdown_percentage
                 remain_mAh = self.pipower5.BAT_MAX_CAPACITY * remain_percentage / 100
                 current = -data['battery_current']
-                estimated_time = remain_mAh / current
-                estimated_time = round(estimated_time, 2)
+                if current != 0:
+                    estimated_time = remain_mAh / current
+                    estimated_time = round(estimated_time, 2)
+                else:
+                    estimated_time = math.inf
             except Exception as e:
                 self.log.error(f"Failed to estimate time until shutdown: {e}")
                 estimated_time = "Unknown"
             data['battery_current_output'] = current
-            data['shutdown_percentage'] = shutdown_percentage
             data['estimated_time'] = estimated_time
 
             # Check button state
-            button_state = self.pipower5.read_power_btn()
             if button_state == ButtonState.CLICK:
                 self.log.debug(f'pipower5_button_click: {button_state}')
                 self.call(self.__on_user_button_click__, button_state)
@@ -401,14 +416,12 @@ class PiPower5Service():
                 self.call(self.__on_user_button_long_press_released__, button_state)
 
             # Check low battery
-            battery_percentage = data['battery_percentage']
             if battery_percentage < shutdown_percentage:
                 self.on_low_battery(data)
             elif battery_percentage > shutdown_percentage + 5:
                 self.on_low_battery.reset()
 
             # Check shutdown request
-            shutdown_request = self.pipower5.read_shutdown_request()
             if shutdown_request != self.last_shutdown_request:
                 if shutdown_request == ShutdownRequest.BUTTON:
                     self.log.info("Shutdown request: Button")
@@ -420,15 +433,22 @@ class PiPower5Service():
                 self.last_shutdown_request = shutdown_request
 
             # Check power state
-            is_input_plugged_in = data['is_input_plugged_in']
-            power_source = data['power_source']
-            if self.check_input_plugged_in(is_input_plugged_in):
+            if self.is_input_plugged_in_debounced(is_input_plugged_in):
                 self.on_power_restore(data)
-                # Check power insufficient
-                if  power_source == 'battery' and is_input_plugged_in:
-                    self.on_power_insufficient(data)
             else:
                 self.on_power_disconnected(data)
+
+            # Check battery activated
+            if self.is_battery_activated_debounced(is_battery_activated):
+                self.on_battery_activated(data)
+            else:
+                self.on_battery_activated.reset()
+
+            # Check power insufficient
+            is_power_insufficient = self.is_battery_activated_debounced(is_battery_activated) and self.is_input_plugged_in_debounced(is_input_plugged_in)
+            if is_power_insufficient:
+                self.on_power_insufficient(data)
+
             await asyncio.sleep(self.interval)
 
     @log_error

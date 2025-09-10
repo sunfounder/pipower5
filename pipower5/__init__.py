@@ -2,11 +2,14 @@ from .version import __version__
 
 def update_config_file(config, config_path):
     import json
-    from .utils import merge_dict
     current = None
     with open(config_path, 'r') as f:
         current = json.load(f)
-    current = merge_dict(current, config)
+    for key in config:
+        if key in current:
+            current[key].update(config[key])
+        else:
+            current[key] = config[key]
     with open(config_path, 'w') as f:
         json.dump(current, f, indent=4)
 
@@ -72,14 +75,14 @@ def main():
     parser.add_argument('-a', '--all', action='store_true', help='Show all status')
     parser.add_argument('-fv', '--firmware', action='store_true', help='PiPower5 firmware version')
     parser.add_argument('-pfs', '--power-failure-simulation', nargs='?', default='', help='Power failure simulation')
-    parser.add_argument("-seo", '--send-email-on', nargs='?', default=[], help=f"Send email on: {AVAILABLE_EVENTS}")
+    parser.add_argument("-seo", '--send-email-on', nargs='?', default='', help=f"Send email on: {AVAILABLE_EVENTS}")
     parser.add_argument("-set", '--send-email-to', nargs='?', default='', help="Email address to send email to")
     parser.add_argument("-ss", '--smtp-server', nargs='?', default='', help="SMTP server")
     parser.add_argument("-smp", '--smtp-port', nargs='?', default='', help="SMTP port")
     parser.add_argument("-se", '--smtp-email', nargs='?', default='', help="SMTP email")
     parser.add_argument("-spw", '--smtp-password', nargs='?', default='', help="SMTP password")
     parser.add_argument("-ssc", '--smtp-security', nargs='?', default='', help="SMTP security, 'none', 'ssl' or 'tls'")
-    parser.add_argument("-bzo", '--buzz-on', nargs='?', default=[], help=f"Buzz on: {AVAILABLE_EVENTS}")
+    parser.add_argument("-bzo", '--buzz-on', nargs='?', default='', help=f"Buzz on: {AVAILABLE_EVENTS}")
     parser.add_argument("-bzv", '--buzzer-volume', nargs='?', default='', help="Buzz volume")
     parser.add_argument("-bzt", '--buzzer-test', nargs='?', default='', help="Test buzzer on selected event.")
 
@@ -270,18 +273,19 @@ Internal:
         print(f"Pipower5 firmware version: {pipower5.read_firmware_version()}")
 
     # send email on
-    if args.send_email_on != []:
+    if args.send_email_on != '':
         if args.send_email_on == None:
             send_email_on = [f' - {event}' for event in current_config['system']['send_email_on']]
             send_email_on = '\n'.join(send_email_on)
             print("Send email on:")
             print(send_email_on)
         else:
-            send_email_on = [p.replace(',', '') for p in args.send_email_on]
+            send_email_on = args.send_email_on.split(',')
             for event in send_email_on:
                 if event not in AVAILABLE_EVENTS:
                     print(f"Invalid event for Send email on: '{event}', it should be {', '.join(AVAILABLE_EVENTS)}")
                     quit()
+            send_email_on = list(set(send_email_on))
             new_sys_config['send_email_on'] = send_email_on
             print(f"Set Send email on: {send_email_on}")
     # send email to
@@ -371,18 +375,19 @@ Internal:
         print(f'  available_bat_capacity: {int(report["available_bat_capacity"])} mAh')
 
     # buzzer
-    if args.buzz_on != []:
+    if args.buzz_on != '':
         if args.buzz_on == None:
             buzz_on = [f' - {event}' for event in current_config['system']['pipower5_buzz_on']]
             buzz_on = '\n'.join(buzz_on)
             print("Buzz on:")
             print(buzz_on)
         else:
-            buzz_on = [p.replace(',', '') for p in args.buzz_on]
+            buzz_on = args.buzz_on.split(',')
             for event in buzz_on:
                 if event not in AVAILABLE_EVENTS:
                     print(f"Invalid event for Buzz on: '{event}', it should be {', '.join(AVAILABLE_EVENTS)}")
                     quit()
+            buzz_on = list(set(buzz_on))
             new_sys_config['pipower5_buzz_on'] = buzz_on
             print(f"Set Buzz on: {buzz_on}")
     if args.buzzer_volume != '':

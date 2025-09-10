@@ -3,6 +3,11 @@ import json
 from enum import IntEnum, StrEnum
 from spc.spc import SPC
 from .note import NOTES, get_note_freq
+import threading
+
+class PowerSource(IntEnum):
+    EXTERNAL = 0
+    BATTERY = 1
 
 class ButtonState(IntEnum):
     RELEASED = 0
@@ -52,6 +57,9 @@ class PiPower5(SPC):
 
     def __init__(self):
         super().__init__()
+
+        self.buzzer_sequence_queue = []
+        self.buzzer_thread = None
 
     def get_max_charge_current(self):
         return self.i2c.read_byte_data(self.REG_CHARGE_MAX_CURRENT)*100
@@ -332,7 +340,7 @@ class PiPower5(SPC):
         else:
             raise ValueError(f"Invalid action: {action}")
 
-    def buzz_sequence(self, sequence):
+    def _buzz_sequence(self, sequence):
         '''
         Buzz according to the sequence, every value is a list of [action, duration]
         Actions:
@@ -350,7 +358,17 @@ class PiPower5(SPC):
             time.sleep(duration / 1000)
         self.write_buzzer_freq(0)
 
-    async def buzz_sequence_async(self, sequence):
+    def _buzz_sequence_loop(self):
+        while True:
+            if len(self.buzzer_sequence_queue) > 0:
+                sequence = self.buzzer_sequence_queue.pop(0)
+                self._buzz_sequence(sequence)
+                time.sleep(1)
+            else:
+                break
+        self.buzzer_thread = None
+
+    def buzz_sequence(self, sequence):
         '''
         Buzz according to the sequence, every value is a list of [action, duration]
         Actions:
@@ -363,7 +381,8 @@ class PiPower5(SPC):
         Args:
             sequence (list): A list of [action, duration]
         '''
-        for action, duration in sequence:
-            self._buzz_action(action)
-            await asyncio.sleep(duration / 1000)
-        self.write_buzzer_freq(0)
+        self.buzzer_sequence_queue.append(sequence)
+        if self.buzzer_thread is None or not self.buzzer_thread.is_alive():
+            self.buzzer_thread = threading.Thread(target=self._buzz_sequence_loop)
+            self.buzzer_thread.start()
+        
