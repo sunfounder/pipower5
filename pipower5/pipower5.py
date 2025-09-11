@@ -119,6 +119,10 @@ class PiPower5(SPC):
         battery_percentage =  self.read_battery_percentage()
         is_input_plugged_in = self.read_is_input_plugged_in()
 
+        # Temporary set shutdown percentage
+        origin_shutdown_percentage = self.read_shutdown_percentage()
+        self.write_shutdown_percentage(10)
+
         print(f'battery: {battery_percentage}%, input: {"plugged in" if is_input_plugged_in else "unplugged"}')
 
         warn_emoji = '\U000026A0'
@@ -231,6 +235,8 @@ class PiPower5(SPC):
             print() # newline
             print('enable Input ... ', end='')
             self.enable_input()
+            # reset shutdown percentage
+            self.write_shutdown_percentage(origin_shutdown_percentage)
             print('OK')
 
         # -----------------
