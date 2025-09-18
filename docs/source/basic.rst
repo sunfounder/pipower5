@@ -11,16 +11,21 @@ For information on advanced features, refer to the **"Hardware Overview"** and *
 
    Before using your PiPower 5, **please charge it fully**. A full charge prevents battery issues and ensures optimal performance.
    
-   It is recommended to use a PD power supply rated at 27W or higher, or a DC 5.5-2.1 power supply to charge the device.
+   It is recommended to use a USB-C power supply to charge the device.
    
-   .. image:: img/pipower5_power_input.png
-     :width: 80%
+
+
+   .. image:: img/power_input.png
+     :width: 50%
      :align: center
    
    During charging, the indicator light will blink.
    
-   .. image:: img/pipower5_battery_indicator.png
-     :width: 80%
+
+
+
+   .. image:: img/battery_indicator.png
+     :width: 50%
      :align: center
 
    Battery status is indicated by the number of lit LEDs:
@@ -44,20 +49,18 @@ For information on advanced features, refer to the **"Hardware Overview"** and *
    
    For other devices, use the USB-A port on PiPower to power your device, or connect to the 5V/GND pins located next to the USB-A port.
    
-   .. .. image:: img/output_mainboard.jpg
-   ..     :width: 500
-   ..     :align: center
-   
-   .. .. image:: img/output_mainboard_pin.jpg
-   ..     :width: 400
-   ..     :align: center
+   .. image:: img/power_output.png
+       :width: 50%
+       :align: center
 
 4. Press the power button once to power your target device 
 
    You will see the **PWR LED** light up, and your target device will receive power from PiPower 5.
    
-   .. image:: img/pipower5_pwr_led.png
-       :width: 80%
+
+
+   .. image:: img/pwr_led.png
+       :width: 50%
        :align: center
 
    .. raw:: html
@@ -88,11 +91,11 @@ For information on advanced features, refer to the **"Hardware Overview"** and *
          sudo python3 install.py
 
    
-      This command also installs a :ref:`web dashboard <web_dashboard>` that runs on port 34001 of your device. The dashboard provides access to PiPower and Raspberry Pi device information. If you do not need the web dashboard, use this command instead:
+      .. This command also installs a :ref:`web dashboard <web_dashboard>` that runs on port 34001 of your device. The dashboard provides access to PiPower and Raspberry Pi device information. If you do not need the web dashboard, use this command instead:
 
-      .. code-block:: shell
+      .. .. code-block:: shell
 
-         sudo python install.py --disable-dashboard
+      ..    sudo python install.py --disable-dashboard
 
       After installation, you will be prompted to restart the system. Enter ``Y`` and press **Enter** to reboot. Once rebooted, the PiPower 5 safe shutdown service will start automatically.
 

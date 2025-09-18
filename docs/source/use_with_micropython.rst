@@ -5,7 +5,9 @@ We provide a library that allows you to monitor input and output voltages, batte
 
 If you are using the PiPower 5 to power your Raspberry Pi Pico or ESP32 board, you can connect the board to the PiPower 5 via the Type-A output port or two jumper wires.
 
-To connect the PiPower 5's I2C interface, use a jumper. If no operations are needed before shutting down, connect the SDSIG jumper cap directly to the GND pin. If operations are required before shutdown, remove the jumper cap and connect the intermediate wire to an I/O pin on the Raspberry Pi Pico or ESP32 board. This setup notifies the PiPower 5 that the shutdown process is complete and it can safely power off.
+To connect the PiPower 5's I2C interface, use a jumper. 
+
+.. If no operations are needed before shutting down, connect the SDSIG jumper cap directly to the GND pin. If operations are required before shutdown, remove the jumper cap and connect the intermediate wire to an I/O pin on the Raspberry Pi Pico or ESP32 board. This setup notifies the PiPower 5 that the shutdown process is complete and it can safely power off.
 
 #. Download the library from GitHub. You can quickly download it using the link below or visit: https://github.com/sunfounder/micropython_spc.
 

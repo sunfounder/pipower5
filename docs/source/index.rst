@@ -30,7 +30,7 @@ Thank you for choosing our |link_PiPower_5|.
 
 .. todo: new pic
 
-.. image:: img/pipower_5_new.jpg
+.. image:: img/PP.0.A.JPG
     :width: 400
     :align: center
 
@@ -89,7 +89,6 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
 
    pipower_hat
    battery
-   fan
 
 .. toctree::
    :maxdepth: 2
@@ -97,6 +96,7 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
    :caption: Software Configuration
 
    pipower_software
+   update_firmware
    use_with_python
    use_with_micropython
    use_with_arduino

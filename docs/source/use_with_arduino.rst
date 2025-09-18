@@ -1,7 +1,9 @@
 Arduino
 ===================================
 
-If you are using the PiPower 5 to power your Arduino board, you can connect the Arduino to the PiPower 5's Type A output port or use two jump wires. Connect the board's I2C interface using a jumper. If no operation is required before powering off, directly connect the **SDSIG** jumper cap to the GND. If operations are necessary before shutdown, remove the jumper cap and connect the intermediate wire to an IO port on the Arduino to notify PiPower 5 that it can safely power off.
+If you are using the PiPower 5 to power your Arduino board, you can connect the Arduino to the PiPower 5's Type A output port or use two jump wires. Connect the board's I2C interface using a jumper. 
+
+.. If no operation is required before powering off, directly connect the **SDSIG** jumper cap to the GND. If operations are necessary before shutdown, remove the jumper cap and connect the intermediate wire to an IO port on the Arduino to notify PiPower 5 that it can safely power off.
 
 We provide a library that allows you to monitor input and output voltages, battery voltage and percentage, power source, charging status, and other internal data.
 

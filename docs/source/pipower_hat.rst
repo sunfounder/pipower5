@@ -4,31 +4,109 @@ PiPower 5 HAT
 Overview
 -------------------
 
-.. image:: img/pipower5_pinout.png
+.. image:: img/pipower5_ov.png
   :width: 100%
 
 
-1. **USB Type-C Power Input**: External power input for supplying power to the Raspberry Pi and charging the battery. Supports USB PD protocol, 5V–15V.
-2. **DC Power Input**: DC Power Jack, 5.5mm Outer Diameter, 2.1mm Inner Diameter. External power input for powering the Raspberry Pi and charging the battery. Supports 5V–15V.
-3. **Power Input Selector Switch**: Toggles between available power input sources. Details at: :ref:`power_input`
-4. :ref:`cap_onoff`: Determines whether the device powers on automatically when external power is connected while the device is off.
-5. :ref:`cap_sdsig` **(Shutdown Signal)**: GPIO26 short-circuit connection for Raspberry Pi shutdown signaling. After configuring the Raspberry Pi's shutdown signal, it informs the onboard microcontroller to cut off power during shutdown.
-6. :ref:`cap_btn` **(External Power Button Jumper)**: Connects to an external power button. When connected to a momentary button, it functions identically to the onboard button.
-7. **PWR LED**: Indicates output status. Lights up when the output is active.
-8. **BAT LED**: Indicates battery power supply status. Lights up when the device is powered by the battery, signaling battery consumption.
-9. :ref:`power_button`:
-    
-   - Single press: Activates output.
-   - Long press (2 seconds) and release: Sends a shutdown request via I²C.
-   - Long press (5 seconds): Directly turns off the output.
-10. :ref:`battery_indicators` **LED**: Displays battery level and charging status. During charging, the indicator remains lit even in the off state until fully charged.
-11. **I²C Interface (SH1.0 4-pin Connector)**: Compatible with Qwiic and STEMMA QT.
-12. **I²C Interface (1×4 2.54mm Header)**: Standard 4-pin header for I²C communication.
-13. **USB Type-A Output**: Provides 5V output.
-14. **Power Output Interface**: 2×4 2.54mm header for 5V output.
-15. :ref:`pin_header`: Connects directly to the Raspberry Pi, linking I²C, power, and other pins. Refer to the Raspberry Pi pinout diagram. Note: The I²C interface and GPIO26 pin are pre-connected and must be considered when stacking HATs.
-16. **Battery Reverse Polarity Warning LED**: Two red LEDs light up to warn of reversed battery connection.
-17. :ref:`battery_connector`: XH2.54 3-pin connector. From left to right: negative terminal, mid-point between two batteries, positive terminal.
+
+1. **USB Type-C Power Input**  
+
+   - External power input for supplying the Raspberry Pi and charging the battery simultaneously.  
+   - Supports **USB Power Delivery (PD) protocol**, input range **5V–15V**.
+
+2. **Power Input Selector (DIP Switch)**  
+
+   - Allows selection of different input power profiles for flexible configuration.
+
+3. **Default ON Jumper**  
+
+   - Defines whether the system should automatically power on when external power is connected while the device is shut down.  
+   - ON = Auto power-on enabled, OFF = Manual start required.
+
+4. **SDSIG (Shutdown Signal)**  
+
+   - Provides shutdown detection for Raspberry Pi.  
+   - When bridged to **PI3V3**, it works with Raspberry Pi 4 and Pi 5.  
+   - When shorted to **Pin 26**, it supports Pi 3 and Pi Zero.  
+   - After proper configuration, PiPower5 will cut power automatically once the Raspberry Pi shuts down.
+
+5. **PWR LED (Output Status Indicator)**  
+
+   - Lights up when the system output is active.
+
+6. **BAT LED (Battery Status Indicator)**  
+
+   - Lights up when the system is powered by the battery.  
+   - A reminder to monitor battery consumption when running without external power.
+
+7. **Power Button**  
+
+   - **Single press**: Enable output power.  
+   - **Long press (2 seconds)**: Sends a safe shutdown request via I²C.  
+   - **Long press (5 seconds)**: Forces an immediate power-off (hard shutdown).  
+   - **Customizable**: Single and double-press actions can be reconfigured by software.
+
+8. **External Power Button Terminal (ZH1.5 2P)**  
+
+   - Allows connection of an external physical power button.
+
+9. **External Power Button Header (2.54mm)**  
+
+   - An alternative solderable header option for external power button connection.
+
+10. **Battery Indicator LEDs**  
+
+    - Display remaining battery capacity and charging status.  
+    - Note: Even when the system is off, LEDs remain active during charging until the battery is fully charged.
+
+11. **I²C Interface (SH1.0 4P)**  
+
+    - Compatible with **Qwiic** and **STEMMA QT** ecosystems.  
+    - Used for communication with the onboard microcontroller and external peripherals.
+
+12. **I²C Interface (1x4P 2.54mm Header)**  
+
+    - Alternative I²C breakout with **3V3 power output**, configurable as always-on or switched.
+
+13. **I²C Power Selection Jumper**  
+
+    - **PERM**: 3V3 power is always on when external power is connected.  
+    - **SHUT (default)**: 3V3 power cuts off automatically when the system shuts down.
+
+14. **USB Type-A Output Port**  
+
+    - Provides **regulated 5V output**, suitable for powering peripherals or other devices.
+
+15. **2x4P 2.54mm Power Output Header**  
+
+    - Additional 5V output for external modules or SBCs.
+
+16. **Raspberry Pi GPIO Header (Female Connector)**  
+
+    - Direct interface for Raspberry Pi, passing through power, I²C, and other signals.  
+    - Fully compatible with Raspberry Pi pinout.
+
+17. **Raspberry Pi GPIO Header (Male Pin Breakout)** 
+
+    - Brings Raspberry Pi GPIO pins out for stacking HATs or external expansion.  
+    - **Note**: I²C lines and Pin 26 are already occupied by PiPower5 functions.
+    - You can also connect a GPIO extension cable (from the bottom of the side panel) to experiment on a breadboard.
+
+18. **Battery Connector (XH2.54 3P)**  
+
+    - Battery connection interface.  
+    - Pin order (left to right): Negative, Mid-point (between two cells), Positive.  
+    - Designed for **7.4V (2-cell) Li-ion/LiPo batteries**.
+
+19. **Reverse Battery Warning LEDs**  
+
+    - Two red LEDs light up if the battery is connected in reverse polarity, warning of incorrect installation.
+
+20. **Screw Terminals for Battery & Input Power**  
+
+    - Alternative connection method for external batteries and power sources.  
+    - Supports **5V–15V external input** (recommended: >9V).  
+    - Battery support: **2 x 3.7V Li-ion / LiPo cells only** (NOT compatible with LiFePO₄ batteries).  
 
 
 Specification Table
@@ -91,7 +169,7 @@ Power Input
 -------------
 
 .. image:: img/power_input.png
-  :width: 90%
+  :width: 50%
   :align: center
 
 .. raw:: html
@@ -102,8 +180,11 @@ When using Raspberry Pi 5, it is recommended to use a USB PD power supply or a D
 
 You can monitor the **BAT LED** indicator to check the battery status. When external power is sufficient, the BAT LED should remain off, indicating that the battery is in standby mode and not being discharged. If the BAT LED lights up, it means the battery is supplying power to the device, possibly due to insufficient or disconnected external power. Prolonged illumination of the BAT LED may lead to excessive battery discharge, preventing it from functioning as an uninterrupted power supply (UPS) during power outages. Ensure you are using a power source that meets the required specifications to avoid such scenarios.
 
+
+
+
 .. image:: img/bat_led.png
-  :width: 90%
+  :width: 50%
   :align: center
 
 .. raw:: html
@@ -126,11 +207,11 @@ The charging current is subject to two types of limitations:
 
 .. note::
 
-   The charging current is determined by both the "DC Power Charging Limitation" and the "Input Power Selection Limitation" and is constrained by the smaller value between the two.
+   The charging current is determined by both the "Screw Terminal Power Charging Limitation" and the "Charge Power Selection Limitation" and is constrained by the smaller value between the two.
 
-1. DC Power Charging Limitation
+1. Screw Terminal Power Charging Limitation
    
-   When supplying power via the DC 5.5-2.1 interface, the charging current is automatically adjusted based on the input voltage, as shown below:
+   When supplying power via screw terminal power input, the charging current is automatically adjusted based on the input voltage, as shown below:
 
    .. list-table::
       :header-rows: 1
@@ -146,42 +227,51 @@ The charging current is subject to two types of limitations:
       * - 13.5 < VBUS ≤ 16.5V
         - 2A
 
-2. Input Power Selection Limitation
+2. Charge Power Selection Limitation
    
-   A 2-position DIP switch on the board allows selection of different input power levels. The corresponding allocation of charging power and output power for each setting is as follows:
+   A 2-position DIP switch on the board allows selection of different charge power levels. The corresponding allocation of charging power and output power for each setting is as follows:
 
    .. image:: img/power_selector.png
-     :width: 90%
+     :width: 50%
      :align: center
 
    .. list-table::
       :header-rows: 1
 
-      * - PS1
-        - PS2
-        - Power Level
+      * - Charge Sel 1
+        - Charge Sel 2
         - Charging Power
-        - Output Power
       * - 0
         - 0
-        - ≤ 32W
         - 5W
-        - ≤ 3A
-      * - 0
-        - 1
-        - ≥ 32W
-        - 5W
-        - 5A
       * - 1
         - 0
-        - ≥ 37W
         - 10W
-        - 5A
+      * - 0
+        - 1
+        - 15W
       * - 1
         - 1
-        - ≥ 45W
         - 20W
-        - 5A
+
+
+**How to choose the charging power**
+
+The formula is:
+
+*Power supply capacity = Raspberry Pi required power + Charging power*
+
+We recommend estimating the Raspberry Pi’s power requirement at **20W to 25W**.
+
+- If you use a **30W power supply**, set charging power to **10W** or **5W**.  
+- If you use a **45W power supply**, you can safely set charging power to **20W**.  
+
+If you are familiar with your Raspberry Pi’s power needs, you may set a higher charging power as long as you reserve enough margin for occasional power spikes.  
+
+⚠️ Be cautious: insufficient power may cause the Raspberry Pi to shut down unexpectedly.
+
+
+
 
 **Charging Process**
 
@@ -208,8 +298,11 @@ The charging process is automatically halted when the internal temperature of th
 Power Button
 ----------------
 
+
+
+
 .. image:: img/power_button.png
-  :width: 90%
+  :width: 50%
   :align: center
 
 .. raw:: html
@@ -234,8 +327,11 @@ Four onboard LEDs indicate the battery level and charging status.
 
    If the device is charging during shutdown, the indicator light will continue to display the charging status until charging is complete.
 
+
+
+
 .. image:: img/battery_indicator.png
-  :width: 90%
+  :width: 50%
   :align: center
 
 .. raw:: html
@@ -255,10 +351,10 @@ Four onboard LEDs indicate the battery level and charging status.
 
 Battery Connector
 ------------------------
-XH2.54 3P battery connector.
+VH3.96 2P battery connector and screw terminal battery connector.
 
 .. image:: img/battery_pin.png
-  :width: 90%
+  :width: 50%
   :align: center
 
 .. raw:: html
@@ -267,47 +363,52 @@ XH2.54 3P battery connector.
 
 .. _cap_btn:
 
-BTN Jumper
--------------
+External Power Button Terminal & Header
+--------------------------------------------
 
 .. image:: img/btn_jumper.png
-  :width: 90%
+  :width: 50%
   :align: center
 
 .. raw:: html
 
    <br/>
 
-BTN jumper is designed for connecting an external power button. If you install PiPower 5 in an enclosure, the onboard power button might be inaccessible. In such cases, you can connect an external button to control the power.
-
-To set it up, connect a momentary switch, such as a tactile switch or a vintage-style metal button, to the jumper pins. The two leads of the button can be connected to the jumper's pins in any direction, as polarity is not required. Once connected, you can use the external button just like the onboard power button.
+This terminal or header is designed for connecting an external power button. Connect a momentary switch, such as a tactile switch or a vintage-style metal button, to the jumper pins. The two leads of the button can be connected to the jumper's pins in any direction, as polarity is not required. Once connected, you can use the external button just like the onboard power button.
 
 .. _cap_sdsig:
 
 SDSIG Jumper
 ------------
 
+
+
+
 .. image:: img/sdsig_jumper.png
-  :width: 90%
+  :width: 50%
   :align: center
 
 .. raw:: html
 
    <br/>
 
-The Shutdown Signal (SDSIG) pin controls the power-off state of the host system. Pulling this pin high indicates that the host has shut down and needs to be powered off. Pulling the pin low signals that the host is powered on.
+Provides shutdown detection for Raspberry Pi.
 
-For systems where this functionality is not required (e.g., microcontroller-based platforms such as Arduino or Raspberry Pi Pico), connect this jumper to the GND pin.
+* When bridged to PI3V3, it works with Raspberry Pi 4 and Pi 5.
+* When shorted to Pin 26, it supports Pi 3 and Pi Zero.
 
-For Raspberry Pi users, connect the jumper to pin 26 on the GPIO header. After installing the PiPower 5 software, the Raspberry Pi will pull this pin high upon shutdown, prompting PiPower 5 to cut power to the system.
+After proper configuration, PiPower5 will cut power automatically once the Raspberry Pi shuts down.
 
 .. _cap_onoff:
 
 Default ON/OFF Jumper
 ----------------------
 
+
+
+
 .. image:: img/default_jumper.png
-  :width: 90%
+  :width: 50%
   :align: center
 
 .. raw:: html
@@ -328,8 +429,11 @@ Pin Headers for RPi
 
 The pin header is designed for direct connection to a Raspberry Pi, including both I2C communication and power supply. 
 
+
+
+
 .. image:: img/pin_header.png
-  :width: 90%
+  :width: 50%
   :align: center
 
 .. raw:: html
@@ -358,8 +462,12 @@ The header supports stacking additional HATs. However, note that the I2C pins an
 I2C Communication
 -------------------------------
 
+
+
+
+
 .. image:: img/i2c.png
-  :width: 90%
+  :width: 50%
   :align: center
 
 .. raw:: html
