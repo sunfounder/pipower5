@@ -12,12 +12,15 @@
 
     👉 Ready to explore and create with us? Click [|link_sf_facebook|] and join today!
 
-SunFounder |link_PiPower_5| - Protect Your Device & Data
+SunFounder PiPower5 - Protect Your Device & Data
 ================================================================================
 
-* |link_PiPower_5_buy|
+.. * |link_PiPower_5_buy|
 
-Thank you for choosing our |link_PiPower_5|.
+.. Thank you for choosing our |link_PiPower_5|.
+
+Thank you for choosing our PiPower5.
+
 
 .. .. note::
 ..     This document is available in the following languages.
