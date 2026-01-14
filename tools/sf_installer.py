@@ -296,7 +296,7 @@ class SF_Installer():
     # Install Steps:
     def install_build_dep(self):
         print("Install build dependencies...")
-        self.do('Update package list', 'apt-get update')
+        self.do('Update package list', 'DEBIAN_FRONTEND=noninteractive apt-get update')
         deps = [ *self.APT_DEPENDENCIES ]
 
         if self.build_dependencies is not None:
@@ -304,7 +304,7 @@ class SF_Installer():
 
         deps = " ".join(deps)
         self.do(f'Install build dependencies: {deps}',
-                f'apt-get install -y {deps}')
+                f'DEBIAN_FRONTEND=noninteractive apt-get install -y {deps}')
 
     def run_commands_before_install(self):
         if len(self.before_install_commands) == 0:
@@ -323,7 +323,7 @@ class SF_Installer():
         #     self.do(f'Install {dep}', f'apt-get install -y {dep}')
         deps = " ".join(self.custom_apt_dependencies)
         self.do(f'Install APT dependencies: {deps}',
-                f'apt-get install -y {deps}')
+                f'DEBIAN_FRONTEND=noninteractive apt-get install -y {deps}')
 
     def create_working_dir(self):
         print("Create working directory...")

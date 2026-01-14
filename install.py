@@ -13,6 +13,26 @@ sys.path.append('./tools')
 from sf_installer import SF_Installer
 from version import __version__
 
+DASHBOARD_VERSION = '1.3.x'
+SF_RPI_STATUS_VERSION = '1.1.7'
+
+GITHUB_URL = 'https://github.com/sunfounder/'
+GITEE_URL = 'https://gitee.com/sunfounder/'
+
+# Test if github url reachable
+import requests
+try:
+    requests.get(GITHUB_URL)
+    GIT_URL = GITHUB_URL
+except requests.exceptions.RequestException:
+    print(f"Warning: {GITHUB_URL} is not reachable")
+    try:
+        requests.get(GITEE_URL)
+        GIT_URL = GITEE_URL
+    except requests.exceptions.RequestException:
+        print(f"Error: {GITEE_URL} is not reachable")
+        exit(1)
+
 
 settings = {
     # - Setup venv options if needed, default to []
@@ -46,7 +66,7 @@ settings = {
     # - Install python source code from git
     'python_source': {
         'pipower5': './',
-        'sf_rpi_status': 'git+https://github.com/sunfounder/sf_rpi_status.git@1.1.4',
+        'sf_rpi_status': f'git+{GIT_URL}sf_rpi_status.git@{SF_RPI_STATUS_VERSION}',
     },
 
     # create symbolic links from venv/bin/ to /usr/local/bin/
@@ -81,18 +101,15 @@ dashboard_settings = {
         'curl', # for influxdb key download
     ],
     'run_commands_before_install': {
-        # download influxdb key and add to trusted key list https://docs.influxdata.com/influxdb/v2/install/?t=Linux
-        'Download influxdb key': 'curl --silent --location -O https://repos.influxdata.com/influxdata-archive.key',
-        'Setup influxdb install source': 'echo "943666881a1b8d9b849b74caebf02d3465d6beb716510d86a39f6c8e8dac7515  influxdata-archive.key" | sha256sum --check - && cat influxdata-archive.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/influxdata-archive.gpg > /dev/null && echo "deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive.gpg] https://repos.influxdata.com/debian stable main" | tee /etc/apt/sources.list.d/influxdata.list',
-        'Cleanup influxdata-achive.key': 'rm influxdata-archive.key',
-        'Update APT': 'apt-get update',
+        'Setup InfluxDB': 'bash scripts/setup_influxdb.sh',
+        # 'Update APT': 'apt-get update',
     },
     'apt_dependencies': [
         'influxdb', # for pm_dashboard
         'lsof', # for pm_dashboard
     ],
     'python_source': {
-        'pm_dashboard': 'git+https://github.com/sunfounder/pm_dashboard.git@1.3.x',
+        'pm_dashboard': f'git+{GIT_URL}pm_dashboard.git@{DASHBOARD_VERSION}',
     },
 }
 
