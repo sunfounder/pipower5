@@ -1,0 +1,12 @@
+config I2C_PIPOWER5
+	tristate "PiPower5 I2C driver"
+	depends on I2C
+	help
+	  Say Y or M here if you have a PiPower5 power management board connected
+	  to an I2C bus on your system. This driver provides battery monitoring,
+	  power management, and system control capabilities for the PiPower5 HAT.
+
+	  To compile this driver as a module, choose M here: the module will be
+	  called pipower5.
+
+	  If unsure, say N.

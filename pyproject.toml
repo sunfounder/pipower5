@@ -18,7 +18,6 @@ classifiers = [
 dynamic = ["version"]
 
 dependencies = [
-  'spc @ git+https://github.com/sunfounder/spc@main',
 ]
 
 [project.scripts]

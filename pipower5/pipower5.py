@@ -1,8 +1,8 @@
 import time
 import json
 from enum import IntEnum, StrEnum
-from spc.spc import SPC
 from .note import NOTES, get_note_freq
+from .device import check_pipower5_connected, DEVICE_PATH
 import threading
 
 class PowerSource(IntEnum):
@@ -33,7 +33,7 @@ class Event(StrEnum):
     BATTERY_CRITICAL_SHUTDOWN = 'battery_critical_shutdown'
     BATTERY_VOLTAGE_CRITICAL_SHUTDOWN = 'battery_voltage_critical_shutdown'
 
-class PiPower5(SPC):
+class PiPower5():
     # register address
     REG_PWR_BTN_STATE= 154
     REG_CHARGE_MAX_CURRENT = 155
@@ -56,13 +56,42 @@ class PiPower5(SPC):
     PAUSE_ACTIONS = ['pause', 'PAUSE', 'Pause', 'P', 'p']
 
     def __init__(self):
-        super().__init__()
-
+        check_pipower5_connected()
         self.buzzer_sequence_queue = []
         self.buzzer_thread = None
 
-    def get_max_charge_current(self):
-        return self.i2c.read_byte_data(self.REG_CHARGE_MAX_CURRENT)*100
+    def read_sysfs(self, reg):
+        with open(f"{DEVICE_PATH}/{reg}", "r") as f:
+            return int(f.read())
+
+    def read_input_voltage(self):
+        return int(self.read_sysfs("input_voltage"))
+    def read_input_current(self):
+        return int(self.read_sysfs("input_current"))
+    def read_input_power(self):
+        return int(self.read_sysfs("input_power"))
+    def read_output_voltage(self):
+        return int(self.read_sysfs("output_voltage"))
+    def read_output_current(self):
+        return int(self.read_sysfs("output_current"))
+    def read_output_power(self):
+        return int(self.read_sysfs("output_power"))
+    def read_battery_voltage(self):
+        return int(self.read_sysfs("battery_voltage"))
+    def read_battery_current(self):
+        return int(self.read_sysfs("battery_current"))
+    def read_battery_power(self):
+        return int(self.read_sysfs("battery_power"))
+    def read_battery_percentage(self):
+        return int(self.read_sysfs("battery_percentage"))
+    def read_is_input_plugged_in(self):
+        return bool(self.read_sysfs("is_input_plugged_in"))
+    def read_is_charging(self):
+        return bool(self.read_sysfs("is_charging"))
+    def read_power_source(self):
+        return PowerSource(self.read_sysfs("power_source"))
+
+
 
     def disable_input(self):
         time_out = 5 # seconds
