@@ -103,6 +103,7 @@ class PiPower5Manager():
                                             config=self.config,
                                             log=self.log)
             self.pm_dashboard.set_read_data(self.read_data)
+            self.pm_dashboard.set_read_config(self.read_config)
             self.pm_dashboard.set_on_config_changed(self.update_config)
             self.pm_dashboard.set_debug_level(self.log_level)
             self.pm_dashboard.set_test_smtp(self.service.test_smtp)
@@ -112,6 +113,10 @@ class PiPower5Manager():
     @log_error
     def read_data(self):
         return self.data
+
+    @log_error
+    def read_config(self):
+        return self.config
 
     @log_error
     def handle_data_changed(self, data) -> None:
@@ -135,7 +140,22 @@ class PiPower5Manager():
 
     @log_error
     def update_config(self, config):
-        patch = self.service.update_config(config['system'])
+        patch = {}
+        if "temperature_unit" in config['system']:
+            config['system']['temperature_unit'] = config['system']['temperature_unit'].upper()
+            patch['temperature_unit'] = config['system']['temperature_unit']
+        if "debug_level" in config['system']:
+            config['system']['debug_level'] = config['system']['debug_level'].upper()
+            self.set_debug_level(config['system']['debug_level'])
+            patch['debug_level'] = config['system']['debug_level']
+        
+        service_patch = self.service.update_config(config['system'])
+        patch.update(service_patch)
+
+        if self.pm_dashboard:
+            dashboard_patch = self.pm_dashboard.update_config(config['system'])
+            patch.update(dashboard_patch)
+
         self.config["system"].update(patch)
         try:
             os.chmod(self.config_path, 0o777)
