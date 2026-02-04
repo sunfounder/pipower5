@@ -119,7 +119,12 @@ class PiPower5Manager():
         return self.config
 
     @log_error
-    def handle_data_changed(self, data) -> None:
+    def handle_data_changed(self, data, delete_keys=[]) -> None:
+        if len(delete_keys) != 0:
+            self.log.debug(f"Delete keys: {delete_keys}")
+        for key in delete_keys:
+            if key in self.data:
+                del self.data[key]
         self.data.update(data)
 
     @log_error

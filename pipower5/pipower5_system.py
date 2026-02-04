@@ -135,6 +135,10 @@ class PiPower5System():
 
         self._is_ready = True
 
+        # A list of last disk keys, for knowing which disk is gone,
+        # and need to be removed from data
+        self.disk_keys = []
+
     @log_error
     def set_before_shutdown(self, callback):
         self.__before_shutdown__ = callback
@@ -236,8 +240,18 @@ class PiPower5System():
                 data[f'disk_{disk_name}_free'] = int(disk.free)
                 data[f'disk_{disk_name}_percent'] = float(disk.percent)
         
+        # Get current disk keys
+        keys = list(data.keys())
+        # Find disk keys that is gone
+        delete_keys = []
+        for key in self.disk_keys:
+            if key not in keys:
+                delete_keys.append(key)
+        # Update disk keys
+        self.disk_keys = keys
+        
         if self.__on_data_changed__:
-            self.__on_data_changed__(data)
+            self.__on_data_changed__(data, delete_keys=delete_keys)
 
     @log_error
     async def main(self):
