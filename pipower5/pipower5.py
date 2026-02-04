@@ -389,7 +389,6 @@ class PiPower5(SPC):
         '''
         if isinstance(sequence, str):
             sequence = [item.split(',') for item in sequence.split(':')]
-            self.log.critical(f"sequence: {sequence}")
             sequence = [[action.strip(), int(duration.strip())] for action, duration in sequence]
 
         self.buzzer_sequence_queue.append(sequence)
