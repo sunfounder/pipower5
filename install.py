@@ -13,7 +13,7 @@ sys.path.append('./tools')
 from sf_installer import SF_Installer
 from version import __version__
 
-DASHBOARD_VERSION = '1.3.x'
+DASHBOARD_VERSION = '1.4.x'
 SF_RPI_STATUS_VERSION = '1.1.7'
 
 GITHUB_URL = 'https://github.com/sunfounder/'
