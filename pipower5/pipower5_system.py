@@ -149,7 +149,7 @@ class PiPower5System():
             self.log.info(f"Shutdown reason: {reason}")
             if self.__before_shutdown__:
                 self.__before_shutdown__(reason)
-            time.sleep(2)
+            time.sleep(5)
 
             try:
                 from sf_rpi_status import shutdown
