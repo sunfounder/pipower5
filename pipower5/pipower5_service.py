@@ -57,7 +57,8 @@ class PiPower5Service():
         self.on_power_disconnected = LazyCaller(self._on_power_disconnected, oneshot=True)
         self.on_battery_activated = LazyCaller(self._on_battery_activated, oneshot=True)
 
-        self.is_input_plugged_in_debounced = Debounce(timeout=3)
+        self.is_input_plugged_in_debounced = Debounce(timeout=1)
+        self.is_power_insufficient_debounced = Debounce(timeout=3)
         self.is_battery_activated_debounced = Debounce(timeout=3)
 
         self._is_ready = True
@@ -265,7 +266,7 @@ class PiPower5Service():
             self.log.debug(f"Event {event} sent successfully")
             return True
         else:
-            self.log.error(f"Failed to send event {event}: {status}")
+            self.log.warning(f"Failed to send event {event}: {status}")
             return False
 
     def buzz_event(self, event):
@@ -379,10 +380,13 @@ class PiPower5Service():
             shutdown_percentage = self.pipower5.read_shutdown_percentage()
             shutdown_request = self.pipower5.read_shutdown_request()
             button_state = self.pipower5.read_power_btn()
-            is_input_plugged_in = data['is_input_plugged_in']
-            power_source = data['power_source']
-            battery_percentage = data['battery_percentage']
+            is_input_plugged_in = self.is_input_plugged_in_debounced(data['is_input_plugged_in'])
+            power_source = self.is_power_insufficient_debounced(data['power_source'])
             is_battery_activated = power_source == PowerSource.BATTERY
+            is_power_insufficient = is_battery_activated and is_input_plugged_in
+            is_power_insufficient = self.is_power_insufficient_debounced(is_power_insufficient)
+
+            battery_percentage = data['battery_percentage']
             data['shutdown_percentage'] = shutdown_percentage
 
             # Estimate time until shutdown
@@ -433,19 +437,18 @@ class PiPower5Service():
                 self.last_shutdown_request = shutdown_request
 
             # Check power state
-            if self.is_input_plugged_in_debounced(is_input_plugged_in):
+            if is_input_plugged_in:
                 self.on_power_restore(data)
             else:
                 self.on_power_disconnected(data)
 
             # Check battery activated
-            if self.is_battery_activated_debounced(is_battery_activated):
+            if is_battery_activated:
                 self.on_battery_activated(data)
             else:
                 self.on_battery_activated.reset()
 
             # Check power insufficient
-            is_power_insufficient = self.is_battery_activated_debounced(is_battery_activated) and self.is_input_plugged_in_debounced(is_input_plugged_in)
             if is_power_insufficient:
                 self.on_power_insufficient(data)
 
