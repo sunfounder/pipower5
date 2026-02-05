@@ -403,7 +403,7 @@ class PiPower5():
                 break
         self.buzzer_thread = None
 
-    def buzz_sequence(self, sequence):
+    def buzz_sequence(self, sequence: [str,list]):
         '''
         Buzz according to the sequence, every value is a list of [action, duration]
         Actions:
@@ -414,8 +414,12 @@ class PiPower5():
         - Integer like 1000, 2000 in milisecond
 
         Args:
-            sequence (list): A list of [action, duration]
+            sequence (str|list): A list of [[action, duration], [action, duration]] or a string of action,duration:action,duration.
         '''
+        if isinstance(sequence, str):
+            sequence = [item.split(',') for item in sequence.split(':')]
+            sequence = [[action.strip(), int(duration.strip())] for action, duration in sequence]
+
         self.buzzer_sequence_queue.append(sequence)
         if self.buzzer_thread is None or not self.buzzer_thread.is_alive():
             self.buzzer_thread = threading.Thread(target=self._buzz_sequence_loop)
