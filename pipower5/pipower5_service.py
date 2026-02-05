@@ -381,8 +381,8 @@ class PiPower5Service():
             shutdown_request = self.pipower5.read_shutdown_request()
             button_state = self.pipower5.read_power_btn()
             is_input_plugged_in = self.is_input_plugged_in_debounced(data['is_input_plugged_in'])
-            power_source = self.is_power_insufficient_debounced(data['power_source'])
-            is_battery_activated = power_source == PowerSource.BATTERY
+            is_battery_activated = data['power_source'] == PowerSource.BATTERY
+            is_battery_activated = self.is_battery_activated_debounced(is_battery_activated)
             is_power_insufficient = is_input_plugged_in and is_battery_activated
             is_power_insufficient = self.is_power_insufficient_debounced(is_power_insufficient)
 
