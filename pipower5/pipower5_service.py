@@ -383,7 +383,7 @@ class PiPower5Service():
             is_input_plugged_in = self.is_input_plugged_in_debounced(data['is_input_plugged_in'])
             power_source = self.is_power_insufficient_debounced(data['power_source'])
             is_battery_activated = power_source == PowerSource.BATTERY
-            is_power_insufficient = is_battery_activated and is_input_plugged_in
+            is_power_insufficient = is_input_plugged_in and is_battery_activated
             is_power_insufficient = self.is_power_insufficient_debounced(is_power_insufficient)
 
             battery_percentage = data['battery_percentage']
