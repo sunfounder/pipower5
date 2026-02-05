@@ -24,7 +24,7 @@ class PiPower5Service():
             self.log.warning(f'Email sender init failed: {e}')
             self.email_sender = None
 
-        self.device = BatteryDevice()
+        self.device = BatteryDevice(log=self.log)
 
         self.interval = 1
         self.task = None
