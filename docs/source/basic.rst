@@ -38,6 +38,7 @@ For information on advanced features, refer to the **"Hardware Overview"** and *
    * **LEDs incrementally light up in a cycle**: Charging
    * **Middle two LEDs flashing**: Waiting for shutdown signal
    * **All LEDs off**: Unpowered or in sleep mode
+   * During charging, the indicator remains lit **even in the off state** until fully charged.
   
    .. raw:: html
 
@@ -110,16 +111,22 @@ For information on advanced features, refer to the **"Hardware Overview"** and *
       .. image:: img/web_dashboard.png
        :width: 100%
        :align: center
-   
-6. Turn Off the Power After Use
 
-   * **Hold for more than 5 seconds**: Turns off the output directly.
-   * **Hold for 2 seconds (until the middle two battery LEDs light up) and release**: Send a shutdown request via I2C for a safe shutdown. 
+6. Power-Off safely after raspberry pi shutdown
+
+   .. include:: /pipower_software.rst
+      :start-after: start_power_off_after_shutdown
+      :end-before: end_power_off_after_shutdown
+
+.. 6. Turn Off the Power After Use
+
+..    * **Hold for more than 5 seconds**: Turns off the output directly.
+..    * **Hold for 2 seconds (until the middle two battery LEDs light up) and release**: Send a shutdown request via I2C for a safe shutdown. 
   
-     .. note::
+..      .. note::
 
-        **This feature requires the PiPower 5 Tool to be installed.** The PiPower 5 Tool handles the shutdown signal from PiPower 5 to safely power down the Raspberry Pi. For more information about the PiPower 5 Tool, see :ref:`pipower_5_tool`.
+..         **This feature requires the PiPower 5 Tool to be installed.** The PiPower 5 Tool handles the shutdown signal from PiPower 5 to safely power down the Raspberry Pi. For more information about the PiPower 5 Tool, see :ref:`pipower_5_tool`.
  
    
-   During charging, the indicator remains lit **even in the off state** until fully charged.
+   
 

@@ -60,6 +60,8 @@ After installing the ``pipower5`` library, the Raspberry Pi will automatically m
 Power-Off After Raspberry Pi Shutdown
 ++++++++++++++++++++++++++++++++++++++
 
+.. start_power_off_after_shutdown
+
 PiPower5 can detect when the Raspberry Pi has shut down and automatically cut power afterwards.
 
 - Press and hold the PiPower button for 2 seconds (or when the battery is low) → Raspberry Pi shuts down → PiPower5 powers off.  
@@ -67,22 +69,38 @@ PiPower5 can detect when the Raspberry Pi has shut down and automatically cut po
 - Shut down from the Raspberry Pi desktop menu → PiPower5 powers off.  
 - When the battery level drops below the configured shutdown percentage, PiPower5 notifies the Raspberry Pi to shut down. After shutdown, PiPower5 cuts power.  
 
-.. note::  
-   To use this feature, ensure that the **SDSIG jumper** on PiPower5 is connected to **PI3V3**.
 
-Run the following command:
+If you are using a **Raspberry Pi 4 or 5**, you need to:
 
-.. code-block:: shell
+   a. Ensure that the **SDSIG jumper** on PiPower5 is connected to **PI3V3**.
 
-   sudo raspi-config
+   b. Type the following command to enter Raspberry Pi Configuration:
 
-Navigate to:  
-**6 Advanced Options → A11 Shutdown Behaviour → B1 Full power off**  
-(*Switch off Pi power management (PMIC) outputs on Pi4 / Pi5 - recommended*).
+      .. code-block:: shell
 
-Reboot when prompted after exiting `raspi-config`.
+         sudo raspi-config
+
+      Navigate to:  
+      **6 Advanced Options → A11 Shutdown Behaviour → B1 Full power off**  
+      (*Switch off Pi power management (PMIC) outputs on Pi4 / Pi5 - recommended*).
+
+   c. Reboot when prompted after exiting ``raspi-config``.
 
 
+If you are using a **Raspberry Pi 3** or earlier, you need to:
+
+   a. Switch the **SDSIG jumper** on PiPower5 to **GPIO26**.
+
+   b. Add the following line to the ``/boot/config.txt`` file:
+
+      .. code-block:: shell
+
+         dtoverlay=gpio-poweroff,gpio_pin=26,active_low=1
+         gpio=26=op,dh
+
+   c. Save and exit the file.
+
+.. end_power_off_after_shutdown
 
 Configure Shutdown Percentage
 ++++++++++++++++++++++++++++++++++++++
