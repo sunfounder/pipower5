@@ -76,6 +76,7 @@ Overview
 14. **USB Type-A Output Port**  
 
     - Provides **regulated 5V output**, suitable for powering peripherals or other devices.
+    - When powering a Raspberry Pi, you may encounter a non-PD power supply warning, which can be safely ignored.
 
 15. **2x4P 2.54mm Power Output Header**  
 
@@ -200,6 +201,9 @@ The PiPower 5 integrates power path management, enabling automatic power source 
 - Upon disconnection of the external power source, the system immediately switches to battery power via a step-down circuit. This seamless transition ensures the system continues functioning normally during power interruptions.
 
 You can check the BAT LED indicator to confirm whether the battery is currently powering the system.
+
+
+
 
 **Charging Current**
 
