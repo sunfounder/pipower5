@@ -1,7 +1,7 @@
-18650 Battery
+Battery
 =================
 
-.. image:: img/3pin_battery.jpg
+.. image:: img/vh2pin_battery.png
     :width: 400
     :align: center
 
@@ -9,11 +9,10 @@
 
    <br/>
 
-* **VCC**: Battery positive terminal, here there are two sets of VCC and GND is to increase the current and reduce the resistance.
-* **Middle**: To balance the voltage between the two cells and thus protect the battery.
+* **VCC**: Battery positive terminal.
 * **GND**: Negative battery terminal.
 
-This is a custom battery pack made by SunFounder consisting of two 18650 batteries with a capacity of 2000mAh. The connector is XH2.54 3P, which can be charged directly after being inserted into the shield.
+This is a custom battery pack made by SunFounder consisting of two 18650 batteries with a capacity of 2000mAh. The connector is VH3.96 2P, which can be charged directly after being inserted into the shield.
 
 **Features**
 
@@ -21,5 +20,5 @@ This is a custom battery pack made by SunFounder consisting of two 18650 batteri
 * **Battery Capacity**: 2000mAh, 14.8Wh
 * **Battery Weight**: 90.8g
 * **Number of Cells**: 2
-* **Connector**: XH2.54 3pin
+* **Connector**: VH3.96 2pin
 * **Over-discharge protection**: 6.0V

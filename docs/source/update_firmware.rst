@@ -7,7 +7,7 @@ This guide explains how to update the firmware of **PiPower5** on a Raspberry Pi
 
 .. code-block:: shell
 
-   git clone https://github.com/sunfounder/pipower5_update.git --depth 1
+   git clone https://github.com/sunfounder/pipower5_update_tools.git --depth 1
 
    sudo pip3 install blessed --break
    sudo pip3 install smbus2 --break
