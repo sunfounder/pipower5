@@ -83,7 +83,7 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
 
    About PiPower 5 <self>
    assembly
-   basic
+   quick_guide
 
 .. toctree::
    :maxdepth: 2
@@ -98,11 +98,10 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
    :hidden:
    :caption: Software Configuration
 
-   pipower_software
+   pipower5_software
    update_firmware
    use_with_python
-   use_with_micropython
-   use_with_arduino
+
 
 .. toctree::
    :maxdepth: 2
@@ -110,7 +109,7 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
    :caption: Appendix
 
    compatible_sbc
-   Join Our Community <https://bit.ly/raphaelkit>
+
 
 **Copyright Notice**
 

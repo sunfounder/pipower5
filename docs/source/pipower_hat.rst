@@ -1,7 +1,9 @@
 PiPower 5 HAT
 ======================
 
-Overview
+.. interface:
+
+Interface Overview
 -------------------
 
 .. image:: img/pipower5_ov.png
