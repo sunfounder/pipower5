@@ -288,7 +288,7 @@ To allow PiPower 5 to automatically cut power after the Raspberry Pi shuts down,
      .. code-block:: text
   
         6 Advanced Options
-        -> A11/A12 Shutdown Behaviour
+        -> A11 Shutdown Behaviour
         -> B1 Full power off Switch off Pi ...
 
    * Reboot the Raspberry Pi when prompted.
