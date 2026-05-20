@@ -372,6 +372,7 @@ class PiPower5Service():
         })
 
         while self.running:
+            button_state = self.pipower5.read_power_btn()
             data = self.pipower5.read_all()
             data['device_name'] = self.device_name
             self.call(self.__on_data_changed__, data)
@@ -379,7 +380,6 @@ class PiPower5Service():
 
             shutdown_percentage = self.pipower5.read_shutdown_percentage()
             shutdown_request = self.pipower5.read_shutdown_request()
-            button_state = self.pipower5.read_power_btn()
             is_input_plugged_in = self.is_input_plugged_in_debounced(data['is_input_plugged_in'])
             is_battery_activated = data['power_source'] == PowerSource.BATTERY
             is_battery_activated = self.is_battery_activated_debounced(is_battery_activated)
