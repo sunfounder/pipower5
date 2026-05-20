@@ -490,9 +490,17 @@ class PiPower5Service():
         if not self.running or self.task is None:
             self.log.warning("Service not running")
             return
-            
+
         self.running = False
-        
+
+        # Stop buzzer immediately to prevent it from playing after shutdown
+        self.pipower5.buzzer_stop = True
+        self.pipower5.buzzer_sequence_queue.clear()
+        self.pipower5.write_buzzer_freq(0)
+        if self.pipower5.buzzer_thread and self.pipower5.buzzer_thread.is_alive():
+            self.pipower5.buzzer_thread.join(timeout=0.1)
+        self.pipower5.buzzer_stop = False
+
         # 如果任务已完成，直接返回
         if self.task.done():
             return
