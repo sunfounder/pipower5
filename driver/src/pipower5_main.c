@@ -108,31 +108,16 @@ static int pipower5_probe(struct i2c_client *client) {
   pi_dev->client = client;
   mutex_init(&pi_dev->lock);
 
-  /* Create class if it doesn't exist */
-  if (!pipower5_class) {
-    pipower5_class = class_create(CLASS_NAME);
-    if (IS_ERR(pipower5_class)) {
-      dev_warn(dev, "Failed to create class, but continuing anyway\n");
-      // Set class to NULL to avoid using error pointer
-      pipower5_class = NULL;
-    }
-  }
-
-  /* Create device if class is available */
-  if (pipower5_class) {
-    /* Create device under /sys/class/pipower5/ first */
-    pi_dev->pipower5_dev =
-        device_create(pipower5_class, dev, MKDEV(0, 0), pi_dev, "pipower5");
-    if (IS_ERR(pi_dev->pipower5_dev)) {
-      ret = PTR_ERR(pi_dev->pipower5_dev);
-      dev_err(dev, "Failed to create pipower5 device: %d\n", ret);
-      return ret;
-    }
-    dev_info(dev, "Created pipower5 device successfully\n");
-  } else {
-    dev_err(dev, "No class available, cannot create device\n");
+  /* Create device under /sys/class/pipower5/ */
+  pi_dev->pipower5_dev =
+      device_create(pipower5_class, dev, MKDEV(0, 0), pi_dev, "pipower5");
+  if (IS_ERR(pi_dev->pipower5_dev)) {
+    ret = PTR_ERR(pi_dev->pipower5_dev);
+    dev_err(dev, "Failed to create pipower5 device: %d\n", ret);
     pi_dev->pipower5_dev = NULL;
+    return ret;
   }
+  dev_info(dev, "Created pipower5 device at /sys/class/pipower5/pipower5\n");
 
   /* Try to initialize cached values, but continue even if it fails */
   ret = pipower5_update_status(pi_dev);
@@ -176,9 +161,7 @@ static int pipower5_probe(struct i2c_client *client) {
       hwmon_device_unregister(pi_dev->hwmon_dev);
       cancel_delayed_work_sync(&pi_dev->poll_work);
       destroy_workqueue(pi_dev->wq);
-      if (pipower5_class) {
-        device_destroy(pipower5_class, MKDEV(0, 0));
-      }
+      device_destroy(pipower5_class, MKDEV(0, 0));
       return ret;
     }
   }
@@ -193,7 +176,7 @@ static int pipower5_probe(struct i2c_client *client) {
     hwmon_device_unregister(pi_dev->hwmon_dev);
     cancel_delayed_work_sync(&pi_dev->poll_work);
     destroy_workqueue(pi_dev->wq);
-    if (pi_dev->pipower5_dev && pipower5_class) {
+    if (pi_dev->pipower5_dev) {
       device_destroy(pipower5_class, MKDEV(0, 0));
     }
     return ret;
@@ -210,7 +193,7 @@ static int pipower5_probe(struct i2c_client *client) {
     hwmon_device_unregister(pi_dev->hwmon_dev);
     cancel_delayed_work_sync(&pi_dev->poll_work);
     destroy_workqueue(pi_dev->wq);
-    if (pi_dev->pipower5_dev && pipower5_class) {
+    if (pi_dev->pipower5_dev) {
       device_destroy(pipower5_class, MKDEV(0, 0));
     }
     return ret;
@@ -243,14 +226,33 @@ static void pipower5_remove(struct i2c_client *client) {
   }
 
   /* Destroy device */
-  if (pi_dev->pipower5_dev && pipower5_class) {
+  if (pi_dev->pipower5_dev) {
     device_destroy(pipower5_class, MKDEV(0, 0));
+    pi_dev->pipower5_dev = NULL;
   }
 
   dev_info(&client->dev, "PiPower5 driver removed\n");
 }
 
-module_i2c_driver(pipower5_driver);
+static int __init pipower5_driver_init(void) {
+  pipower5_class = class_create(CLASS_NAME);
+  if (IS_ERR(pipower5_class)) {
+    pr_err("pipower5: failed to create class\n");
+    return PTR_ERR(pipower5_class);
+  }
+  return i2c_add_driver(&pipower5_driver);
+}
+
+static void __exit pipower5_driver_exit(void) {
+  i2c_del_driver(&pipower5_driver);
+  if (pipower5_class) {
+    class_destroy(pipower5_class);
+    pipower5_class = NULL;
+  }
+}
+
+module_init(pipower5_driver_init);
+module_exit(pipower5_driver_exit);
 
 MODULE_AUTHOR("SunFounder <service@sunfounder.com>");
 MODULE_DESCRIPTION("PiPower5 Power Management Driver Framework");
