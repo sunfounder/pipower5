@@ -70,6 +70,11 @@ static void pipower5_poll_work(struct work_struct *work) {
   if (ret < 0) {
     dev_err(&pi_dev->client->dev, "Failed to update status: %d\n", ret);
   } else {
+    /* Notify power_supply subsystem so desktop/UIs see updated battery data */
+    if (pi_dev->power_supply) {
+      power_supply_changed(pi_dev->power_supply);
+    }
+
     /* Check for power button state change */
     pipower5_button_check(pi_dev);
 

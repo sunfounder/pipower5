@@ -39,11 +39,6 @@ static enum power_supply_property pipower5_power_props[] = {
     POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN,
     POWER_SUPPLY_PROP_CHARGE_NOW,
     POWER_SUPPLY_PROP_CHARGE_FULL,
-    POWER_SUPPLY_PROP_CURRENT_NOW,
-    POWER_SUPPLY_PROP_ENERGY_NOW,
-    POWER_SUPPLY_PROP_ENERGY_EMPTY,
-    POWER_SUPPLY_PROP_ENERGY_FULL,
-    POWER_SUPPLY_PROP_ENERGY_FULL_DESIGN,
     POWER_SUPPLY_PROP_MODEL_NAME,
     POWER_SUPPLY_PROP_MANUFACTURER,
     POWER_SUPPLY_PROP_TECHNOLOGY,
@@ -63,18 +58,18 @@ static int pipower5_power_get_property(struct power_supply *psy,
     break;
 
   case POWER_SUPPLY_PROP_ONLINE:
-    val->intval = pi_dev->is_input_plugged_in;
+    /* Always report as online so desktop UIs show the battery */
+    val->intval = 1;
     break;
 
   case POWER_SUPPLY_PROP_STATUS:
-    if (pi_dev->is_charging) {
+    /* Check FULL first (even when charging), then charging, then discharging */
+    if (pi_dev->battery_percentage >= 98) {
+      val->intval = POWER_SUPPLY_STATUS_FULL;
+    } else if (pi_dev->is_charging) {
       val->intval = POWER_SUPPLY_STATUS_CHARGING;
     } else {
-      if (pi_dev->battery_percentage >= 98) {
-        val->intval = POWER_SUPPLY_STATUS_FULL;
-      } else {
-        val->intval = POWER_SUPPLY_STATUS_DISCHARGING;
-      }
+      val->intval = POWER_SUPPLY_STATUS_DISCHARGING;
     }
     break;
 
@@ -93,21 +88,12 @@ static int pipower5_power_get_property(struct power_supply *psy,
   case POWER_SUPPLY_PROP_VOLTAGE_MIN_DESIGN:
       val->intval = PIPOWER5_BATTERY_MIN_VOLTAGE * 1000; // mV to uV
       break;
-  case POWER_SUPPLY_PROP_CURRENT_NOW:
-      val->intval = pi_dev->battery_current * 1000; // mA to uA
-      break;
-  case POWER_SUPPLY_PROP_ENERGY_FULL:
-  case POWER_SUPPLY_PROP_ENERGY_FULL_DESIGN:
   case POWER_SUPPLY_PROP_CHARGE_FULL:
   case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
       val->intval = PIPOWER5_BATTERY_FULL_CHARGE_MAH * 1000; // mAh to uAh
       break;
-  case POWER_SUPPLY_PROP_ENERGY_NOW:
   case POWER_SUPPLY_PROP_CHARGE_NOW:
       val->intval = (PIPOWER5_BATTERY_FULL_CHARGE_MAH * pi_dev->battery_percentage / 100) * 1000; // mAh to uAh
-      break;
-  case POWER_SUPPLY_PROP_ENERGY_EMPTY:
-      val->intval = 0;
       break;
   case POWER_SUPPLY_PROP_MODEL_NAME:
       val->strval = "PiPower 5";
