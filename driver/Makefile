@@ -193,8 +193,10 @@ uninstall:
 	fi
 	@# DKMS uninstall
 	-@$(MAKE) dkms_uninstall
-	@# Remove from traditional locations
+	@# Remove from traditional locations (including old pipower5_driver)
 	@sudo rm -f /lib/modules/$(shell uname -r)/extra/pipower5.ko* /lib/modules/$(shell uname -r)/updates/pipower5.ko* 2>/dev/null || true
+	@sudo rm -f /lib/modules/$(shell uname -r)/kernel/drivers/misc/pipower5_driver.ko* 2>/dev/null || true
+	@sudo rm -f /etc/modules-load.d/pipower5_driver.conf 2>/dev/null || true
 	@# Remove dtbo
 	@if [ -d "$(OVERLAY_DIR)" ]; then \
 		sudo rm -f $(OVERLAY_DIR)/$(DTBO_NAME); \
@@ -216,22 +218,12 @@ unload:
 status:
 	@echo "=== PiPower5 Driver Status ==="
 	@echo ""
-	@# Module file (check multiple possible locations)
-	@MODULE_FOUND=0; \
-	for d in extra updates kernel/drivers/misc misc; do \
-		if [ -f "/lib/modules/$(shell uname -r)/$$d/pipower5.ko" ]; then \
-			echo "Module file      : INSTALLED (/lib/modules/$(shell uname -r)/$$d/pipower5.ko)"; \
-			MODULE_FOUND=1; \
-			break; \
-		fi; \
-	done; \
-	if [ $$MODULE_FOUND -eq 0 ]; then \
-		KO_PATH=$$(find /lib/modules/$(shell uname -r) -name pipower5.ko 2>/dev/null | head -1); \
-		if [ -n "$$KO_PATH" ]; then \
-			echo "Module file      : INSTALLED ($$KO_PATH)"; \
-		else \
-			echo "Module file      : MISSING (run 'sudo make install')"; \
-		fi; \
+	@# Module file (check multiple locations, including DKMS .ko.xz)
+	@KO_PATH=$$(find /lib/modules/$(shell uname -r) -name 'pipower5.ko*' 2>/dev/null | head -1); \
+	if [ -n "$$KO_PATH" ]; then \
+		echo "Module file      : INSTALLED ($$KO_PATH)"; \
+	else \
+		echo "Module file      : MISSING (run 'sudo make install')"; \
 	fi
 	@# DKMS registration
 	@if command -v dkms >/dev/null 2>&1; then \
