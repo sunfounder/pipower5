@@ -4,18 +4,24 @@ UPS HAT for Raspberry Pi 5.
 
 ## Installation
 
-### Option 1: One-liner (Pironman 5 plugin)
+### Option 1: One-liner
 
-If you already have Pironman 5 installed:
+Install PiPower 5 standalone:
 
 ```bash
-pironman5 plugin install pipower5
+curl -sSL https://raw.githubusercontent.com/sunfounder/sunfounder-installer-scripts/main/pironman5/install.sh | sudo bash -s -- --variant pipower5
 ```
 
-Or install Pironman 5 + PiPower 5 together:
+Or install as Pironman 5 UPS bundle:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/sunfounder/sunfounder-installer-scripts/main/pironman5/install.sh | sudo bash -s -- --variant ups
+```
+
+If Pironman 5 is already installed, add PiPower 5 as a plugin:
+
+```bash
+pironman5 plugin install pipower5
 ```
 
 ### Option 2: Manual install
