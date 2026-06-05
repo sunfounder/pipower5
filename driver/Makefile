@@ -162,12 +162,17 @@ install: module dtbo
 	@echo "Installing PiPower5 driver..."
 	@# Unload if loaded
 	-@sudo rmmod pipower5 2>/dev/null || true
-	@# Use DKMS if available, fall back to traditional
+	@# Install DKMS if not present, then use DKMS
+	@if ! command -v dkms >/dev/null 2>&1; then \
+		echo "DKMS not found. Installing DKMS..."; \
+		sudo apt-get update -qq && sudo apt-get install -y dkms || { \
+			echo "Failed to install DKMS, falling back to traditional install."; \
+			$(MAKE) modules_install; \
+		}; \
+	fi
 	@if command -v dkms >/dev/null 2>&1; then \
-		echo "DKMS detected, using DKMS..."; \
 		$(MAKE) dkms_install; \
 	else \
-		echo "DKMS not found. Install 'dkms' for auto-rebuild on kernel updates."; \
 		$(MAKE) modules_install; \
 	fi
 	@$(MAKE) install-overlay
@@ -176,7 +181,7 @@ install: module dtbo
 	@sudo modprobe pipower5 || echo "Warning: Failed to load module. A reboot may be needed."
 	@echo "Installation completed."
 	@echo ""
-	@echo "After reboot, check status with: make status"
+	@echo "Check status with: make status"
 
 # Full uninstall: remove module, DKMS, overlay, config.txt
 uninstall:
@@ -211,11 +216,22 @@ unload:
 status:
 	@echo "=== PiPower5 Driver Status ==="
 	@echo ""
-	@# Module file
-	@if [ -f /lib/modules/$(shell uname -r)/extra/pipower5.ko ] || [ -f /lib/modules/$(shell uname -r)/updates/pipower5.ko ]; then \
-		echo "Module file      : INSTALLED"; \
-	else \
-		echo "Module file      : MISSING"; \
+	@# Module file (check multiple possible locations)
+	@MODULE_FOUND=0; \
+	for d in extra updates kernel/drivers/misc misc; do \
+		if [ -f "/lib/modules/$(shell uname -r)/$$d/pipower5.ko" ]; then \
+			echo "Module file      : INSTALLED (/lib/modules/$(shell uname -r)/$$d/pipower5.ko)"; \
+			MODULE_FOUND=1; \
+			break; \
+		fi; \
+	done; \
+	if [ $$MODULE_FOUND -eq 0 ]; then \
+		KO_PATH=$$(find /lib/modules/$(shell uname -r) -name pipower5.ko 2>/dev/null | head -1); \
+		if [ -n "$$KO_PATH" ]; then \
+			echo "Module file      : INSTALLED ($$KO_PATH)"; \
+		else \
+			echo "Module file      : MISSING (run 'sudo make install')"; \
+		fi; \
 	fi
 	@# DKMS registration
 	@if command -v dkms >/dev/null 2>&1; then \
