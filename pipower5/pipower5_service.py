@@ -3,7 +3,6 @@ import logging
 from .pipower5 import PiPower5, ButtonState, ShutdownRequest, Event, PowerSource
 from .utils import log_error
 from .email_sender import EmailSender
-from .battery_device import BatteryDevice
 from .lazy_caller import LazyCaller
 from .debounce import Debounce
 import threading
@@ -23,8 +22,6 @@ class PiPower5Service():
         except Exception as e:
             self.log.warning(f'Email sender init failed: {e}')
             self.email_sender = None
-
-        self.device = BatteryDevice(log=self.log)
 
         self.interval = 1
         self.task = None
@@ -376,7 +373,6 @@ class PiPower5Service():
             data = self.pipower5.read_all()
             data['device_name'] = self.device_name
             self.call(self.__on_data_changed__, data)
-            self.device.update_battery(data)
 
             shutdown_percentage = self.pipower5.read_shutdown_percentage()
             shutdown_request = self.pipower5.read_shutdown_request()

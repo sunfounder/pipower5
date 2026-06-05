@@ -44,9 +44,10 @@ def main():
     pipower5 = PiPower5()
     parser = argparse.ArgumentParser(prog='pipower5', description='PiPower 5')
     parser.add_argument("command",
-                        choices=["start", "stop"],
+                        choices=["start", "stop", "doctor", "uninstall"],
                         nargs="?",
                         help="Command")
+    parser.add_argument("--fix", action="store_true", help="Attempt auto-repair (with doctor)")
     parser.add_argument("-v", "--version", action="store_true", help="Show version")
     parser.add_argument("-c", "--config", action="store_true", help="Show config")
     parser.add_argument("-drd", "--database-retention-days", nargs='?', default='', help="Database retention days")
@@ -156,6 +157,16 @@ def main():
         import os
         os.system('kill -9 $(pgrep -f "pipower5 start")')
         os.system('kill -9 $(pgrep -f "pipower5-service start")')
+        quit()
+
+    if args.command == "doctor":
+        from .device import doctor
+        doctor(fix=args.fix)
+        quit()
+
+    if args.command == "uninstall":
+        from .device import uninstall
+        uninstall()
         quit()
 
     if args.version:

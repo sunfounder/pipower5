@@ -331,17 +331,16 @@ static ssize_t power_button_state_store(struct device *dev,
   if (ret)
     return ret;
 
-  if (value > 1)
+  /* Only accept 0 to reset the power button state register */
+  if (value != 0)
     return -EINVAL;
 
   mutex_lock(&pi_dev->lock);
-  ret = pipower5_write_byte_data(pi_dev, REG_WRITE_POWER_BTN_STATE, (u8)value);
-  if (ret == 0) {
-    pi_dev->power_button_state = (u8)value;
-    ret = count;
-  }
+  ret = pipower5_write_byte_data(pi_dev, REG_WRITE_POWER_BTN_STATE, 0);
   mutex_unlock(&pi_dev->lock);
 
+  if (ret == 0)
+    return count;
   return ret;
 }
 

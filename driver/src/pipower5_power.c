@@ -26,10 +26,11 @@ struct pipower5_power {
 };
 
 static enum power_supply_property pipower5_power_props[] = {
-    POWER_SUPPLY_PROP_PRESENT,     
-    POWER_SUPPLY_PROP_ONLINE,      
+    POWER_SUPPLY_PROP_PRESENT,
+    POWER_SUPPLY_PROP_ONLINE,
     POWER_SUPPLY_PROP_STATUS,
     POWER_SUPPLY_PROP_CAPACITY,
+    POWER_SUPPLY_PROP_CAPACITY_LEVEL,
     POWER_SUPPLY_PROP_VOLTAGE_NOW,
     POWER_SUPPLY_PROP_VOLTAGE_MAX,
     POWER_SUPPLY_PROP_VOLTAGE_MIN,
@@ -43,6 +44,10 @@ static enum power_supply_property pipower5_power_props[] = {
     POWER_SUPPLY_PROP_ENERGY_EMPTY,
     POWER_SUPPLY_PROP_ENERGY_FULL,
     POWER_SUPPLY_PROP_ENERGY_FULL_DESIGN,
+    POWER_SUPPLY_PROP_MODEL_NAME,
+    POWER_SUPPLY_PROP_MANUFACTURER,
+    POWER_SUPPLY_PROP_TECHNOLOGY,
+    POWER_SUPPLY_PROP_SCOPE,
 };
 
 static int pipower5_power_get_property(struct power_supply *psy,

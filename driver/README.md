@@ -1,50 +1,78 @@
-# PiPower 5 Battery driver
+# PiPower 5 Native Kernel Driver
 
-Register PiPower 5 to UPower
+Standalone I2C kernel driver for PiPower 5 that exposes battery status via
+Linux power_supply subsystem (UPower), sysfs, and input events — **no Python
+required for battery monitoring**.
 
-## File explanation
-- `pipower5.conf`: Auto enable pipower5 driver on boot
-- `src/pipower5_main.c`: Main driver implementation
-- `src/pipower5_i2c.c`: I2C communication functions
-- `src/pipower5_sysfs.c`: SysFS interface
-- `src/pipower5_power.c`: UPower integration
-- `include/pipower5.h`: Header file with definitions
-- `install.sh`: Install script to install pipower5 driver
-- `Makefile`: Makefile to build pipower5 driver
+## File structure
 
-## Compilation and Installation
+| File | Purpose |
+|------|---------|
+| `include/pipower5.h` | Register definitions, struct, function prototypes |
+| `src/pipower5_main.c` | I2C driver framework, probe/remove, workqueue polling |
+| `src/pipower5_i2c.c` | I2C register read/write (SMBus) |
+| `src/pipower5_sysfs.c` | sysfs attributes (24 entries, read/write) |
+| `src/pipower5_power.c` | power_supply / UPower registration |
+| `src/pipower5_button.c` | Power button input device (`/dev/input/eventX`) |
+| `src/pipower5_shutdown.c` | Shutdown handling (low battery / button) |
+| `sunfounder-pipower5-overlay.dts` | Device tree overlay (I2C address 0x5C) |
+| `dkms.conf` | DKMS configuration (auto-rebuild on kernel updates) |
+| `Makefile` | Build, install, DKMS, uninstall, status targets |
+| `install.sh` | Quick install / uninstall script |
 
-### Quick Build
+## Quick Start
+
 ```bash
-make
+# Install driver (DKMS + overlay + config.txt)
+sudo ./install.sh
+
+# Or manually:
+sudo make install
+
+# Check status:
+make status
+pipower5 doctor
 ```
 
-### Build and Install
+## Available Make Targets
+
+| Target | Description |
+|--------|-------------|
+| `make all` | Build module + device tree overlay |
+| `make install` | Full install (DKMS + overlay + config.txt + modprobe) |
+| `make uninstall` | Full uninstall (module, DKMS, overlay, config.txt) |
+| `make dkms_install` | Install via DKMS (survives kernel updates) |
+| `make dkms_uninstall` | Remove from DKMS |
+| `make status` | Diagnostic health check |
+| `make load` / `make unload` | Load/unload module |
+| `make clean` | Remove build artifacts |
+
+## sysfs Interface
+
+After loading, data is available at `/sys/class/pipower5/pipower5/`:
+
 ```bash
-make install
+cat /sys/class/pipower5/pipower5/battery_percentage
+cat /sys/class/pipower5/pipower5/battery_voltage
+# ... (24 attributes total)
 ```
 
-### Available Make Targets
-- `make` or `make all` - Compile the module
-- `make module` - Compile the module
-- `make clean` - Remove compiled files
-- `make install` - Compile and install the module
-- `make uninstall` - Remove the module
-- `make load` - Load the module
-- `make unload` - Unload the module
-- `make status` - Check if module is loaded
-- `make help` - Show help message
+## UPower / Desktop Integration
 
-### Manual Installation
+The driver registers as a native `power_supply` device. Desktop
+environments and `upower` will show battery status automatically:
+
 ```bash
-# Compile
-make
-
-# Install
-sudo cp pipower5.ko /lib/modules/$(uname -r)/kernel/drivers/misc/
-sudo depmod -a
-sudo modprobe pipower5
+upower -i /org/freedesktop/UPower/devices/battery_pipower5
 ```
 
-### Auto-load at Boot
-After installation, the module will be loaded automatically at boot time.
+## config.txt
+
+The driver uses `dtoverlay=` in config.txt instead of HAT EEPROM
+auto-detection to avoid EEPROM conflicts:
+
+```
+dtoverlay=sunfounder-pipower5
+```
+
+The Makefile and `pipower5 doctor --fix` manage this automatically.

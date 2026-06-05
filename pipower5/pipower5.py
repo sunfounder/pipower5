@@ -5,6 +5,32 @@ from .note import NOTES, get_note_freq
 from .device import check_pipower5_connected, DEVICE_PATH
 import threading
 
+I2C_ADDR = 0x5C
+I2C_BUS = 1
+
+# Internal register addresses (for operations not exposed via sysfs)
+REG_WRITE_BUZZER_FEQ_L = 13
+REG_WRITE_BUZZER_FEQ_H = 14
+REG_READ_BATTERY_1_VOLTAGE = 0x50   # V50 board variant
+REG_READ_BATTERY_2_VOLTAGE = 0x52   # V50 board variant
+REG_PWR_BTN_STATE = 154
+REG_WRITE_POWER_BTN_STATE = 12
+REG_CHARGE_MAX_CURRENT = 155
+
+ADV_CMD_START = 0xAC
+ADV_CMD_END = 0xAE
+ADV_CMD_OK = 0xE0
+ADV_CMD_ERR = 0xEF
+ADV_CMD_RST = 0x00
+ADV_CMD_VBUS_EN = 0x01
+ADV_CMD_BAT_EN = 0x02
+ADV_CMD_OUPUT_EN = 0x03
+ADV_CMD_ENTER_IAP = 0x04
+
+BAT_MAX_CAPACITY = 2000 # mAh
+
+PAUSE_ACTIONS = ['pause', 'PAUSE', 'Pause', 'P', 'p']
+
 class PowerSource(IntEnum):
     EXTERNAL = 0
     BATTERY = 1
@@ -34,63 +60,117 @@ class Event(StrEnum):
     BATTERY_VOLTAGE_CRITICAL_SHUTDOWN = 'battery_voltage_critical_shutdown'
 
 class PiPower5():
-    # register address
-    REG_PWR_BTN_STATE= 154
-    REG_CHARGE_MAX_CURRENT = 155
-
-    REG_WRITE_POWER_BTN_STATE = 12
-
-    BAT_MAX_CAPACITY = 2000 # mAh   
-
-    ADV_CMD_START = 0xAC
-    ADV_CMD_END = 0xAE
-    ADV_CMD_OK = 0xE0
-    ADV_CMD_ERR = 0xEF
-
-    ADV_CMD_RST = 0x00
-    ADV_CMD_VBUS_EN = 0x01
-    ADV_CMD_BAT_EN = 0x02
-    ADV_CMD_OUPUT_EN = 0x03
-    ADV_CMD_ENTER_IAP = 0x04
-
-    PAUSE_ACTIONS = ['pause', 'PAUSE', 'Pause', 'P', 'p']
+    BAT_MAX_CAPACITY = BAT_MAX_CAPACITY
 
     def __init__(self):
         check_pipower5_connected()
+        from smbus2 import SMBus
+        self._i2c = SMBus(I2C_BUS)
         self.buzzer_sequence_queue = []
         self.buzzer_thread = None
         self.buzzer_stop = False
 
-    def read_sysfs(self, reg):
-        with open(f"{DEVICE_PATH}/{reg}", "r") as f:
-            return int(f.read())
+    # ==================== SysFS Helpers ====================
+
+    def _read_sysfs(self, name):
+        with open(f"{DEVICE_PATH}/{name}", "r") as f:
+            return f.read().strip()
+
+    def _read_sysfs_int(self, name):
+        return int(self._read_sysfs(name))
+
+    def _write_sysfs(self, name, value):
+        with open(f"{DEVICE_PATH}/{name}", "w") as f:
+            f.write(str(value))
+
+    # ==================== Sensor Reads (sysfs) ====================
 
     def read_input_voltage(self):
-        return int(self.read_sysfs("input_voltage"))
+        return self._read_sysfs_int("input_voltage")
     def read_input_current(self):
-        return int(self.read_sysfs("input_current"))
+        return self._read_sysfs_int("input_current")
     def read_input_power(self):
-        return int(self.read_sysfs("input_power"))
+        return self._read_sysfs_int("input_power")
     def read_output_voltage(self):
-        return int(self.read_sysfs("output_voltage"))
+        return self._read_sysfs_int("output_voltage")
     def read_output_current(self):
-        return int(self.read_sysfs("output_current"))
+        return self._read_sysfs_int("output_current")
     def read_output_power(self):
-        return int(self.read_sysfs("output_power"))
+        return self._read_sysfs_int("output_power")
     def read_battery_voltage(self):
-        return int(self.read_sysfs("battery_voltage"))
+        return self._read_sysfs_int("battery_voltage")
     def read_battery_current(self):
-        return int(self.read_sysfs("battery_current"))
+        return self._read_sysfs_int("battery_current")
     def read_battery_power(self):
-        return int(self.read_sysfs("battery_power"))
+        return self._read_sysfs_int("battery_power")
     def read_battery_percentage(self):
-        return int(self.read_sysfs("battery_percentage"))
+        return self._read_sysfs_int("battery_percentage")
     def read_is_input_plugged_in(self):
-        return bool(self.read_sysfs("is_input_plugged_in"))
+        return bool(self._read_sysfs_int("is_input_plugged_in"))
     def read_is_charging(self):
-        return bool(self.read_sysfs("is_charging"))
+        return bool(self._read_sysfs_int("is_charging"))
     def read_power_source(self):
-        return PowerSource(self.read_sysfs("power_source"))
+        return PowerSource(self._read_sysfs_int("power_source"))
+    def read_shutdown_request(self):
+        return ShutdownRequest(self._read_sysfs_int("shutdown_request"))
+    def read_shutdown_percentage(self):
+        return self._read_sysfs_int("shutdown_percentage")
+    def read_firmware_version(self):
+        return self._read_sysfs("firmware_version")
+    def read_default_on(self):
+        return bool(self._read_sysfs_int("default_on"))
+    def get_max_charge_current(self):
+        return self._read_sysfs_int("charge_current_max") * 100
+    def read_buzzer_volume(self):
+        return self._read_sysfs_int("buzzer_volume")
+    def get_buzzer_volume(self):
+        return self.read_buzzer_volume()
+    def read_power_btn(self):
+        '''
+        Read power button state. Reads from register 154 via sysfs,
+        then writes 0 to register 12 to reset.
+        '''
+        val = self._read_sysfs_int("power_button_state")
+        self._i2c.write_byte_data(I2C_ADDR, REG_WRITE_POWER_BTN_STATE, 0)
+        return ButtonState(val)
+    def read_battery_1_voltage(self):
+        '''V50 board: battery 1 voltage (mV)'''
+        return self._i2c.read_word_data(I2C_ADDR, REG_READ_BATTERY_1_VOLTAGE)
+    def read_battery_2_voltage(self):
+        '''V50 board: battery 2 voltage (mV)'''
+        return self._i2c.read_word_data(I2C_ADDR, REG_READ_BATTERY_2_VOLTAGE)
+
+    def read_all(self):
+        '''Read all sensor data in one call.'''
+        return {
+            'input_voltage': self.read_input_voltage(),
+            'input_current': self.read_input_current(),
+            'output_voltage': self.read_output_voltage(),
+            'output_current': self.read_output_current(),
+            'battery_voltage': self.read_battery_voltage(),
+            'battery_current': self.read_battery_current(),
+            'battery_percentage': self.read_battery_percentage(),
+            'power_source': self.read_power_source(),
+            'is_input_plugged_in': self.read_is_input_plugged_in(),
+            'is_charging': self.read_is_charging(),
+        }
+
+    # ==================== Write Operations (sysfs + I2C) ====================
+
+    def write_shutdown_percentage(self, value):
+        self._write_sysfs("shutdown_percentage", value)
+
+    def set_buzzer_volume(self, volume):
+        self._write_sysfs("buzzer_volume", volume)
+
+    def write_buzzer_volume(self, volume):
+        self._write_sysfs("buzzer_volume", volume)
+
+    def write_buzzer_freq(self, freq):
+        '''Write 16-bit buzzer frequency to registers 13 (low) and 14 (high).'''
+        freq = int(freq)
+        self._i2c.write_byte_data(I2C_ADDR, REG_WRITE_BUZZER_FEQ_L, freq & 0xFF)
+        self._i2c.write_byte_data(I2C_ADDR, REG_WRITE_BUZZER_FEQ_H, (freq >> 8) & 0xFF)
 
 
 
@@ -98,9 +178,9 @@ class PiPower5():
         time_out = 5 # seconds
         st = time.time()
         while time.time() - st < time_out:
-            self.i2c.write_block_data(self.ADV_CMD_START, [self.ADV_CMD_VBUS_EN, 0, self.ADV_CMD_END])
-            status = self.i2c.read_byte()
-            if status == self.ADV_CMD_OK:
+            self._i2c.write_i2c_block_data(I2C_ADDR, ADV_CMD_START, [ADV_CMD_VBUS_EN, 0, ADV_CMD_END])
+            status = self._i2c.read_byte(I2C_ADDR)
+            if status == ADV_CMD_OK:
                 return True
             # !!! Don't add delay, otherwise status maybe error casued multiple process read data at the same time !!!
         else:
@@ -110,9 +190,9 @@ class PiPower5():
         time_out = 5 # seconds
         st = time.time()
         while time.time() - st < time_out:
-            self.i2c.write_block_data(self.ADV_CMD_START, [self.ADV_CMD_VBUS_EN, 1, self.ADV_CMD_END])
-            status = self.i2c.read_byte()
-            if status == self.ADV_CMD_OK:
+            self._i2c.write_i2c_block_data(I2C_ADDR, ADV_CMD_START, [ADV_CMD_VBUS_EN, 1, ADV_CMD_END])
+            status = self._i2c.read_byte(I2C_ADDR)
+            if status == ADV_CMD_OK:
                 return True
             # !!! Don't add delay, otherwise status maybe error casued multiple process read data at the same time !!!
         else:
@@ -335,31 +415,10 @@ class PiPower5():
         os.remove(file_path + ".lock")        
         #
         return result
-    
-    def read_power_btn(self):
-        '''
-        Read power button state.
 
-        Returns:
-            ButtonState: Power button state.
-        '''
-        val = self.i2c.read_byte_data(self.REG_PWR_BTN_STATE)
-        self.i2c.write_byte_data(self.REG_WRITE_POWER_BTN_STATE, 0) # reset state
-
-        return ButtonState(val)
-
-    def read_shutdown_request(self):
-        '''
-        Read shutdown request.
-
-        Returns:
-            ShutdownRequest: Shutdown request.
-        '''
-        val = super().read_shutdown_request()
-        return ShutdownRequest(val)
 
     def _buzz_action(self, action):
-        if action in self.PAUSE_ACTIONS:
+        if action in PAUSE_ACTIONS:
             self.write_buzzer_freq(0)
         elif isinstance(action, str):
             if action is not None and action in NOTES:
