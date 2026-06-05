@@ -1,6 +1,7 @@
 import os
 import json
 import signal
+import shutil
 from importlib.resources import files as resource_files
 
 from .pipower5_service import PiPower5Service
@@ -12,31 +13,38 @@ from .version import __version__ as pipower5_version
 from .constants import NAME, ID, PERIPHERALS, SYSTEM_DEFAULT_CONFIG
 
 __package_name__ = __name__.split('.')[0]
-CONFIG_PATH = str(resource_files(__package_name__).joinpath('config.json'))
+_TEMPLATE_CONFIG = str(resource_files(__package_name__).joinpath('config.json'))
+_USER_CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".config", "pipower5")
+_USER_CONFIG = os.path.join(_USER_CONFIG_DIR, "config.json")
 _, BOARD_VERSION = get_varient_id_and_version()
 
 DEFAULT_DEBUG_LEVEL = 'INFO' # 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL'
 
 class PiPower5Manager():
 
-    def __init__(self, config_path=CONFIG_PATH):
+    def __init__(self, config_path=_USER_CONFIG):
         # --- init logger ---
         self.log = Logger('pipower5')
         self.log_level = 'INFO'
 
-        # read config
+        # read config: user config > template
         self.config_path = config_path
+        config_dir = os.path.dirname(self.config_path)
+        if config_dir and not os.path.isdir(config_dir):
+            os.makedirs(config_dir, exist_ok=True)
+
         if os.path.exists(self.config_path):
+            with open(self.config_path, 'r') as f:
+                self.config = json.load(f)
+        elif os.path.exists(_TEMPLATE_CONFIG) and _TEMPLATE_CONFIG != self.config_path:
+            import shutil
+            shutil.copy(_TEMPLATE_CONFIG, self.config_path)
             with open(self.config_path, 'r') as f:
                 self.config = json.load(f)
         else:
             self.config = {'system': SYSTEM_DEFAULT_CONFIG,}
             with open(self.config_path, 'w') as f:
                 json.dump(self.config, f, indent=4)
-        try:
-            os.chmod(self.config_path, 0o777)
-        except:
-            pass
         
         # --- device_info ---
         self.device_info = {
@@ -162,10 +170,6 @@ class PiPower5Manager():
             patch.update(dashboard_patch)
 
         self.config["system"].update(patch)
-        try:
-            os.chmod(self.config_path, 0o777)
-        except:
-            pass
         with open(self.config_path, 'w') as f:
             json.dump(self.config, f, indent=4)
         return self.config

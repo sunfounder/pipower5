@@ -33,7 +33,9 @@ def main():
     _, BOARD_VERSION = get_varient_id_and_version()
 
     __package_name__ = __name__.split('.')[0]
-    CONFIG_PATH = str(resource_files(__package_name__).joinpath('config.json'))
+    _TEMPLATE_CONFIG = str(resource_files(__package_name__).joinpath('config.json'))
+    _USER_CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".config", "pipower5")
+    _USER_CONFIG = os.path.join(_USER_CONFIG_DIR, "config.json")
     PIP_PATH = "/opt/pipower5/venv/bin/pip"
 
     current_config = None
@@ -100,25 +102,33 @@ def main():
         "system": SYSTEM_DEFAULT_CONFIG,
     }
 
-    config_path = CONFIG_PATH
+    # Determine config path: --config-path override > ~/.config/pipower5/config.json
+    config_path = _USER_CONFIG
     if args.config_path != '':
         if args.config_path == None:
             print(f"Config path: {config_path}")
         else:
             config_path = args.config_path
 
-    # read config
+    # Ensure config directory exists
+    config_dir = os.path.dirname(config_path)
+    if config_dir and not os.path.isdir(config_dir):
+        os.makedirs(config_dir, exist_ok=True)
+
+    # Read config: user config > template (migrate from old location if needed)
     if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            current_config = json.load(f)
+    elif os.path.exists(_TEMPLATE_CONFIG) and _TEMPLATE_CONFIG != config_path:
+        # Copy from package template
+        import shutil
+        shutil.copy(_TEMPLATE_CONFIG, config_path)
         with open(config_path, 'r') as f:
             current_config = json.load(f)
     else:
         current_config = {'system': SYSTEM_DEFAULT_CONFIG,}
         with open(config_path, 'w') as f:
             json.dump(current_config, f, indent=4)
-    try:
-        os.chmod(config_path, 0o777)
-    except:
-        pass
         
 
     if args.config:
