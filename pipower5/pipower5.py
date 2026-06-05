@@ -59,6 +59,7 @@ class PiPower5():
         check_pipower5_connected()
         self.buzzer_sequence_queue = []
         self.buzzer_thread = None
+        self.buzzer_stop = False
 
     def read_sysfs(self, reg):
         with open(f"{DEVICE_PATH}/{reg}", "r") as f:
@@ -389,12 +390,14 @@ class PiPower5():
             sequence (list): A list of [action, duration]
         '''
         for action, duration in sequence:
+            if self.buzzer_stop:
+                break
             self._buzz_action(action)
             time.sleep(duration / 1000)
         self.write_buzzer_freq(0)
 
     def _buzz_sequence_loop(self):
-        while True:
+        while not self.buzzer_stop:
             if len(self.buzzer_sequence_queue) > 0:
                 sequence = self.buzzer_sequence_queue.pop(0)
                 self._buzz_sequence(sequence)
@@ -416,6 +419,7 @@ class PiPower5():
         Args:
             sequence (str|list): A list of [[action, duration], [action, duration]] or a string of action,duration:action,duration.
         '''
+        self.buzzer_stop = False
         if isinstance(sequence, str):
             sequence = [item.split(',') for item in sequence.split(':')]
             sequence = [[action.strip(), int(duration.strip())] for action, duration in sequence]
