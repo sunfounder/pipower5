@@ -2,9 +2,9 @@
 """
 
 __all__ = [
-    'NAME', 'ID', 'UUID', 'PRODUCT_ID', 'PRODUCT_VER', 'VENDOR',
+    'NAME', 'ID', 'VENDOR',
     'DEVICE_PATH', 'DTOVERLAY_NAME',
-    'is_installed', 'is_connected', 'check_pipower5_connected',
+    'is_connected', 'check_pipower5_connected',
     'add_dtoverlay', 'remove_dtoverlay', 'has_dtoverlay',
     'doctor', 'uninstall',
 ]
@@ -12,13 +12,8 @@ __all__ = [
 import os
 import subprocess
 
-HAT_DEVICE_TREE = "/proc/device-tree"
-
 NAME = "PiPower 5"
 ID = "pipower5"
-UUID = "9daeea78-0000-0a2a-0033-582369ac3e02"
-PRODUCT_ID = 0x0a2a
-PRODUCT_VER = 0x0033
 VENDOR = "SunFounder"
 
 DEVICE_PATH = "/sys/class/pipower5/pipower5"
@@ -33,32 +28,12 @@ RESET  = "\033[0m"
 
 # ── Detection ───────────────────────────────────────────────────────────────
 
-def is_installed() -> bool:
-    """Check if a PiPower 5 board is physically installed."""
-    if not os.path.isdir(HAT_DEVICE_TREE):
-        return False
-    for f in os.listdir(HAT_DEVICE_TREE):
-        if 'hat' in f:
-            uuid_path = f"{HAT_DEVICE_TREE}/{f}/uuid"
-            if os.path.isfile(uuid_path):
-                try:
-                    with open(uuid_path, "r") as fh:
-                        uuid = fh.read()[:-1]
-                        product_id = int(uuid.split("-")[2], 16)
-                        if product_id == PRODUCT_ID:
-                            return True
-                except Exception:
-                    pass
-    return False
-
 def is_connected() -> bool:
     """Check if the pipower5 kernel driver is loaded and sysfs is available."""
     return os.path.exists(DEVICE_PATH)
 
 def check_pipower5_connected():
-    """Raise IOError if PiPower 5 is not installed or driver not loaded."""
-    if not is_installed():
-        raise IOError("PiPower 5 not installed. Ensure the HAT is attached.")
+    """Raise IOError if PiPower 5 driver is not loaded."""
     if not is_connected():
         raise IOError("PiPower 5 driver not loaded. Run 'pipower5 doctor' to diagnose.")
 
