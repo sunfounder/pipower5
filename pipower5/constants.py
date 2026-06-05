@@ -1,44 +1,6 @@
 
 NAME = "PiPower 5"
 ID = "pipower5"
-PERIPHERALS = [
-    "storage",
-    "cpu",
-    "network",
-    "memory",
-    "history",
-    "log",
-    "cpu_temperature",
-    "gpu_temperature",
-    "temperature_unit",
-    "clear_history",
-    "delete_log_file",
-    "data_interval",
-    "debug_level",
-    "ip_address",
-    "mac_address",
-    "restart_service",
-
-    "pwm_fan_speed",
-
-    "pipower5",
-    "input_voltage",
-    "input_current",
-    "is_input_plugged_in",
-    "output_voltage",
-    "output_current",
-    "output_power",
-    "power_source",
-    "battery_voltage",
-    "battery_current",
-    "battery_percentage",
-    "is_charging",
-    "shutdown_percentage",
-    "default_on",
-    "power-failure-simulation",
-    "send_email",
-    "pipower5_buzzer",
-]
 
 SYSTEM_DEFAULT_CONFIG = {
     "enable_history": True,

@@ -17,9 +17,9 @@ def main():
     import time
     import argparse
 
-    from .constants import PERIPHERALS, SYSTEM_DEFAULT_CONFIG
+    from .constants import SYSTEM_DEFAULT_CONFIG
     from .version import __version__
-    from .utils import is_included, get_varient_id_and_version
+    from .utils import get_varient_id_and_version
     from .pipower5 import PiPower5, Event
 
     from importlib.resources import files as resource_files
@@ -46,7 +46,7 @@ def main():
     pipower5 = PiPower5()
     parser = argparse.ArgumentParser(prog='pipower5', description='PiPower 5')
     parser.add_argument("command",
-                        choices=["start", "stop", "doctor", "uninstall"],
+                        choices=["doctor", "uninstall"],
                         nargs="?",
                         help="Command")
     parser.add_argument("--fix", action="store_true", help="Attempt auto-repair (with doctor)")
@@ -89,8 +89,7 @@ def main():
     parser.add_argument("-bzv", '--buzzer-volume', nargs='?', default='', help="Buzz volume")
     parser.add_argument("-bzt", '--buzzer-test', nargs='?', default='', help="Test buzzer on selected event.")
 
-    if is_included(PERIPHERALS, "temperature_unit"):
-        parser.add_argument("-u", "--temperature-unit", choices=["C", "F"], nargs='?', default='', help="Temperature unit")
+    parser.add_argument("-u", "--temperature-unit", choices=["C", "F"], nargs='?', default='', help="Temperature unit")
 
     args = parser.parse_args()
 
@@ -163,12 +162,6 @@ def main():
                 print(f"Invalid value for database retention days, it should be a number")
                 quit()
 
-    if args.command == "stop":
-        import os
-        os.system('kill -9 $(pgrep -f "pipower5 start")')
-        os.system('kill -9 $(pgrep -f "pipower5-service start")')
-        quit()
-
     if args.command == "doctor":
         from .device import doctor
         doctor(fix=args.fix)
@@ -199,16 +192,15 @@ def main():
         print("Dashboard removed, restart pipower5 to apply changes: sudo systemctl restart pipower5.service")
         quit()
 
-    if is_included(PERIPHERALS, "temperature_unit"):
-        if args.temperature_unit != '':
-            if args.temperature_unit == None:
-                print(f"Temperature unit: {current_config['system']['temperature_unit']}")
-            else:
-                if args.temperature_unit not in ['C', 'F']:
-                    print(f"Invalid value for Temperature unit, it should be C or F")
-                    quit()
-                new_sys_config['temperature_unit'] = args.temperature_unit
-                print(f"Set Temperature unit: {args.temperature_unit}")
+    if args.temperature_unit != '':
+        if args.temperature_unit == None:
+            print(f"Temperature unit: {current_config['system']['temperature_unit']}")
+        else:
+            if args.temperature_unit not in ['C', 'F']:
+                print(f"Invalid value for Temperature unit, it should be C or F")
+                quit()
+            new_sys_config['temperature_unit'] = args.temperature_unit
+            print(f"Set Temperature unit: {args.temperature_unit}")
 
     if args.shutdown_percentage != '':
         if args.shutdown_percentage == None:
@@ -443,9 +435,3 @@ Internal:
         }
         
         update_config_file(new_config, config_path)
-
-    if args.command == "start":
-        from pipower5.pipower5_manager import PiPower5Manager
-        pipower5 = PiPower5Manager(config_path=config_path)
-        pipower5.set_debug_level(debug_level)
-        pipower5.start()
