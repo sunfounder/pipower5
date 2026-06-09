@@ -118,15 +118,15 @@ rst_epilog = """
     
 .. |link_german_tutorials| raw:: html
 
-    <a href="https://docs.sunfounder.com/projects/pipower3/de/latest/" target="_blank">Deutsch Online-Kurs</a>
+    <a href="https://docs.sunfounder.com/projects/pipower5/de/latest/" target="_blank">Deutsch Online-Kurs</a>
 
 .. |link_jp_tutorials| raw:: html
 
-    <a href="https://docs.sunfounder.com/projects/pipower3/ja/latest/" target="_blank">日本語オンライン教材</a>
+    <a href="https://docs.sunfounder.com/projects/pipower5/ja/latest/" target="_blank">日本語オンライン教材</a>
 
 .. |link_en_tutorials| raw:: html
 
-    <a href="https://docs.sunfounder.com/projects/pipower3/en/latest/" target="_blank">English Online-tutorials</a>
+    <a href="https://docs.sunfounder.com/projects/pipower5/en/latest/" target="_blank">English Online-tutorials</a>
 
 .. |link_PiPower_5_buy| raw:: html
 

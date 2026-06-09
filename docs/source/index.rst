@@ -109,6 +109,8 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
    :caption: Appendix
 
    compatible_sbc
+   troubleshooting
+   faq
 
 
 **Copyright Notice**

@@ -1,1 +1,16 @@
+.vscode/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+test-dev/
+bk/
 build*
+build/
+bk/
+photo
+test/photo*
+test/scene/*
+backups/*
+**secret*
+.claude/

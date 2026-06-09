@@ -480,7 +480,7 @@ I2C Communication
 
    <br/>
 
-I2C address: 0x5a
+I2C address: 0x5C
 
 The onboard microcontroller collects various signals from the board and stores them in registers. These signals can be accessed via I2C using the following register tables.
 
