@@ -278,14 +278,15 @@ static ssize_t shutdown_percentage_store(struct device *dev,
   if (value > 100)
     return -EINVAL;
 
-  mutex_lock(&pi_dev->lock);
+  /* Do I2C write first (acquires its own lock), then update cache */
   ret = pipower5_write_byte_data(pi_dev, REG_WRITE_SHUTDOWN_PERCENTAGE,
                                  (u8)value);
   if (ret == 0) {
+    mutex_lock(&pi_dev->lock);
     pi_dev->shutdown_percentage = (u8)value;
+    mutex_unlock(&pi_dev->lock);
     ret = count;
   }
-  mutex_unlock(&pi_dev->lock);
 
   return ret;
 }
@@ -337,9 +338,8 @@ static ssize_t power_button_state_store(struct device *dev,
   if (value != 0)
     return -EINVAL;
 
-  mutex_lock(&pi_dev->lock);
+  /* pipower5_write_byte_data acquires its own lock */
   ret = pipower5_write_byte_data(pi_dev, REG_WRITE_POWER_BTN_STATE, 0);
-  mutex_unlock(&pi_dev->lock);
 
   if (ret == 0)
     return count;
@@ -393,11 +393,12 @@ static ssize_t buzzer_volume_store(struct device *dev,
     value = 100;
   }
 
+  /* Update cache first, then do I2C write (acquires its own lock) */
   mutex_lock(&pi_dev->lock);
   pi_dev->buzzer_volume = (u8)value;
-  ret = pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_VOL, (u8)value);
   mutex_unlock(&pi_dev->lock);
 
+  ret = pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_VOL, (u8)value);
   if (ret < 0) {
     return ret;
   }
