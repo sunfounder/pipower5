@@ -1,5 +1,7 @@
 # PiPower 5 Documentation Repository
 
+> **Canonical AI guidance.** This is the authoritative CLAUDE.md for the PiPower 5 documentation project. All language-variant repositories (`pipower5-rtd-*-sync`) should sync their CLAUDE.md from this file. When adding rules or fixes, update this file first, then propagate to other language repos.
+
 ## Project Identity
 
 | Field | Value |
@@ -54,11 +56,13 @@ pipower5/
         ├── use_with_arduino.rst   # Arduino library usage
         ├── use_with_micropython.rst  # MicroPython library usage
         ├── compatible_sbc.rst     # Compatible SBC list
+        ├── faq.rst               # Frequently asked questions
+        ├── troubleshooting.rst   # Troubleshooting guide
         ├── _static/
-        │   └── lang.js        # Multi-language redirect script
+        │   └── lang.js           # Multi-language redirect script
         ├── _templates/
-        │   └── layout.html    # Sphinx HTML template (SunFounder nav bar)
-        └── img/               # All documentation images
+        │   └── layout.html       # Sphinx HTML template (SunFounder nav bar)
+        └── img/                  # All documentation images
 ```
 
 ---
@@ -274,7 +278,12 @@ When working on this repository:
 2. **The Facebook community note** at the top of each `.rst` file is part of SunFounder's documentation standard. It appears in `index.rst`, `pipower5_software.rst`, and other user-facing pages.
 3. **`conf.py` link substitutions** are the single source of external URLs. Never hardcode external links in `.rst` files — use `|link_xxx|` substitutions.
 4. **Reference labels** (`.. _label:`) are code identifiers, not human-readable text. Never translate them.
-5. **RST section underlines must match title length.** When translating section titles, the underline characters (`=`, `-`, `^`, `~`) must be at least as long as the title text. Translated titles are often longer — extend the underline accordingly.
+5. **RST section underlines (and overlines) must match title length.** 
+   
+   - For single-underline headings (title followed by `=` or `-`), the underline must be at least as long as the title text.
+   - For overline+underline headings (e.g., `----` above and below the title), **both** the overline and underline must use the same character, be the **exact same length**, and be at least as long as the title. When translating titles, always update both lines together.
+   
+   Translated titles are often longer than the English originals — extend overlines and underlines accordingly.
 6. **Code blocks** (Python, bash, shell) are never translated. Command strings and file paths stay as-is.
 7. **The `_static` and `_templates` directories** contain custom assets. Changes here affect the global look and behavior of the published site.
 8. **Build output** goes to `docs/build/` and is gitignored — never commit build artifacts.
