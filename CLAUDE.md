@@ -284,9 +284,26 @@ When working on this repository:
    - For overline+underline headings (e.g., `----` above and below the title), **both** the overline and underline must use the same character, be the **exact same length**, and be at least as long as the title. When translating titles, always update both lines together.
    
    Translated titles are often longer than the English originals — extend overlines and underlines accordingly.
-6. **Code blocks** (Python, bash, shell) are never translated. Command strings and file paths stay as-is.
-7. **The `_static` and `_templates` directories** contain custom assets. Changes here affect the global look and behavior of the published site.
-8. **Build output** goes to `docs/build/` and is gitignored — never commit build artifacts.
-9. **Images** are all under `docs/source/img/`. When adding new images, place them there and reference with relative paths.
-10. **Register tables** in `pipower_hat.rst` use raw HTML. When updating register values, edit both the "Register Table" (read) and "Register Settings Table" (write) sections.
-11. **The `show` script** at the repo root is a GPL license display utility — it is Python 2 syntax and should be considered legacy.
+6. **Nested lists require blank lines and correct indentation in RST.** When a numbered list item or bullet item contains sub-bullets, a blank line must precede the nested list, and the nested items must be indented to align with the text of the parent item (typically 3+ spaces). Without the blank line, RST renders the bullets as a single run-on line.
+
+   **Wrong** (sub-bullets without blank line):
+   ```rst
+   3. **Parent item**:
+      - First sub-item
+      - Second sub-item
+   ```
+
+   **Correct**:
+   ```rst
+   3. **Parent item**:
+
+        - First sub-item
+        - Second sub-item
+   ```
+
+7. **Code blocks** (Python, bash, shell) are never translated. Command strings and file paths stay as-is.
+8. **The `_static` and `_templates` directories** contain custom assets. Changes here affect the global look and behavior of the published site.
+9. **Build output** goes to `docs/build/` and is gitignored — never commit build artifacts.
+10. **Images** are all under `docs/source/img/`. When adding new images, place them there and reference with relative paths.
+11. **Register tables** in `pipower_hat.rst` use raw HTML. When updating register values, edit both the "Register Table" (read) and "Register Settings Table" (write) sections.
+12. **The `show` script** at the repo root is a GPL license display utility — it is Python 2 syntax and should be considered legacy.

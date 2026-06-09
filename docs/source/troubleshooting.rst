@@ -24,7 +24,7 @@ This page helps you diagnose PiPower 5 issues using the onboard LEDs, buzzer, an
    :depth: 2
 
 
-----
+----------------------------
 LED & Buzzer Quick Reference
 ----------------------------
 
@@ -125,7 +125,7 @@ If the buzzer is enabled, these sounds indicate specific events:
    If you never hear buzzer sounds, the buzzer may be disabled or its volume set to 0. Run ``pipower5 -bzv`` to check the current volume, or test with ``pipower5 -bzt low_battery``.
 
 
-----
+-----------------------
 Symptom-Based Diagnosis
 -----------------------
 
@@ -146,9 +146,10 @@ Symptom-Based Diagnosis
    - If battery LEDs remain off after 15 minutes, the battery may be defective.
 
 3. **Is external power connected correctly?**
-   - Use a USB-C PD power supply (5V–15V) or DC power via the screw terminals.
-   - Ensure the USB-C cable supports power delivery — some data-only cables will not work.
-   - Try a different power adapter and cable.
+
+     - Use a USB-C PD power supply (5V–15V) or DC power via the screw terminals.
+     - Ensure the USB-C cable supports power delivery — some data-only cables will not work.
+     - Try a different power adapter and cable.
 
 4. **Press the power button once.**
    PiPower 5 requires a button press to activate output, unless the Default ON jumper is set.
@@ -222,9 +223,11 @@ Symptom-Based Diagnosis
       sudo systemctl restart pipower5.service
 
 2. **Check if the battery is actually discharging.**
-   Run ``pipower5 -a`` and look at:
-   - ``source``: Should be "0 - External" when external power is connected.
-   - ``battery current``: Negative = charging, positive = discharging.
+
+     Run ``pipower5 -a`` and look at:
+
+     - ``source``: Should be "0 - External" when external power is connected.
+     - ``battery current``: Negative = charging, positive = discharging.
 
 3. **For Raspberry Pi 5 with high-power peripherals (SSD, HATs)**:
    Consider setting ``pipower5 -sp 100`` to trigger immediate safe shutdown when external power is lost. See :ref:`pipower5_tool`.
@@ -353,7 +356,7 @@ Symptom-Based Diagnosis
 3. If the issue persists, the DC-DC converter may be faulty. Contact support.
 
 
-----
+----------------------------
 Software Diagnostic Commands
 ----------------------------
 
@@ -401,7 +404,7 @@ The ``pipower5`` CLI tool is your primary diagnostic interface. Here are the mos
    - ``Output: voltage`` is between 5.1V and 5.4V.
 
 
-----
+--------------------
 Still Having Issues?
 --------------------
 
@@ -423,9 +426,10 @@ If none of the above resolves your problem, collect the following information be
       sudo journalctl -u pipower5.service --no-pager -n 100
 
 3. **Hardware details**:
-   - Raspberry Pi model
-   - Power adapter model and rated wattage
-   - Battery type and age
-   - PiPower 5 DIP switch settings
-   - SDSIG and Default ON jumper positions
+
+     - Raspberry Pi model
+     - Power adapter model and rated wattage
+     - Battery type and age
+     - PiPower 5 DIP switch settings
+     - SDSIG and Default ON jumper positions
 
