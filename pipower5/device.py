@@ -17,6 +17,7 @@ ID = "pipower5"
 VENDOR = "SunFounder"
 
 DEVICE_PATH = "/sys/class/pipower5/pipower5"
+MODULE_PATH = "/sys/module/pipower5"
 DTOVERLAY_NAME = "sunfounder-pipower5"
 POWER_SUPPLY_PATH = "/sys/class/power_supply/pipower5"
 
@@ -29,8 +30,8 @@ RESET  = "\033[0m"
 # ── Detection ───────────────────────────────────────────────────────────────
 
 def is_connected() -> bool:
-    """Check if the pipower5 kernel driver is loaded and sysfs is available."""
-    return os.path.exists(DEVICE_PATH)
+    """Check if the pipower5 kernel module is loaded."""
+    return os.path.exists(MODULE_PATH)
 
 def check_pipower5_connected():
     """Raise IOError if PiPower 5 driver is not loaded."""
@@ -111,7 +112,7 @@ def _print_check(name: str, ok: bool, detail: str = ""):
     print(msg)
 
 def _check_sysfs() -> tuple:
-    ok = os.path.exists(DEVICE_PATH)
+    ok = os.path.exists(DEVICE_PATH) or os.path.exists(MODULE_PATH)
     return ok, "" if ok else "Driver not loaded or device not present. Reboot or run 'sudo modprobe pipower5'."
 
 def _check_module_loaded() -> tuple:
