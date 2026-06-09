@@ -125,11 +125,11 @@ class PiPower5():
         return self.read_buzzer_volume()
     def read_power_btn(self):
         '''
-        Read power button state. Reads from register 154 via sysfs,
-        then writes 0 to register 12 to reset.
+        Read power button state, then reset it to 0.
+        Both read and write go through sysfs — no direct I2C.
         '''
         val = self._read_sysfs_int("power_button_state")
-        self._i2c.write_byte_data(I2C_ADDR, REG_WRITE_POWER_BTN_STATE, 0)
+        self._write_sysfs("power_button_state", 0)
         return ButtonState(val)
     def read_battery_1_voltage(self):
         '''V50 board: battery 1 voltage (mV)'''

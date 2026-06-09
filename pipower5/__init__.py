@@ -20,7 +20,7 @@ def main():
     from .constants import SYSTEM_DEFAULT_CONFIG
     from .version import __version__
     from .utils import get_varient_id_and_version
-    from .pipower5 import PiPower5, Event
+    from .pipower5 import PiPower5, Event, PowerSource
 
     from importlib.resources import files as resource_files
     import json
@@ -241,7 +241,7 @@ def main():
         print(f"Battery percentage: {pipower5.read_battery_percentage()} %")
     if args.battery_source:
         power_source = pipower5.read_power_source()
-        print(f"Power source: {power_source} ({'Battery' if power_source == pipower5.BATTERY else 'External'})")
+        print(f"Power source: {power_source} ({'Battery' if power_source == PowerSource.BATTERY else 'External'})")
     if args.is_input_plugged_in:
         print(f"Input plugged in: {pipower5.read_is_input_plugged_in()}")
     if args.is_charging:
@@ -276,7 +276,7 @@ Battery:
     current: {data_buffer['battery_current']} mA
     power: {data_buffer['battery_voltage'] * data_buffer['battery_current'] * 0.000001:.3f} W
     percentage: {data_buffer['battery_percentage']} %
-    source: {data_buffer['power_source']} - {'Battery' if data_buffer['power_source'] == pipower5.BATTERY else 'External'}
+    source: {data_buffer['power_source']} - {'Battery' if data_buffer['power_source'] == PowerSource.BATTERY else 'External'}
     charging: {data_buffer['is_charging']}
 
 Internal:
