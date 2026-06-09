@@ -278,15 +278,15 @@ static ssize_t shutdown_percentage_store(struct device *dev,
   if (value > 100)
     return -EINVAL;
 
-  /* Do I2C write first (acquires its own lock), then update cache */
-  ret = pipower5_write_byte_data(pi_dev, REG_WRITE_SHUTDOWN_PERCENTAGE,
-                                 (u8)value);
+  /* Do I2C write + cache update under one lock */
+  mutex_lock(&pi_dev->lock);
+  ret = __pipower5_write_byte(pi_dev, REG_WRITE_SHUTDOWN_PERCENTAGE,
+                              (u8)value);
   if (ret == 0) {
-    mutex_lock(&pi_dev->lock);
     pi_dev->shutdown_percentage = (u8)value;
-    mutex_unlock(&pi_dev->lock);
     ret = count;
   }
+  mutex_unlock(&pi_dev->lock);
 
   return ret;
 }
@@ -338,8 +338,10 @@ static ssize_t power_button_state_store(struct device *dev,
   if (value != 0)
     return -EINVAL;
 
-  /* pipower5_write_byte_data acquires its own lock */
-  ret = pipower5_write_byte_data(pi_dev, REG_WRITE_POWER_BTN_STATE, 0);
+  /* Hold lock for the I2C write */
+  mutex_lock(&pi_dev->lock);
+  ret = __pipower5_write_byte(pi_dev, REG_WRITE_POWER_BTN_STATE, 0);
+  mutex_unlock(&pi_dev->lock);
 
   if (ret == 0)
     return count;
@@ -393,12 +395,12 @@ static ssize_t buzzer_volume_store(struct device *dev,
     value = 100;
   }
 
-  /* Update cache first, then do I2C write (acquires its own lock) */
+  /* Cache update + I2C write under one lock */
   mutex_lock(&pi_dev->lock);
   pi_dev->buzzer_volume = (u8)value;
+  ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL, (u8)value);
   mutex_unlock(&pi_dev->lock);
 
-  ret = pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_VOL, (u8)value);
   if (ret < 0) {
     return ret;
   }
@@ -410,16 +412,28 @@ static DEVICE_ATTR_RW(buzzer_volume);
 
 /* ==================== Buzzer Playback ==================== */
 
+/* Maximum duration for a single continuous tone (5s safety limit). */
+#define PIPOWER5_BUZZER_MAX_SINGLE_MS  5000
+/* Maximum per-note duration (30s safety limit). */
+#define PIPOWER5_BUZZER_MAX_NOTE_MS   30000
+
+/*
+ * Buzzer work callback — runs on pi_dev->wq.
+ * Writes frequencies to hardware with explicit lock management:
+ * caller holds no lock, this function acquires/releases as needed.
+ */
 static void pipower5_buzzer_work_func(struct work_struct *work) {
   struct delayed_work *dwork = to_delayed_work(work);
   struct pipower5_device *pi_dev =
       container_of(dwork, struct pipower5_device, buzzer_work);
   struct buzzer_note *note;
 
-  /* Safety: no more notes or empty sequence */
+  /* Safety: no more notes or empty sequence → silence */
   if (pi_dev->buzzer_note_index >= pi_dev->buzzer_note_count) {
-    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
-    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+    mutex_lock(&pi_dev->lock);
+    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
+    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+    mutex_unlock(&pi_dev->lock);
     pi_dev->buzzer_playing = false;
     return;
   }
@@ -428,8 +442,10 @@ static void pipower5_buzzer_work_func(struct work_struct *work) {
 
   if (pi_dev->buzzer_playing) {
     /* Finished playing current note → turn off buzzer, advance */
-    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
-    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+    mutex_lock(&pi_dev->lock);
+    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
+    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+    mutex_unlock(&pi_dev->lock);
     pi_dev->buzzer_playing = false;
     pi_dev->buzzer_note_index++;
 
@@ -439,16 +455,21 @@ static void pipower5_buzzer_work_func(struct work_struct *work) {
     }
   } else {
     /* Start playing a new note */
-    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_L,
-                             note->freq & 0xFF);
-    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_H,
-                             (note->freq >> 8) & 0xFF);
+    mutex_lock(&pi_dev->lock);
+    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L,
+                          note->freq & 0xFF);
+    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H,
+                          (note->freq >> 8) & 0xFF);
+    mutex_unlock(&pi_dev->lock);
     pi_dev->buzzer_playing = true;
 
-    /* Schedule note-off after duration */
+    /* Schedule note-off after duration (with safety cap) */
     if (note->duration_ms > 0) {
+      unsigned int dur = note->duration_ms;
+      if (dur > PIPOWER5_BUZZER_MAX_NOTE_MS)
+        dur = PIPOWER5_BUZZER_MAX_NOTE_MS;
       queue_delayed_work(pi_dev->wq, &pi_dev->buzzer_work,
-                         msecs_to_jiffies(note->duration_ms));
+                         msecs_to_jiffies(dur));
     } else {
       /* Zero duration → turn off immediately */
       queue_delayed_work(pi_dev->wq, &pi_dev->buzzer_work, 1);
@@ -456,9 +477,11 @@ static void pipower5_buzzer_work_func(struct work_struct *work) {
   }
 }
 
-/* buzzer_play write-only sysfs:
- * Sequence format: "freq,dur;freq,dur;..."
- * Single freq: "freq" or "0" to stop
+/*
+ * buzzer_play write-only sysfs:
+ *   Sequence:  "freq,dur;freq,dur;..."
+ *   Single:    "freq"  → auto-stops after 5 s
+ *   Stop:      "0"     → immediate silence
  */
 static ssize_t buzzer_play_store(struct device *dev,
                                  struct device_attribute *attr,
@@ -479,13 +502,30 @@ static ssize_t buzzer_play_store(struct device *dev,
   if (!strpbrk(buf, ",;")) {
     if (sscanf(buf, "%u", &single_freq) == 1) {
       if (single_freq == 0 || single_freq > 65534) {
-        pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
-        pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+        /* Immediate stop */
+        mutex_lock(&pi_dev->lock);
+        __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
+        __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+        mutex_unlock(&pi_dev->lock);
       } else {
-        pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_L,
-                                 single_freq & 0xFF);
-        pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_H,
-                                 (single_freq >> 8) & 0xFF);
+        /*
+         * Single continuous tone — auto-stop after safety timeout.
+         * Treated as a 1-note sequence so the work func handles turn-off.
+         */
+        mutex_lock(&pi_dev->lock);
+        __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L,
+                              single_freq & 0xFF);
+        __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H,
+                              (single_freq >> 8) & 0xFF);
+        mutex_unlock(&pi_dev->lock);
+
+        pi_dev->buzzer_notes[0].freq = (u16)single_freq;
+        pi_dev->buzzer_notes[0].duration_ms = PIPOWER5_BUZZER_MAX_SINGLE_MS;
+        pi_dev->buzzer_note_count = 1;
+        pi_dev->buzzer_note_index = 0;
+        pi_dev->buzzer_playing = true;
+        queue_delayed_work(pi_dev->wq, &pi_dev->buzzer_work,
+                           msecs_to_jiffies(PIPOWER5_BUZZER_MAX_SINGLE_MS));
       }
     }
     return count;
@@ -515,6 +555,10 @@ static ssize_t buzzer_play_store(struct device *dev,
       continue;
     if (i >= PIPOWER5_MAX_BUZZER_SEQUENCE)
       break;
+
+    /* Cap per-note duration */
+    if (dur > PIPOWER5_BUZZER_MAX_NOTE_MS)
+      dur = PIPOWER5_BUZZER_MAX_NOTE_MS;
 
     pi_dev->buzzer_notes[i].freq = (u16)freq;
     pi_dev->buzzer_notes[i].duration_ms = (u16)dur;

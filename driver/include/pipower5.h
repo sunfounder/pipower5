@@ -134,10 +134,13 @@ struct pipower5_device {
   bool buzzer_playing;
 };
 
-/* Function prototypes for I2C operations */
-int pipower5_read_word_data(struct pipower5_device *pi_dev, u8 reg);
-int pipower5_read_byte_data(struct pipower5_device *pi_dev, u8 reg);
-int pipower5_write_byte_data(struct pipower5_device *pi_dev, u8 reg, u8 value);
+/*
+ * Low-level I2C primitives — caller MUST hold pi_dev->lock.
+ * Named with leading __ to signal this requirement.
+ */
+int __pipower5_read_word(struct pipower5_device *pi_dev, u8 reg);
+int __pipower5_read_byte(struct pipower5_device *pi_dev, u8 reg);
+int __pipower5_write_byte(struct pipower5_device *pi_dev, u8 reg, u8 value);
 int pipower5_update_status(struct pipower5_device *pi_dev);
 
 /* Function prototypes for sysfs operations */
