@@ -146,9 +146,10 @@ Symptombasierte Diagnose
    - Wenn die Akku-LEDs nach 15 Minuten immer noch aus sind, ist der Akku möglicherweise defekt.
 
 3. **Ist die externe Stromversorgung korrekt angeschlossen?**
-   - Verwenden Sie ein USB-C PD-Netzteil (5V–15V) oder Gleichstrom über die Schraubklemmen.
-   - Stellen Sie sicher, dass das USB-C-Kabel Power Delivery unterstützt — reine Datenkabel funktionieren nicht.
-   - Versuchen Sie ein anderes Netzteil und Kabel.
+
+     - Verwenden Sie ein USB-C PD-Netzteil (5V–15V) oder Gleichstrom über die Schraubklemmen.
+     - Stellen Sie sicher, dass das USB-C-Kabel Power Delivery unterstützt — reine Datenkabel funktionieren nicht.
+     - Versuchen Sie ein anderes Netzteil und Kabel.
 
 4. **Drücken Sie einmal die Power-Taste.**
    PiPower 5 erfordert einen Tastendruck, um den Ausgang zu aktivieren, es sei denn, der Default-ON-Jumper ist gesetzt.
@@ -222,9 +223,11 @@ Symptombasierte Diagnose
       sudo systemctl restart pipower5.service
 
 2. **Überprüfen Sie, ob sich der Akku tatsächlich entlädt.**
-   Führen Sie ``pipower5 -a`` aus und achten Sie auf:
-   - ``source``: Sollte "0 - External" sein, wenn externe Stromversorgung angeschlossen ist.
-   - ``battery current``: Negativ = Laden, positiv = Entladen.
+
+     Führen Sie ``pipower5 -a`` aus und achten Sie auf:
+
+     - ``source``: Sollte "0 - External" sein, wenn externe Stromversorgung angeschlossen ist.
+     - ``battery current``: Negativ = Laden, positiv = Entladen.
 
 3. **Für Raspberry Pi 5 mit Hochleistungs-Peripherie (SSD, HATs)**:
    Erwägen Sie ``pipower5 -sp 100`` zu setzen, um ein sofortiges sicheres Herunterfahren auszulösen, wenn die externe Stromversorgung ausfällt. Siehe :ref:`pipower5_tool`.
