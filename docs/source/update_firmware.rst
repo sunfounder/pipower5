@@ -1,9 +1,9 @@
-Update PiPower5 Firmware Using Raspberry Pi
+PiPower5-Firmware mit Raspberry Pi aktualisieren
 ===================================================================
 
-This guide explains how to update the firmware of **PiPower5** on a Raspberry Pi.  
+Diese Anleitung erklärt, wie Sie die Firmware von **PiPower5** auf einem Raspberry Pi aktualisieren.
 
-**1. Download** ``pipower5_update_tools`` **and install dependencies**
+**1. Laden Sie** ``pipower5_update_tools`` **herunter und installieren Sie die Abhängigkeiten**
 
 .. code-block:: shell
 
@@ -12,102 +12,102 @@ This guide explains how to update the firmware of **PiPower5** on a Raspberry Pi
    sudo pip3 install blessed --break
    sudo pip3 install smbus2 --break
 
-**2. Check for updates**
+**2. Auf Updates prüfen**
 
 .. code-block:: shell
 
    cd pipower5_update_tools
    git pull
 
-**3. Run the update tool**
+**3. Update-Tool ausführen**
 
 .. code-block:: shell
 
    python3 run.py
 
-**4. Stop the service if prompted**
+**4. Dienst bei Aufforderung stoppen**
 
-When running ``pipower5_update_tools``, you may be prompted to stop ``pipower5.service``.  Press ``Y`` to stop the service.  
+Beim Ausführen von ``pipower5_update_tools`` werden Sie möglicherweise aufgefordert, ``pipower5.service`` zu stoppen. Drücken Sie ``Y``, um den Dienst zu stoppen.
 
 .. image:: img/upd_frw_1.png
 
-**5. Select** ``Update Firmware``
+**5. Wählen Sie** ``Update Firmware``
 
-Choose **Update Firmware**. The Raspberry Pi will send a command that switches PiPower5 into **BOOT mode**.  
+Wählen Sie **Update Firmware**. Der Raspberry Pi sendet einen Befehl, der PiPower5 in den **BOOT-Modus** versetzt.
 
 .. image:: img/upd_frw_2.png
 
-**6. Verify BOOT mode**
+**6. BOOT-Modus überprüfen**
 
-Once successfully in BOOT mode, the **two middle LEDs** on the PiPower5 will flash alternately, indicating BOOT mode is active.  
+Sobald der BOOT-Modus erfolgreich aktiviert ist, blinken die **zwei mittleren LEDs** auf dem PiPower5 abwechselnd, was anzeigt, dass der BOOT-Modus aktiv ist.
 
 .. image:: img/upd_frw_3.png
 
-**7. Choose the firmware file**
+**7. Firmware-Datei auswählen**
 
-Select a firmware file in ``.bin`` format and press ``Enter`` to start writing.  
+Wählen Sie eine Firmware-Datei im ``.bin``-Format und drücken Sie ``Enter``, um mit dem Schreiben zu beginnen.
 
 .. image:: img/upd_frw_4.png
 
-**8. Complete the update**
+**8. Update abschließen**
 
-After flashing is complete, select **Restart**.  
-PiPower5 will reboot and start running the new firmware.  
+Wählen Sie nach Abschluss des Flash-Vorgangs **Restart**.
+PiPower5 startet neu und führt die neue Firmware aus.
 
 .. image:: img/upd_frw_5.png
 
 ----------------------------------------------------------------
 
-**Restore Factory Firmware**
+**Werks-Firmware wiederherstellen**
 
-If you need to roll back to the factory firmware, use the **Restore Factory Firmware** option in ``pipower5_update_tools``.  
-This will reload the firmware stored in the factory partition and revert to the original version.  
+Wenn Sie zur Werks-Firmware zurückkehren müssen, verwenden Sie die Option **Restore Factory Firmware** in ``pipower5_update_tools``.
+Dadurch wird die in der Werkpartition gespeicherte Firmware neu geladen und die ursprüngliche Version wiederhergestellt.
 
 .. image:: img/upd_frw_6.png
 
 
 ----------------------------------------------------------------
 
-**Force BOOT Mode**
+**BOOT-Modus erzwingen**
 
-If you cannot enter BOOT mode normally, you can force it:
+Wenn Sie nicht normal in den BOOT-Modus wechseln können, können Sie ihn erzwingen:
 
-1. Power off PiPower5.  
-2. Short the **Boot 1 pin**.  
-3. Power on the device.  
+1. Schalten Sie PiPower5 aus.
+2. Schließen Sie den **Boot 1-Pin** kurz.
+3. Schalten Sie das Gerät ein.
 
-PiPower5 will start directly in BOOT mode.  
+PiPower5 startet direkt im BOOT-Modus.
 
 .. image:: img/upd_frw_7.png
 
-To exit BOOT mode, press and hold the power button for two seconds.  
-PiPower5 will then reboot into normal mode.  
+Um den BOOT-Modus zu verlassen, halten Sie die Power-Taste zwei Sekunden lang gedrückt.
+PiPower5 startet dann im normalen Modus neu.
 
 .. image:: img/upd_frw_8.png
 
 ----------------------------------------------------------------
 
-**Troubleshooting**
+**Fehlerbehebung**
 
 
-Here are some common issues you may encounter during the update process and their solutions:
+Hier sind einige häufig auftretende Probleme während des Update-Vorgangs und deren Lösungen:
 
-- **Device not detected**  
+- **Gerät nicht erkannt**
 
-  - Try rebooting both the Raspberry Pi and PiPower5, then re-run the update tool.  
+  - Versuchen Sie, sowohl den Raspberry Pi als auch PiPower5 neu zu starten und führen Sie das Update-Tool erneut aus.
 
-- **Failed to enter BOOT mode**  
+- **BOOT-Modus konnte nicht aktiviert werden**
 
-  - Ensure that ``pipower5.service`` is stopped before updating.  
-  - If automatic BOOT mode fails, use the **Force BOOT Mode** method (shorting the Boot 1 pin).  
+  - Stellen Sie sicher, dass ``pipower5.service`` vor dem Update gestoppt ist.
+  - Wenn der automatische BOOT-Modus fehlschlägt, verwenden Sie die Methode **BOOT-Modus erzwingen** (Kurzschließen des Boot 1-Pins).
 
-- **Update process stuck or flashing failed**  
+- **Update-Vorgang hängt oder Flash-Vorgang fehlgeschlagen**
 
-  - Double-check that the firmware file is in ``.bin`` format.  
-  - Re-run the update tool and try again.  
-  - Use a stable power supply to prevent interruptions during flashing.  
+  - Überprüfen Sie, ob die Firmware-Datei im ``.bin``-Format vorliegt.
+  - Führen Sie das Update-Tool erneut aus und versuchen Sie es noch einmal.
+  - Verwenden Sie eine stabile Stromversorgung, um Unterbrechungen während des Flash-Vorgangs zu vermeiden.
 
-- **Firmware update completed, but device not working properly**  
+- **Firmware-Update abgeschlossen, aber Gerät funktioniert nicht richtig**
 
-  - Restore the factory firmware using the built-in tool.  
-  - If the problem persists, verify that the firmware file matches your PiPower5 version.  
+  - Stellen Sie die Werks-Firmware mit dem integrierten Tool wieder her.
+  - Wenn das Problem weiterhin besteht, überprüfen Sie, ob die Firmware-Datei mit Ihrer PiPower5-Version übereinstimmt.

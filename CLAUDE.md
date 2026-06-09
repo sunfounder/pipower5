@@ -1,5 +1,7 @@
 # PiPower 5 Documentation Repository
 
+> **Synced from canonical source.** This CLAUDE.md is synced from the English source repository. The authoritative version lives in the main `pipower5-rtd-*` workspace. When adding rules, update the canonical file first, then propagate here.
+
 ## Project Identity
 
 | Field | Value |
@@ -54,6 +56,8 @@ pipower5/
         ├── use_with_arduino.rst   # Arduino library usage
         ├── use_with_micropython.rst  # MicroPython library usage
         ├── compatible_sbc.rst     # Compatible SBC list
+        ├── faq.rst               # Frequently asked questions
+        ├── troubleshooting.rst   # Troubleshooting guide
         ├── _static/
         │   └── lang.js        # Multi-language redirect script
         ├── _templates/
@@ -274,7 +278,12 @@ When working on this repository:
 2. **The Facebook community note** at the top of each `.rst` file is part of SunFounder's documentation standard. It appears in `index.rst`, `pipower5_software.rst`, and other user-facing pages.
 3. **`conf.py` link substitutions** are the single source of external URLs. Never hardcode external links in `.rst` files — use `|link_xxx|` substitutions.
 4. **Reference labels** (`.. _label:`) are code identifiers, not human-readable text. Never translate them.
-5. **RST section underlines must match title length.** When translating section titles, the underline characters (`=`, `-`, `^`, `~`) must be at least as long as the title text. Translated titles are often longer — extend the underline accordingly.
+5. **RST section underlines (and overlines) must match title length.** 
+   
+   - For single-underline headings (title followed by `=` or `-`), the underline must be at least as long as the title text.
+   - For overline+underline headings (e.g., `----` above and below the title), **both** the overline and underline must use the same character, be the **exact same length**, and be at least as long as the title. When translating titles, always update both lines together.
+   
+   Translated titles are often longer than the English originals — extend overlines and underlines accordingly.
 6. **Code blocks** (Python, bash, shell) are never translated. Command strings and file paths stay as-is.
 7. **The `_static` and `_templates` directories** contain custom assets. Changes here affect the global look and behavior of the published site.
 8. **Build output** goes to `docs/build/` and is gitignored — never commit build artifacts.

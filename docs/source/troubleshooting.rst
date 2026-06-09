@@ -1,413 +1,413 @@
 .. note::
 
-    Hello, welcome to the SunFounder Raspberry Pi & Arduino & ESP32 Enthusiasts Community on Facebook! Dive deeper into Raspberry Pi, Arduino, and ESP32 with fellow enthusiasts.
+    Hallo, willkommen in der SunFounder Raspberry Pi & Arduino & ESP32 Enthusiasten-Community auf Facebook! Tauchen Sie tiefer in Raspberry Pi, Arduino und ESP32 mit gleichgesinnten Enthusiasten ein.
 
-    **Why Join?**
+    **Warum beitreten?**
 
-    - **Expert Support**: Solve post-sale issues and technical challenges with help from our community and team.
-    - **Learn & Share**: Exchange tips and tutorials to enhance your skills.
-    - **Exclusive Previews**: Get early access to new product announcements and sneak peeks.
-    - **Special Discounts**: Enjoy exclusive discounts on our newest products.
-    - **Festive Promotions and Giveaways**: Take part in giveaways and holiday promotions.
+    - **Experten-Support**: Lösen Sie Probleme nach dem Kauf und technische Herausforderungen mit Hilfe unserer Community und unseres Teams.
+    - **Lernen & Teilen**: Tauschen Sie Tipps und Tutorials aus, um Ihre Fähigkeiten zu verbessern.
+    - **Exklusive Vorschauen**: Erhalten Sie frühzeitigen Zugang zu neuen Produktankündigungen und Vorab-Einblicken.
+    - **Spezielle Rabatte**: Genießen Sie exklusive Rabatte auf unsere neuesten Produkte.
+    - **Festliche Aktionen und Gewinnspiele**: Nehmen Sie an Gewinnspielen und Feiertagsaktionen teil.
 
-    👉 Ready to explore and create with us? Click [|link_sf_facebook|] and join today!
+    👉 Bereit, mit uns zu entdecken und zu gestalten? Klicken Sie [|link_sf_facebook|] und treten Sie noch heute bei!
 
 .. _troubleshooting:
 
-Troubleshooting
+Fehlerbehebung
 ===============
 
-This page helps you diagnose PiPower 5 issues using the onboard LEDs, buzzer, and software tools. Start with the quick reference tables below, then follow the symptom-based guides for detailed steps.
+Diese Seite hilft Ihnen bei der Diagnose von PiPower 5-Problemen mithilfe der integrierten LEDs, des Summers und der Software-Tools. Beginnen Sie mit den folgenden Kurzreferenz-Tabellen und folgen Sie dann den symptombezogenen Anleitungen für detaillierte Schritte.
 
-.. contents:: Table of Contents
+.. contents:: Inhaltsverzeichnis
    :local:
    :depth: 2
 
 
-----
-LED & Buzzer Quick Reference
+----------------------------
+LED- & Summer-Kurzreferenz
 ----------------------------
 
-Before diving into specific symptoms, use these tables to interpret what the board is telling you.
+Bevor Sie sich in spezifische Symptome vertiefen, verwenden Sie diese Tabellen, um zu interpretieren, was die Platine Ihnen mitteilt.
 
-Power & Status LEDs
-+++++++++++++++++++
+Betriebs- & Status-LEDs
++++++++++++++++++++++++++
 
 .. list-table::
    :header-rows: 1
    :widths: 15 25 60
 
    * - LED
-     - State
-     - What It Means
-   * - **PWR LED** (green)
-     - ON
-     - Output power is active — the board is supplying 5V to your device.
+     - Zustand
+     - Bedeutung
+   * - **PWR-LED** (grün)
+     - AN
+     - Ausgangsstrom ist aktiv — die Platine liefert 5V an Ihr Gerät.
    * -
-     - OFF
-     - Output is off. Press the power button once to turn it on.
-   * - **BAT LED** (yellow)
-     - ON
-     - Battery is currently supplying power. If external power is connected, this indicates insufficient input power.
+     - AUS
+     - Ausgang ist aus. Drücken Sie einmal die Power-Taste, um ihn einzuschalten.
+   * - **BAT-LED** (gelb)
+     - AN
+     - Akku versorgt derzeit das System. Wenn externe Stromversorgung angeschlossen ist, deutet dies auf unzureichende Eingangsleistung hin.
    * -
-     - OFF
-     - Battery is in standby — external power is sufficient.
-   * - **Reverse Battery LEDs** (2× red)
-     - ON (both)
-     - Battery polarity is reversed! Disconnect immediately and correct the wiring.
+     - AUS
+     - Akku ist im Standby — externe Stromversorgung ist ausreichend.
+   * - **Verpolungs-LEDs** (2× rot)
+     - AN (beide)
+     - Akku-Polarität ist vertauscht! Sofort trennen und Verkabelung korrigieren.
 
-Battery Level LEDs
-++++++++++++++++++
+Akku-Ladestand-LEDs
+++++++++++++++++++++++
 
 .. list-table::
    :header-rows: 1
    :widths: 20 80
 
-   * - LED Pattern
-     - Meaning
-   * - 4 LEDs lit
-     - Battery > 80%
-   * - 3 LEDs lit
-     - Battery 60% – 80%
-   * - 2 LEDs lit
-     - Battery 40% – 60%
-   * - 1 LED lit
-     - Battery 20% – 40%
-   * - First LED flashing
-     - Battery < 20% — charge soon
-   * - LEDs cycling sequentially
-     - Charging in progress
-   * - Middle two LEDs flashing
-     - Waiting for shutdown signal from Raspberry Pi
-   * - All LEDs off
-     - Board unpowered or in sleep mode
+   * - LED-Muster
+     - Bedeutung
+   * - 4 LEDs leuchten
+     - Akku > 80%
+   * - 3 LEDs leuchten
+     - Akku 60% – 80%
+   * - 2 LEDs leuchten
+     - Akku 40% – 60%
+   * - 1 LED leuchtet
+     - Akku 20% – 40%
+   * - Erste LED blinkt
+     - Akku < 20% — bald aufladen
+   * - LEDs laufen nacheinander durch
+     - Ladevorgang läuft
+   * - Mittlere zwei LEDs blinken
+     - Warten auf Shutdown-Signal vom Raspberry Pi
+   * - Alle LEDs aus
+     - Platine ohne Strom oder im Schlafmodus
 
 .. note::
 
-   Battery LEDs remain active during charging even when the board is in the off state. They turn off only when charging is complete.
+   Die Akku-LEDs bleiben während des Ladevorgangs aktiv, auch wenn die Platine ausgeschaltet ist. Sie erlöschen erst, wenn der Ladevorgang abgeschlossen ist.
 
-Buzzer Signals
-++++++++++++++
+Summer-Signale
+++++++++++++++++
 
-If the buzzer is enabled, these sounds indicate specific events:
+Wenn der Summer aktiviert ist, zeigen diese Töne bestimmte Ereignisse an:
 
 .. list-table::
    :header-rows: 1
    :widths: 25 25 50
 
-   * - Event
-     - Typical Sound
-     - What It Means
+   * - Ereignis
+     - Typischer Ton
+     - Bedeutung
    * - ``battery_activated``
-     - Two ascending tones
-     - Battery has taken over power supply (external power lost or insufficient).
+     - Zwei aufsteigende Töne
+     - Der Akku hat die Stromversorgung übernommen (externe Stromversorgung verloren oder unzureichend).
    * - ``low_battery``
-     - Two repeated tones of same pitch
-     - Battery level has fallen below the configured shutdown percentage. Charge immediately.
+     - Zwei wiederholte Töne gleicher Tonhöhe
+     - Der Akkustand ist unter den konfigurierten Abschalt-Prozentsatz gefallen. Sofort aufladen.
    * - ``power_disconnected``
-     - High tone → low tone
-     - External power was disconnected. System is now running on battery.
+     - Hoher Ton → tiefer Ton
+     - Externe Stromversorgung wurde getrennt. System läuft jetzt über Akku.
    * - ``power_restored``
-     - Low tone → high tone
-     - External power was restored. Battery is no longer discharging.
+     - Tiefer Ton → hoher Ton
+     - Externe Stromversorgung wurde wiederhergestellt. Akku wird nicht mehr entladen.
    * - ``power_insufficient``
-     - Three rapid tones of same pitch
-     - External power is connected but too weak. Battery is supplementing. Check your power adapter.
+     - Drei schnelle Töne gleicher Tonhöhe
+     - Externe Stromversorgung ist angeschlossen, aber zu schwach. Akku unterstützt zusätzlich. Überprüfen Sie Ihr Netzteil.
    * - ``battery_critical_shutdown``
-     - Three rapid descending tones
-     - Battery capacity critically low. System will shut down.
+     - Drei schnelle absteigende Töne
+     - Akkukapazität kritisch niedrig. System wird herunterfahren.
    * - ``battery_voltage_critical_shutdown``
-     - Four rapid descending tones
-     - Battery voltage critically low (failsafe). System will shut down immediately.
+     - Vier schnelle absteigende Töne
+     - Akkuspannung kritisch niedrig (Sicherheitsmechanismus). System wird sofort herunterfahren.
 
 .. tip::
 
-   If you never hear buzzer sounds, the buzzer may be disabled or its volume set to 0. Run ``pipower5 -bzv`` to check the current volume, or test with ``pipower5 -bzt low_battery``.
+   Wenn Sie nie Summer-Töne hören, ist der Summer möglicherweise deaktiviert oder seine Lautstärke auf 0 gesetzt. Führen Sie ``pipower5 -bzv`` aus, um die aktuelle Lautstärke zu überprüfen, oder testen Sie mit ``pipower5 -bzt low_battery``.
 
 
-----
-Symptom-Based Diagnosis
------------------------
+-------------------------
+Symptombasierte Diagnose
+-------------------------
 
-"No Power" — All LEDs Off, No Output
-+++++++++++++++++++++++++++++++++++++
+„Keine Stromversorgung" — Alle LEDs aus, kein Ausgang
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: PWR LED off, battery LEDs off, connected device shows no power.
+**Was Sie sehen**: PWR-LED aus, Akku-LEDs aus, angeschlossenes Gerät zeigt keine Stromversorgung.
 
-**Check these, in order:**
+**Überprüfen Sie Folgendes, in dieser Reihenfolge:**
 
-1. **Is the battery installed?**
-   PiPower 5 cannot operate without a battery. Ensure the battery connector (XH2.54 3P) is firmly seated. See :ref:`battery_connector`.
+1. **Ist der Akku installiert?**
+   PiPower 5 kann ohne Akku nicht betrieben werden. Stellen Sie sicher, dass der Akku-Anschluss (XH2.54 3P) fest sitzt. Siehe :ref:`battery_connector`.
 
-2. **Is the battery completely drained?**
-   A deeply discharged battery (< 2.5V per cell) enters trickle-charge mode and may not power the board for several minutes.
+2. **Ist der Akku vollständig entladen?**
+   Ein tiefentladener Akku (< 2,5V pro Zelle) wechselt in den Erhaltungslade-Modus und kann die Platine möglicherweise mehrere Minuten lang nicht mit Strom versorgen.
 
-   - Connect external power and wait 10–15 minutes.
-   - If battery LEDs remain off after 15 minutes, the battery may be defective.
+   - Schließen Sie die externe Stromversorgung an und warten Sie 10–15 Minuten.
+   - Wenn die Akku-LEDs nach 15 Minuten immer noch aus sind, ist der Akku möglicherweise defekt.
 
-3. **Is external power connected correctly?**
-   - Use a USB-C PD power supply (5V–15V) or DC power via the screw terminals.
-   - Ensure the USB-C cable supports power delivery — some data-only cables will not work.
-   - Try a different power adapter and cable.
+3. **Ist die externe Stromversorgung korrekt angeschlossen?**
+   - Verwenden Sie ein USB-C PD-Netzteil (5V–15V) oder Gleichstrom über die Schraubklemmen.
+   - Stellen Sie sicher, dass das USB-C-Kabel Power Delivery unterstützt — reine Datenkabel funktionieren nicht.
+   - Versuchen Sie ein anderes Netzteil und Kabel.
 
-4. **Press the power button once.**
-   PiPower 5 requires a button press to activate output, unless the Default ON jumper is set.
+4. **Drücken Sie einmal die Power-Taste.**
+   PiPower 5 erfordert einen Tastendruck, um den Ausgang zu aktivieren, es sei denn, der Default-ON-Jumper ist gesetzt.
 
-5. **Check the Default ON jumper.** See :ref:`cap_onoff`.
-   - Jumper on **ON**: Output activates automatically when external power is connected.
-   - Jumper on **OFF**: You must press the power button each time.
+5. **Überprüfen Sie den Default-ON-Jumper.** Siehe :ref:`cap_onoff`.
+   - Jumper auf **ON**: Ausgang wird automatisch aktiviert, wenn externe Stromversorgung angeschlossen ist.
+   - Jumper auf **OFF**: Sie müssen jedes Mal die Power-Taste drücken.
 
-6. **Check for reverse battery installation.**
-   If both red LEDs near the battery connector are lit, the battery polarity is reversed. Power off immediately, disconnect the battery, and reconnect with correct polarity. See :ref:`battery_connector`.
-
-
-"BAT LED Always On" — External Power Seems Insufficient
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-**What you see**: External power is connected, but the BAT LED remains lit. The battery is discharging despite external power being present.
-
-**What this means**: The external power supply cannot meet the total power demand. The battery is supplementing the shortfall.
-
-**Check these, in order:**
-
-1. **Is your power adapter powerful enough?**
-   The formula is: *Adapter wattage ≥ Raspberry Pi power (~20–25W) + Charging power (set via DIP switch)*.
-
-   - Raspberry Pi 5 under load can draw > 25W.
-   - If charging power is set to 20W (both DIP switches ON), you need a **45W+** adapter.
-   - For a 30W adapter, reduce charging power to 10W or 5W.
-
-2. **Check the DIP switch (charging power selector).**
-   See the charging power table in :ref:`power_input`. Lower the charging power if your adapter is underpowered.
-
-3. **Try a different USB-C cable.**
-   Not all cables support USB PD at higher wattages. Use the cable that came with your power adapter.
-
-4. **Check the adapter's PD profile.**
-   Some adapters advertise high wattage but only on specific voltage/current combinations. PiPower 5 requires a PD-compliant supply. Non-PD adapters (e.g., fixed 5V-only) may not provide enough current.
-
-5. **For screw terminal input**, ensure input voltage is ≥ 9V for optimal performance. See :ref:`power_input` for the voltage-to-current limits.
+6. **Auf verpolten Akku prüfen.**
+   Wenn beide roten LEDs in der Nähe des Akku-Anschlusses leuchten, ist die Akku-Polarität vertauscht. Schalten Sie sofort aus, trennen Sie den Akku und schließen Sie ihn mit korrekter Polarität wieder an. Siehe :ref:`battery_connector`.
 
 
-"PWR LED Off" — Device Not Receiving Power
+„BAT-LED immer an" — Externe Stromversorgung scheint unzureichend
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+**Was Sie sehen**: Externe Stromversorgung ist angeschlossen, aber die BAT-LED bleibt an. Der Akku entlädt sich trotz vorhandener externer Stromversorgung.
+
+**Was das bedeutet**: Die externe Stromversorgung kann den Gesamtstrombedarf nicht decken. Der Akku gleicht die Unterdeckung aus.
+
+**Überprüfen Sie Folgendes, in dieser Reihenfolge:**
+
+1. **Ist Ihr Netzteil leistungsstark genug?**
+   Die Formel lautet: *Netzteil-Wattzahl ≥ Raspberry Pi-Leistung (~20–25W) + Ladeleistung (über DIP-Schalter eingestellt)*.
+
+   - Raspberry Pi 5 kann unter Last > 25W ziehen.
+   - Wenn die Ladeleistung auf 20W eingestellt ist (beide DIP-Schalter ON), benötigen Sie ein **45W+**-Netzteil.
+   - Reduzieren Sie bei einem 30W-Netzteil die Ladeleistung auf 10W oder 5W.
+
+2. **Überprüfen Sie den DIP-Schalter (Ladeleistungswahl).**
+   Siehe Ladeleistungstabelle in :ref:`power_input`. Reduzieren Sie die Ladeleistung, wenn Ihr Netzteil zu schwach ist.
+
+3. **Versuchen Sie ein anderes USB-C-Kabel.**
+   Nicht alle Kabel unterstützen USB PD mit höheren Wattzahlen. Verwenden Sie das Kabel, das mit Ihrem Netzteil geliefert wurde.
+
+4. **Überprüfen Sie das PD-Profil des Netzteils.**
+   Einige Netzteile geben hohe Wattzahlen an, aber nur bei bestimmten Spannungs-/Stromkombinationen. PiPower 5 benötigt eine PD-konforme Stromversorgung. Nicht-PD-Netzteile (z.B. nur 5V fest) liefern möglicherweise nicht genügend Strom.
+
+5. **Bei Schraubklemmen-Eingang** stellen Sie sicher, dass die Eingangsspannung ≥ 9V für optimale Leistung beträgt. Siehe :ref:`power_input` für die spannungsabhängigen Strombegrenzungen.
+
+
+„PWR-LED aus" — Gerät erhält keinen Strom
 +++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: Battery LEDs are on (board has power), but PWR LED is off and the connected device won't boot.
+**Was Sie sehen**: Akku-LEDs sind an (Platine hat Strom), aber PWR-LED ist aus und das angeschlossene Gerät startet nicht.
 
-**Check these:**
+**Überprüfen Sie Folgendes:**
 
-1. **Press the power button once.**
-   The board has power but output is not enabled.
+1. **Drücken Sie einmal die Power-Taste.**
+   Die Platine hat Strom, aber der Ausgang ist nicht aktiviert.
 
-2. **Is the GPIO header properly seated?**
-   If using a Raspberry Pi, remove and re-seat the PiPower 5 HAT. Check for bent pins or debris in the header.
+2. **Ist der GPIO-Header richtig aufgesteckt?**
+   Wenn Sie einen Raspberry Pi verwenden, entfernen Sie das PiPower 5 HAT und stecken Sie es erneut auf. Überprüfen Sie auf verbogene Pins oder Schmutz im Header.
 
-3. **Try an alternative output.**
-   Connect a device to the USB-A port or the 2x4P header. If these work, the issue is with the GPIO passthrough.
+3. **Versuchen Sie einen alternativen Ausgang.**
+   Schließen Sie ein Gerät an den USB-A-Anschluss oder den 2x4P-Header an. Wenn diese funktionieren, liegt das Problem an der GPIO-Durchleitung.
 
 
-"Device Keeps Shutting Down Unexpectedly"
-+++++++++++++++++++++++++++++++++++++++++
+„Gerät schaltet sich unerwartet immer wieder aus"
++++++++++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: Raspberry Pi or connected device shuts down without warning.
+**Was Sie sehen**: Raspberry Pi oder angeschlossenes Gerät schaltet sich ohne Vorwarnung ab.
 
-**Check these:**
+**Überprüfen Sie Folgendes:**
 
-1. **Check the shutdown percentage.**
-   Run ``pipower5 -sp``. If it is set high (e.g., 50% or more), the board will trigger a shutdown early. Set a lower value if needed:
+1. **Überprüfen Sie den Abschalt-Prozentsatz.**
+   Führen Sie ``pipower5 -sp`` aus. Wenn dieser hoch eingestellt ist (z.B. 50% oder mehr), löst die Platine frühzeitig eine Abschaltung aus. Setzen Sie bei Bedarf einen niedrigeren Wert:
 
    .. code-block:: shell
 
       pipower5 -sp 10
       sudo systemctl restart pipower5.service
 
-2. **Check if the battery is actually discharging.**
-   Run ``pipower5 -a`` and look at:
-   - ``source``: Should be "0 - External" when external power is connected.
-   - ``battery current``: Negative = charging, positive = discharging.
+2. **Überprüfen Sie, ob sich der Akku tatsächlich entlädt.**
+   Führen Sie ``pipower5 -a`` aus und achten Sie auf:
+   - ``source``: Sollte "0 - External" sein, wenn externe Stromversorgung angeschlossen ist.
+   - ``battery current``: Negativ = Laden, positiv = Entladen.
 
-3. **For Raspberry Pi 5 with high-power peripherals (SSD, HATs)**:
-   Consider setting ``pipower5 -sp 100`` to trigger immediate safe shutdown when external power is lost. See :ref:`pipower5_tool`.
+3. **Für Raspberry Pi 5 mit Hochleistungs-Peripherie (SSD, HATs)**:
+   Erwägen Sie ``pipower5 -sp 100`` zu setzen, um ein sofortiges sicheres Herunterfahren auszulösen, wenn die externe Stromversorgung ausfällt. Siehe :ref:`pipower5_tool`.
 
-4. **Check the power adapter.**
-   If ``power_insufficient`` events are triggered (buzzer or log), the adapter is too weak. Upgrade to a higher-wattage supply or lower the charging power DIP switch.
-
-
-"Battery Not Charging"
-++++++++++++++++++++++
-
-**What you see**: External power connected, but battery LEDs do not show the charging animation (sequential cycling).
-
-**Check these:**
-
-1. **Is the battery already full?**
-   4 solid LEDs = battery > 80%. The charging circuit may have stopped because the battery is full or in the constant-voltage taper phase.
-
-2. **Check charging status via software.**
-   Run ``pipower5 -ichg``. If it returns ``False``, the board reports it is not charging. Check ``pipower5 -bp`` for the current battery percentage.
-
-3. **Over-temperature protection active.**
-   If the board has been under heavy load in a warm environment, the charging chip may have exceeded 125°C and halted charging. Let the board cool down and try again.
-
-4. **Input voltage too low via screw terminals.**
-   If using screw terminals with voltage ≤ 6.5V, the charging current is limited. Use ≥ 9V for reliable charging.
-
-5. **Check the battery health.**
-   A battery that never reaches full charge or charges very slowly may have degraded cells. Try a different compatible battery (7.4V 2-cell Li-ion, XH2.54 3P).
+4. **Überprüfen Sie das Netzteil.**
+   Wenn ``power_insufficient``-Ereignisse ausgelöst werden (Summer oder Protokoll), ist das Netzteil zu schwach. Rüsten Sie auf ein Netzteil mit höherer Wattzahl auf oder reduzieren Sie die Ladeleistung über den DIP-Schalter.
 
 
-"I2C Communication Fails" — `pipower5` Command Returns Errors
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+„Akku lädt nicht"
+++++++++++++++++++
 
-**What you see**: Running ``pipower5 -a`` produces an error or no data.
+**Was Sie sehen**: Externe Stromversorgung ist angeschlossen, aber die Akku-LEDs zeigen nicht die Ladeanimation (sequenzielles Durchlaufen).
 
-**Check these:**
+**Überprüfen Sie Folgendes:**
 
-1. **Is I2C enabled on the Raspberry Pi?**
-   Run ``sudo raspi-config`` → Interface Options → I2C → Enable.
+1. **Ist der Akku bereits voll?**
+   4 dauerhaft leuchtende LEDs = Akku > 80%. Der Ladekreislauf hat möglicherweise gestoppt, weil der Akku voll ist oder sich in der Konstantspannungs-Erhaltungsphase befindet.
 
-2. **Is the I2C device detected?**
+2. **Ladestatus per Software überprüfen.**
+   Führen Sie ``pipower5 -ichg`` aus. Wenn es ``False`` zurückgibt, meldet die Platine, dass nicht geladen wird. Überprüfen Sie ``pipower5 -bp`` für den aktuellen Akkustand.
+
+3. **Übertemperaturschutz aktiv.**
+   Wenn die Platine unter hoher Last in einer warmen Umgebung betrieben wurde, hat der Ladechip möglicherweise 125°C überschritten und den Ladevorgang angehalten. Lassen Sie die Platine abkühlen und versuchen Sie es erneut.
+
+4. **Eingangsspannung über Schraubklemmen zu niedrig.**
+   Bei Verwendung von Schraubklemmen mit einer Spannung ≤ 6,5V ist der Ladestrom begrenzt. Verwenden Sie ≥ 9V für zuverlässiges Laden.
+
+5. **Akkuzustand überprüfen.**
+   Ein Akku, der nie vollständig geladen wird oder sehr langsam lädt, hat möglicherweise degradierte Zellen. Versuchen Sie einen anderen kompatiblen Akku (7,4V 2-Zellen Li-Ion, XH2.54 3P).
+
+
+„I2C-Kommunikation fehlgeschlagen" — ``pipower5``-Befehl gibt Fehler zurück
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+**Was Sie sehen**: Die Ausführung von ``pipower5 -a`` erzeugt einen Fehler oder keine Daten.
+
+**Überprüfen Sie Folgendes:**
+
+1. **Ist I2C auf dem Raspberry Pi aktiviert?**
+   Führen Sie ``sudo raspi-config`` aus → Interface Options → I2C → Enable.
+
+2. **Wird das I2C-Gerät erkannt?**
 
    .. code-block:: shell
 
       sudo i2cdetect -y 1
 
-   PiPower 5 should appear at address ``0x5a``. If no device shows up:
+   PiPower 5 sollte an der Adresse ``0x5a`` erscheinen. Wenn kein Gerät angezeigt wird:
 
-   - Reseat the HAT on the GPIO header.
-   - Check that ``i2c-dev`` is loaded: ``lsmod | grep i2c``.
-   - Verify ``dtparam=i2c_arm=on`` is in ``/boot/firmware/config.txt``.
+   - Setzen Sie das HAT erneut auf den GPIO-Header.
+   - Überprüfen Sie, ob ``i2c-dev`` geladen ist: ``lsmod | grep i2c``.
+   - Überprüfen Sie, ob ``dtparam=i2c_arm=on`` in ``/boot/firmware/config.txt`` vorhanden ist.
 
-3. **Is the `pipower5` service running?**
+3. **Läuft der ``pipower5``-Dienst?**
 
    .. code-block:: shell
 
       sudo systemctl status pipower5.service
 
-   If inactive, start it: ``sudo systemctl start pipower5.service``.
+   Wenn inaktiv, starten Sie ihn: ``sudo systemctl start pipower5.service``.
 
-4. **Multiple I2C devices conflict?**
-   PiPower 5 uses I2C address ``0x5a``. Check that no other HAT or device is using this address. See :ref:`pin_header`.
+4. **Konflikt zwischen mehreren I2C-Geräten?**
+   PiPower 5 verwendet die I2C-Adresse ``0x5a``. Stellen Sie sicher, dass kein anderes HAT oder Gerät diese Adresse verwendet. Siehe :ref:`pin_header`.
 
-5. **Reboot.**
-   Sometimes a cold restart of both the Raspberry Pi and PiPower 5 resolves I2C bus issues. Power off completely, wait 10 seconds, then power on.
+5. **Neustart.**
+   Manchmal löst ein Kaltstart sowohl des Raspberry Pi als auch des PiPower 5 I2C-Bus-Probleme. Schalten Sie vollständig aus, warten Sie 10 Sekunden und schalten Sie dann ein.
 
 
-"Buzzer Silent" — No Sound on Events
-+++++++++++++++++++++++++++++++++++++
+„Summer stumm" — Kein Ton bei Ereignissen
+++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: Events occur (power disconnect, low battery, etc.) but no buzzer sound.
+**Was Sie sehen**: Ereignisse treten auf (Stromtrennung, niedriger Akkustand usw.), aber kein Summton.
 
-**Check these:**
+**Überprüfen Sie Folgendes:**
 
-1. **Check buzzer volume.**
+1. **Summer-Lautstärke überprüfen.**
 
    .. code-block:: shell
 
       pipower5 -bzv
 
-   If it returns 0, the buzzer is muted. Set a volume (1–10):
+   Wenn 0 zurückgegeben wird, ist der Summer stummgeschaltet. Stellen Sie eine Lautstärke ein (1–10):
 
    .. code-block:: shell
 
       pipower5 -bzv 5
       sudo systemctl restart pipower5.service
 
-2. **Check which events have buzzer enabled.**
+2. **Überprüfen Sie, für welche Ereignisse der Summer aktiviert ist.**
 
    .. code-block:: shell
 
       pipower5 -bzo
 
-   Ensure the event you expect is in the list. To add an event:
+   Stellen Sie sicher, dass das erwartete Ereignis in der Liste ist. Um ein Ereignis hinzuzufügen:
 
    .. code-block:: shell
 
       pipower5 -bzo low_battery,power_disconnected
 
-3. **Test the buzzer directly.**
+3. **Testen Sie den Summer direkt.**
 
    .. code-block:: shell
 
       pipower5 -bzt low_battery
 
-   If you hear sound, the buzzer hardware is working — the issue is with event configuration.
+   Wenn Sie einen Ton hören, funktioniert die Summer-Hardware — das Problem liegt bei der Ereigniskonfiguration.
 
 
-"Raspberry Pi Shows Low Voltage Warning"
-++++++++++++++++++++++++++++++++++++++++
+„Raspberry Pi zeigt Unterspannungswarnung"
+++++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: The Raspberry Pi desktop or ``dmesg`` shows under-voltage warnings.
+**Was Sie sehen**: Der Raspberry Pi-Desktop oder ``dmesg`` zeigt Unterspannungswarnungen an.
 
-**This is expected behavior in some cases:**
+**Dies ist in einigen Fällen erwartetes Verhalten:**
 
-- When powering a Raspberry Pi from the PiPower 5 USB-A port (instead of the GPIO header), the Pi may report a non-PD power supply warning. This can be safely ignored.
-- If using the GPIO header and still seeing warnings, the PiPower 5 output may be under heavy load. Check the total current draw of your setup.
+- Bei der Stromversorgung eines Raspberry Pi über den PiPower 5 USB-A-Anschluss (anstelle des GPIO-Headers) kann der Pi eine Nicht-PD-Netzteil-Warnung melden. Diese kann bedenkenlos ignoriert werden.
+- Wenn Sie den GPIO-Header verwenden und weiterhin Warnungen sehen, ist der PiPower 5-Ausgang möglicherweise stark belastet. Überprüfen Sie die Gesamtstromaufnahme Ihres Setups.
 
-**Check these:**
+**Überprüfen Sie Folgendes:**
 
-1. Run ``pipower5 -a`` and check ``Output: voltage``. It should be stable around 5.2–5.3V. If it drops below 5.0V under load, total current draw may exceed the 5A limit.
+1. Führen Sie ``pipower5 -a`` aus und überprüfen Sie ``Output: voltage``. Sie sollte stabil bei etwa 5,2–5,3V liegen. Wenn sie unter Last unter 5,0V fällt, überschreitet die Gesamtstromaufnahme möglicherweise die 5A-Grenze.
 
-2. Disconnect non-essential USB peripherals and re-test.
+2. Trennen Sie nicht benötigte USB-Peripheriegeräte und testen Sie erneut.
 
-3. If the issue persists, the DC-DC converter may be faulty. Contact support.
+3. Wenn das Problem weiterhin besteht, ist der DC-DC-Wandler möglicherweise defekt. Kontaktieren Sie den Support.
 
 
-----
-Software Diagnostic Commands
+----------------------------
+Software-Diagnosebefehle
 ----------------------------
 
-The ``pipower5`` CLI tool is your primary diagnostic interface. Here are the most useful commands:
+Das ``pipower5``-CLI-Tool ist Ihre primäre Diagnoseschnittstelle. Hier sind die nützlichsten Befehle:
 
 .. list-table::
    :header-rows: 1
    :widths: 35 65
 
-   * - Command
-     - What It Tells You
+   * - Befehl
+     - Was er Ihnen sagt
    * - ``pipower5 -a``
-     - Complete status snapshot: input/output voltage, battery state, charging status, shutdown request, button state.
+     - Vollständige Statusübersicht: Eingangs-/Ausgangsspannung, Akkustatus, Ladestatus, Abschalt-Anforderung, Tastenstatus.
    * - ``pipower5 -bp``
-     - Battery percentage.
+     - Akkustand in Prozent.
    * - ``pipower5 -ichg``
-     - Whether the battery is currently charging (``True`` / ``False``).
+     - Ob der Akku derzeit lädt (``True`` / ``False``).
    * - ``pipower5 -ii``
-     - Whether external power is connected.
+     - Ob externe Stromversorgung angeschlossen ist.
    * - ``pipower5 -sp``
-     - Current shutdown percentage threshold.
+     - Aktueller Schwellenwert für Abschalt-Prozentsatz.
    * - ``pipower5 -sr``
-     - Current shutdown request status (0 = None, 1 = Low Battery, 2 = Button).
+     - Aktueller Status der Abschalt-Anforderung (0 = Keine, 1 = Niedriger Akkustand, 2 = Taste).
    * - ``pipower5 -pb``
-     - Current power button state.
+     - Aktueller Status der Power-Taste.
    * - ``pipower5 -bzv``
-     - Current buzzer volume.
+     - Aktuelle Summer-Lautstärke.
    * - ``pipower5 -fv``
-     - Firmware version (verify you're on the latest).
+     - Firmware-Version (überprüfen Sie, ob Sie die neueste Version haben).
    * - ``pipower5 -c``
-     - Full configuration dump.
+     - Vollständige Konfigurationsausgabe.
    * - ``pipower5 -pfs 60``
-     - Run a 60-second power failure simulation to test battery runtime.
+     - Führen Sie eine 60-sekündige Stromausfallsimulation durch, um die Akkulaufzeit zu testen.
    * - ``sudo systemctl status pipower5.service``
-     - Check if the PiPower 5 background service is running.
+     - Überprüfen Sie, ob der PiPower 5-Hintergrunddienst läuft.
    * - ``cat /opt/pipower5/log``
-     - View service logs for error messages.
+     - Dienstprotokolle auf Fehlermeldungen prüfen.
 
 .. tip::
 
-   For a quick health check, run ``pipower5 -a`` and verify:
+   Für eine schnelle Gesundheitsprüfung führen Sie ``pipower5 -a`` aus und überprüfen Sie:
 
-   - ``shutdown request`` is ``0 - NONE`` (no pending shutdown).
-   - ``battery percentage`` is above your ``shutdown percentage``.
-   - ``Output: voltage`` is between 5.1V and 5.4V.
+   - ``shutdown request`` ist ``0 - NONE`` (keine ausstehende Abschaltung).
+   - ``battery percentage`` liegt über Ihrem ``shutdown percentage``.
+   - ``Output: voltage`` liegt zwischen 5,1V und 5,4V.
 
 
-----
-Still Having Issues?
---------------------
+--------------
+Noch Probleme?
+--------------
 
-If none of the above resolves your problem, collect the following information before contacting support:
+Wenn nichts davon Ihr Problem löst, sammeln Sie die folgenden Informationen, bevor Sie den Support kontaktieren:
 
-1. **System information**:
+1. **Systeminformationen**:
 
    .. code-block:: shell
 
@@ -415,17 +415,16 @@ If none of the above resolves your problem, collect the following information be
       pipower5 -fv
       pipower5 -c
 
-2. **Service logs**:
+2. **Dienstprotokolle**:
 
    .. code-block:: shell
 
       cat /opt/pipower5/log
       sudo journalctl -u pipower5.service --no-pager -n 100
 
-3. **Hardware details**:
-   - Raspberry Pi model
-   - Power adapter model and rated wattage
-   - Battery type and age
-   - PiPower 5 DIP switch settings
-   - SDSIG and Default ON jumper positions
-
+3. **Hardware-Details**:
+   - Raspberry Pi-Modell
+   - Netzteil-Modell und Nennwattzahl
+   - Akku-Typ und Alter
+   - PiPower 5 DIP-Schalter-Einstellungen
+   - SDSIG- und Default-ON-Jumper-Positionen
