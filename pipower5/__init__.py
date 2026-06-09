@@ -46,11 +46,11 @@ def main():
     pipower5 = PiPower5()
     parser = argparse.ArgumentParser(prog='pipower5', description='PiPower 5')
     parser.add_argument("command",
-                        choices=["doctor", "uninstall"],
+                        choices=["doctor", "uninstall", "info", "status"],
                         nargs="?",
                         help="Command")
     parser.add_argument("--fix", action="store_true", help="Attempt auto-repair (with doctor)")
-    parser.add_argument("-v", "--version", action="store_true", help="Show version")
+    parser.add_argument("-v", "--version", action="store_true", help="Show Python package version")
     parser.add_argument("-c", "--config", action="store_true", help="Show config")
     parser.add_argument("-drd", "--database-retention-days", nargs='?', default='', help="Database retention days")
     parser.add_argument("-dl", "--debug-level", nargs='?', default='', choices=['debug', 'info', 'warning', 'error', 'critical'], help="Debug level")
@@ -76,7 +76,8 @@ def main():
     parser.add_argument('-pb', '--power-btn', action='store_true', help='Read power button')
     parser.add_argument('-cc', '--charging-current', action='store_true', help='Max charging current')
     parser.add_argument('-a', '--all', action='store_true', help='Show all status')
-    parser.add_argument('-fv', '--firmware', action='store_true', help='PiPower5 firmware version')
+    parser.add_argument('-fv', '--firmware', action='store_true', help='PiPower5 MCU firmware version')
+    parser.add_argument('-dv', '--driver-version', action='store_true', help='PiPower5 kernel driver version')
     parser.add_argument('-pfs', '--power-failure-simulation', nargs='?', default='', help='Power failure simulation')
     parser.add_argument("-seo", '--send-email-on', nargs='?', default='', help=f"Send email on: {AVAILABLE_EVENTS}")
     parser.add_argument("-set", '--send-email-to', nargs='?', default='', help="Email address to send email to")
@@ -166,6 +167,9 @@ def main():
         from .device import doctor
         doctor(fix=args.fix)
         quit()
+
+    if args.command in ("info", "status"):
+        args.all = True  # alias for -a
 
     if args.command == "uninstall":
         from .device import uninstall
@@ -281,9 +285,16 @@ Internal:
     max charging current: {pipower5.get_max_charge_current()} mA
     default on: {'on' if pipower5.read_default_on() else 'off'}
     shutdown percentage: {pipower5.read_shutdown_percentage()} %
+
+Versions:
+    python:   {__version__}
+    driver:   {pipower5.read_driver_version()}
+    firmware: {pipower5.read_firmware_version()}
 ''')
     if args.firmware:
-        print(f"Pipower5 firmware version: {pipower5.read_firmware_version()}")
+        print(f"PiPower5 MCU firmware version: {pipower5.read_firmware_version()}")
+    if args.driver_version:
+        print(f"PiPower5 kernel driver version: {pipower5.read_driver_version()}")
 
     # send email on
     if args.send_email_on != '':

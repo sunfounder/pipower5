@@ -113,6 +113,8 @@ class PiPower5():
         return self._read_sysfs_int("shutdown_percentage")
     def read_firmware_version(self):
         return self._read_sysfs("firmware_version")
+    def read_driver_version(self):
+        return self._read_sysfs("driver_version")
     def read_default_on(self):
         return bool(self._read_sysfs_int("default_on"))
     def get_max_charge_current(self):

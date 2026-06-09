@@ -64,7 +64,7 @@
 #define SHUTDOWN_REQUEST_LOW_VOLTAGE 3
 
 /* Driver version */
-#define PIPOWER5_DRIVER_VERSION "1.0.0"
+#define PIPOWER5_DRIVER_VERSION "2.1.0"
 
 /* Device ID values */
 #define PIPOWER5_DEVICE_ID 0x50 /* Example device ID */
