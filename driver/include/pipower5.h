@@ -97,10 +97,6 @@ struct pipower5_device {
   struct workqueue_struct *wq;
   struct delayed_work poll_work;
 
-  /* Input device for power button */
-  struct input_dev *input_dev;
-  int power_button_irq;
-
   /* Cached values */
   u16 input_voltage;
   u16 input_current;
@@ -124,7 +120,6 @@ struct pipower5_device {
   u8 power_button_state;
   u8 charge_current_max;
   u8 buzzer_volume;
-  u8 last_power_button_state;
 
   /* Buzzer playback sequence */
   struct delayed_work buzzer_work;
@@ -151,11 +146,6 @@ void pipower5_buzzer_init(struct pipower5_device *pi_dev);
 /* Function prototypes for upower operations */
 int pipower5_create_upower(struct pipower5_device *pi_dev);
 void pipower5_remove_upower(struct pipower5_device *pi_dev);
-
-/* Function prototypes for button operations */
-int pipower5_button_init(struct pipower5_device *pi_dev);
-void pipower5_button_cleanup(struct pipower5_device *pi_dev);
-void pipower5_button_check(struct pipower5_device *pi_dev);
 
 /* Function prototypes for shutdown operations */
 void pipower5_handle_shutdown(struct pipower5_device *pi_dev);

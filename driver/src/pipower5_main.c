@@ -16,7 +16,7 @@
 #include <linux/hwmon.h>
 #include <linux/i2c.h>
 #include <linux/init.h>
-#include <linux/input.h>
+#include <linux/kmod.h>
 #include <linux/module.h>
 #include <linux/mutex.h>
 #include <linux/of.h>
@@ -34,6 +34,28 @@ static void pipower5_remove(struct i2c_client *client);
 static void pipower5_poll_work(struct work_struct *work);
 
 static struct class *pipower5_class;
+
+/*
+ * Fix sysfs permissions for non-root users.
+ * class_create() / device_create() may create directories without the
+ * execute bit, preventing traversal.  Run chmod + chgrp via usermodehelper.
+ */
+static void pipower5_fix_sysfs_perms(void) {
+  char *argv[] = {
+    "/bin/sh", "-c",
+    "chmod 755 /sys/class/pipower5 /sys/class/pipower5/pipower5 && "
+    "chgrp gpio /sys/class/pipower5/pipower5 && "
+    "chmod 664 /sys/class/pipower5/pipower5/* && "
+    "chgrp gpio /sys/class/pipower5/pipower5/*",
+    NULL
+  };
+  char *envp[] = { NULL };
+  int ret;
+
+  ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
+  if (ret)
+    pr_warn("pipower5: fix_sysfs_perms failed: %d\n", ret);
+}
 
 static const struct of_device_id pipower5_of_match[] = {
     {
@@ -74,9 +96,6 @@ static void pipower5_poll_work(struct work_struct *work) {
     if (pi_dev->power_supply) {
       power_supply_changed(pi_dev->power_supply);
     }
-
-    /* Check for power button state change */
-    pipower5_button_check(pi_dev);
 
     /* Check for shutdown request */
     if (pi_dev->shutdown_request != SHUTDOWN_REQUEST_NONE) {
@@ -167,29 +186,14 @@ static int pipower5_probe(struct i2c_client *client) {
       device_destroy(pipower5_class, MKDEV(0, 0));
       return ret;
     }
+    /* Fix directory permissions so non-root users can traverse */
+    pipower5_fix_sysfs_perms();
   }
 
   /* Create upower interface */
   ret = pipower5_create_upower(pi_dev);
   if (ret < 0) {
     dev_err(dev, "Failed to create upower interface: %d\n", ret);
-    if (pi_dev->pipower5_dev) {
-      pipower5_remove_sysfs(pi_dev);
-    }
-    hwmon_device_unregister(pi_dev->hwmon_dev);
-    cancel_delayed_work_sync(&pi_dev->poll_work);
-    destroy_workqueue(pi_dev->wq);
-    if (pi_dev->pipower5_dev) {
-      device_destroy(pipower5_class, MKDEV(0, 0));
-    }
-    return ret;
-  }
-
-  /* Initialize input device for power button */
-  ret = pipower5_button_init(pi_dev);
-  if (ret) {
-    dev_err(dev, "Failed to initialize input device: %d\n", ret);
-    pipower5_remove_upower(pi_dev);
     if (pi_dev->pipower5_dev) {
       pipower5_remove_sysfs(pi_dev);
     }
@@ -217,9 +221,6 @@ static void pipower5_remove(struct i2c_client *client) {
 
   /* Remove upower interface */
   pipower5_remove_upower(pi_dev);
-
-  /* Remove input device */
-  pipower5_button_cleanup(pi_dev);
 
   /* Remove hwmon device */
   hwmon_device_unregister(pi_dev->hwmon_dev);

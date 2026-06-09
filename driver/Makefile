@@ -14,7 +14,6 @@ pipower5-objs := \
 	src/pipower5_i2c.o \
 	src/pipower5_sysfs.o \
 	src/pipower5_power.o \
-	src/pipower5_button.o \
 	src/pipower5_shutdown.o
 
 # Compilation flags
