@@ -17,6 +17,8 @@
 #include <linux/module.h>
 #include <linux/mutex.h>
 #include <linux/slab.h>
+#include <linux/string.h>
+#include <linux/workqueue.h>
 
 #include "pipower5.h"
 
@@ -405,6 +407,142 @@ static ssize_t buzzer_volume_store(struct device *dev,
 
 static DEVICE_ATTR_RW(buzzer_volume);
 
+/* ==================== Buzzer Playback ==================== */
+
+static void pipower5_buzzer_work_func(struct work_struct *work) {
+  struct delayed_work *dwork = to_delayed_work(work);
+  struct pipower5_device *pi_dev =
+      container_of(dwork, struct pipower5_device, buzzer_work);
+  struct buzzer_note *note;
+
+  /* Safety: no more notes or empty sequence */
+  if (pi_dev->buzzer_note_index >= pi_dev->buzzer_note_count) {
+    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
+    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+    pi_dev->buzzer_playing = false;
+    return;
+  }
+
+  note = &pi_dev->buzzer_notes[pi_dev->buzzer_note_index];
+
+  if (pi_dev->buzzer_playing) {
+    /* Finished playing current note → turn off buzzer, advance */
+    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
+    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+    pi_dev->buzzer_playing = false;
+    pi_dev->buzzer_note_index++;
+
+    if (pi_dev->buzzer_note_index < pi_dev->buzzer_note_count) {
+      /* Start next note immediately */
+      queue_delayed_work(pi_dev->wq, &pi_dev->buzzer_work, 0);
+    }
+  } else {
+    /* Start playing a new note */
+    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_L,
+                             note->freq & 0xFF);
+    pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_H,
+                             (note->freq >> 8) & 0xFF);
+    pi_dev->buzzer_playing = true;
+
+    /* Schedule note-off after duration */
+    if (note->duration_ms > 0) {
+      queue_delayed_work(pi_dev->wq, &pi_dev->buzzer_work,
+                         msecs_to_jiffies(note->duration_ms));
+    } else {
+      /* Zero duration → turn off immediately */
+      queue_delayed_work(pi_dev->wq, &pi_dev->buzzer_work, 1);
+    }
+  }
+}
+
+/* buzzer_play write-only sysfs:
+ * Sequence format: "freq,dur;freq,dur;..."
+ * Single freq: "freq" or "0" to stop
+ */
+static ssize_t buzzer_play_store(struct device *dev,
+                                 struct device_attribute *attr,
+                                 const char *buf, size_t count) {
+  struct pipower5_device *pi_dev = dev_get_drvdata(dev);
+  char *tmp, *pair, *token;
+  int i = 0;
+  unsigned int single_freq;
+
+  /* Cancel any ongoing playback */
+  cancel_delayed_work_sync(&pi_dev->buzzer_work);
+
+  pi_dev->buzzer_note_count = 0;
+  pi_dev->buzzer_note_index = 0;
+  pi_dev->buzzer_playing = false;
+
+  /* Check for single-frequency mode (no comma or semicolon) */
+  if (!strpbrk(buf, ",;")) {
+    if (sscanf(buf, "%u", &single_freq) == 1) {
+      if (single_freq == 0 || single_freq > 65534) {
+        pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
+        pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+      } else {
+        pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_L,
+                                 single_freq & 0xFF);
+        pipower5_write_byte_data(pi_dev, REG_WRITE_BUZZER_FEQ_H,
+                                 (single_freq >> 8) & 0xFF);
+      }
+    }
+    return count;
+  }
+
+  /* Blank/newline only → stop */
+  if (count <= 1)
+    return count;
+
+  /* Make a writable copy for strsep */
+  tmp = kstrndup(buf, count, GFP_KERNEL);
+  if (!tmp)
+    return -ENOMEM;
+
+  /* Parse "freq,dur;freq,dur;..." pairs */
+  pair = tmp;
+  while ((token = strsep(&pair, ";\n")) != NULL) {
+    unsigned int freq, dur;
+
+    /* Skip empty tokens */
+    while (*token == ' ' || *token == '\t')
+      token++;
+    if (*token == '\0')
+      continue;
+
+    if (sscanf(token, "%u,%u", &freq, &dur) != 2)
+      continue;
+    if (i >= PIPOWER5_MAX_BUZZER_SEQUENCE)
+      break;
+
+    pi_dev->buzzer_notes[i].freq = (u16)freq;
+    pi_dev->buzzer_notes[i].duration_ms = (u16)dur;
+    i++;
+  }
+
+  kfree(tmp);
+  pi_dev->buzzer_note_count = i;
+
+  if (i > 0) {
+    /* Start playback */
+    pi_dev->buzzer_note_index = 0;
+    pi_dev->buzzer_playing = false;
+    queue_delayed_work(pi_dev->wq, &pi_dev->buzzer_work, 0);
+  }
+
+  return count;
+}
+
+static DEVICE_ATTR_WO(buzzer_play);
+
+/* Initialise buzzer delayed work (called from probe) */
+void pipower5_buzzer_init(struct pipower5_device *pi_dev) {
+  INIT_DELAYED_WORK(&pi_dev->buzzer_work, pipower5_buzzer_work_func);
+  pi_dev->buzzer_note_count = 0;
+  pi_dev->buzzer_note_index = 0;
+  pi_dev->buzzer_playing = false;
+}
+
 /* Driver version attribute */
 static ssize_t driver_version_show(struct device *dev,
                                    struct device_attribute *attr, char *buf) {
@@ -489,6 +627,7 @@ static struct attribute *pipower5_attrs[] = {
     &dev_attr_power_button_state.attr,
     &dev_attr_charge_current_max.attr,
     &dev_attr_buzzer_volume.attr,
+    &dev_attr_buzzer_play.attr,
     &dev_attr_driver_version.attr,
     NULL,
 };

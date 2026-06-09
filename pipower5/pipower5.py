@@ -3,7 +3,6 @@ import json
 from enum import IntEnum, StrEnum
 from .note import NOTES, get_note_freq
 from .device import check_pipower5_connected, DEVICE_PATH
-import threading
 
 I2C_ADDR = 0x5C
 I2C_BUS = 1
@@ -66,9 +65,6 @@ class PiPower5():
         check_pipower5_connected()
         from smbus2 import SMBus
         self._i2c = SMBus(I2C_BUS)
-        self.buzzer_sequence_queue = []
-        self.buzzer_thread = None
-        self.buzzer_stop = False
 
     # ==================== SysFS Helpers ====================
 
@@ -167,12 +163,9 @@ class PiPower5():
         self._write_sysfs("buzzer_volume", volume)
 
     def write_buzzer_freq(self, freq):
-        '''Write 16-bit buzzer frequency to registers 13 (low) and 14 (high).'''
-        freq = int(freq)
-        self._i2c.write_byte_data(I2C_ADDR, REG_WRITE_BUZZER_FEQ_L, freq & 0xFF)
-        self._i2c.write_byte_data(I2C_ADDR, REG_WRITE_BUZZER_FEQ_H, (freq >> 8) & 0xFF)
-
-
+        '''Set buzzer to a single frequency via sysfs (stops any playing sequence).
+        Write 0 to stop the buzzer.'''
+        self._write_sysfs("buzzer_play", str(int(freq)))
 
     def disable_input(self):
         time_out = 5 # seconds
@@ -417,74 +410,44 @@ class PiPower5():
         return result
 
 
-    def _buzz_action(self, action):
-        if action in PAUSE_ACTIONS:
-            self.write_buzzer_freq(0)
-        elif isinstance(action, str):
-            if action is not None and action in NOTES:
-                freq = get_note_freq(action)
-                freq = int(freq)
-                self.write_buzzer_freq(freq)
-            else:
-                raise ValueError(f"Invalid note: {action}")
-        elif isinstance(action, int):
-            if action > 0 and action < 65535:
-                self.write_buzzer_freq(action)
-            else:
-                raise ValueError(f"Invalid frequency: {action}")
-        else:
-            raise ValueError(f"Invalid action: {action}")
-
-    def _buzz_sequence(self, sequence):
+    def buzz_sequence(self, sequence):
         '''
-        Buzz according to the sequence, every value is a list of [action, duration]
+        Buzz according to the sequence, every value is a list of [action, duration].
+        The sequence is sent to the kernel driver via the buzzer_play sysfs attribute,
+        which handles timing internally — no Python threads or direct I2C needed.
+
         Actions:
         - Tone note string like 'C5', 'D3', 'C#1'
         - Frequency integer like 440, 880
         - Pause string like 'pause', 'PAUSE', 'Pause', 'P', 'p', 'stop', 'STOP'
         Duration:
-        - Integer like 1000, 2000 in milisecond
+        - Integer like 1000, 2000 in milliseconds
 
         Args:
-            sequence (list): A list of [action, duration]
+            sequence (str|list): A list of [[action, duration], [action, duration]]
+                                 or a colon-separated string "action,duration:action,duration".
         '''
-        for action, duration in sequence:
-            if self.buzzer_stop:
-                break
-            self._buzz_action(action)
-            time.sleep(duration / 1000)
-        self.write_buzzer_freq(0)
-
-    def _buzz_sequence_loop(self):
-        while not self.buzzer_stop:
-            if len(self.buzzer_sequence_queue) > 0:
-                sequence = self.buzzer_sequence_queue.pop(0)
-                self._buzz_sequence(sequence)
-                time.sleep(1)
-            else:
-                break
-        self.buzzer_thread = None
-
-    def buzz_sequence(self, sequence: [str,list]):
-        '''
-        Buzz according to the sequence, every value is a list of [action, duration]
-        Actions:
-        - Tone note string like 'C5', 'D3', 'C#1'
-        - Frequency integer like 440, 880
-        - Pause string like 'pause', 'PAUSE', 'Pause', 'P', 'p', 'stop', 'STOP'
-        Duration:
-        - Integer like 1000, 2000 in milisecond
-
-        Args:
-            sequence (str|list): A list of [[action, duration], [action, duration]] or a string of action,duration:action,duration.
-        '''
-        self.buzzer_stop = False
         if isinstance(sequence, str):
             sequence = [item.split(',') for item in sequence.split(':')]
             sequence = [[action.strip(), int(duration.strip())] for action, duration in sequence]
 
-        self.buzzer_sequence_queue.append(sequence)
-        if self.buzzer_thread is None or not self.buzzer_thread.is_alive():
-            self.buzzer_thread = threading.Thread(target=self._buzz_sequence_loop)
-            self.buzzer_thread.start()
-        
+        parts = []
+        for action, duration in sequence:
+            if action in PAUSE_ACTIONS:
+                freq = 0
+            elif isinstance(action, str):
+                if action in NOTES:
+                    freq = int(get_note_freq(action))
+                else:
+                    raise ValueError(f"Invalid note: {action}")
+            elif isinstance(action, int):
+                if 0 <= action < 65535:
+                    freq = action
+                else:
+                    raise ValueError(f"Invalid frequency: {action}")
+            else:
+                raise ValueError(f"Invalid action: {action}")
+            parts.append(f"{freq},{duration}")
+
+        self._write_sysfs("buzzer_play", ";".join(parts))
+

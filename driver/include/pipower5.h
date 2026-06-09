@@ -78,6 +78,14 @@
 #define PIPOWER5_BATTERY_MIN_VOLTAGE 6400 /* mV */
 #define PIPOWER5_BATTERY_FULL_CHARGE_MAH 2000 /* mAh */
 
+/* Buzzer playback */
+#define PIPOWER5_MAX_BUZZER_SEQUENCE 32
+
+struct buzzer_note {
+  u16 freq;
+  u16 duration_ms;
+};
+
 struct pipower5_device {
   struct i2c_client *client;
   struct mutex lock;
@@ -117,6 +125,13 @@ struct pipower5_device {
   u8 charge_current_max;
   u8 buzzer_volume;
   u8 last_power_button_state;
+
+  /* Buzzer playback sequence */
+  struct delayed_work buzzer_work;
+  struct buzzer_note buzzer_notes[PIPOWER5_MAX_BUZZER_SEQUENCE];
+  int buzzer_note_count;
+  int buzzer_note_index;
+  bool buzzer_playing;
 };
 
 /* Function prototypes for I2C operations */
@@ -128,6 +143,7 @@ int pipower5_update_status(struct pipower5_device *pi_dev);
 /* Function prototypes for sysfs operations */
 int pipower5_create_sysfs(struct pipower5_device *pi_dev);
 void pipower5_remove_sysfs(struct pipower5_device *pi_dev);
+void pipower5_buzzer_init(struct pipower5_device *pi_dev);
 
 /* Function prototypes for upower operations */
 int pipower5_create_upower(struct pipower5_device *pi_dev);

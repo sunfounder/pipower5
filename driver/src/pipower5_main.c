@@ -153,6 +153,9 @@ static int pipower5_probe(struct i2c_client *client) {
     return ret;
   }
 
+  /* Initialize buzzer playback */
+  pipower5_buzzer_init(pi_dev);
+
   /* Create sysfs interface only if device exists */
   if (pi_dev->pipower5_dev) {
     ret = pipower5_create_sysfs(pi_dev);
@@ -208,6 +211,7 @@ static void pipower5_remove(struct i2c_client *client) {
   struct pipower5_device *pi_dev = i2c_get_clientdata(client);
 
   /* Cancel work */
+  cancel_delayed_work_sync(&pi_dev->buzzer_work);
   cancel_delayed_work_sync(&pi_dev->poll_work);
   destroy_workqueue(pi_dev->wq);
 
