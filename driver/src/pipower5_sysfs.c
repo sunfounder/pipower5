@@ -18,6 +18,7 @@
 #include <linux/mutex.h>
 #include <linux/slab.h>
 #include <linux/string.h>
+#include <linux/sysfs.h>
 #include <linux/workqueue.h>
 
 #include "pipower5.h"
@@ -291,7 +292,9 @@ static ssize_t shutdown_percentage_store(struct device *dev,
   return ret;
 }
 
-static DEVICE_ATTR_RW(shutdown_percentage);
+static struct device_attribute dev_attr_shutdown_percentage =
+    __ATTR(shutdown_percentage, 0664, shutdown_percentage_show,
+           shutdown_percentage_store);
 
 /* Battery internal resistor attribute */
 static ssize_t battery_internal_resistor_show(struct device *dev,
@@ -348,7 +351,9 @@ static ssize_t power_button_state_store(struct device *dev,
   return ret;
 }
 
-static DEVICE_ATTR_RW(power_button_state);
+static struct device_attribute dev_attr_power_button_state =
+    __ATTR(power_button_state, 0664, power_button_state_show,
+           power_button_state_store);
 
 /* Charge current max attribute */
 static ssize_t charge_current_max_show(struct device *dev,
@@ -408,7 +413,9 @@ static ssize_t buzzer_volume_store(struct device *dev,
   return count;
 }
 
-static DEVICE_ATTR_RW(buzzer_volume);
+static struct device_attribute dev_attr_buzzer_volume =
+    __ATTR(buzzer_volume, 0664, buzzer_volume_show,
+           buzzer_volume_store);
 
 /* ==================== Buzzer Playback ==================== */
 
@@ -578,7 +585,8 @@ static ssize_t buzzer_play_store(struct device *dev,
   return count;
 }
 
-static DEVICE_ATTR_WO(buzzer_play);
+static struct device_attribute dev_attr_buzzer_play =
+    __ATTR(buzzer_play, 0664, NULL, buzzer_play_store);
 
 /* Initialise buzzer delayed work (called from probe) */
 void pipower5_buzzer_init(struct pipower5_device *pi_dev) {
