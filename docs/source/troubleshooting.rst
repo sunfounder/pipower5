@@ -1,413 +1,416 @@
 .. note::
 
-    Hello, welcome to the SunFounder Raspberry Pi & Arduino & ESP32 Enthusiasts Community on Facebook! Dive deeper into Raspberry Pi, Arduino, and ESP32 with fellow enthusiasts.
+    Facebook上のSunFounder Raspberry Pi & Arduino & ESP32エンスージアストコミュニティへようこそ！仲間のエンスージアストと共に、Raspberry Pi、Arduino、ESP32についてより深く学びましょう。
 
-    **Why Join?**
+    **参加する理由**
 
-    - **Expert Support**: Solve post-sale issues and technical challenges with help from our community and team.
-    - **Learn & Share**: Exchange tips and tutorials to enhance your skills.
-    - **Exclusive Previews**: Get early access to new product announcements and sneak peeks.
-    - **Special Discounts**: Enjoy exclusive discounts on our newest products.
-    - **Festive Promotions and Giveaways**: Take part in giveaways and holiday promotions.
+    - **エキスパートサポート**: コミュニティとチームの助けを借りて、販売後の問題や技術的な課題を解決します。
+    - **学びと共有**: ヒントやチュートリアルを交換してスキルを向上させましょう。
+    - **独占プレビュー**: 新製品の発表や先行紹介にいち早くアクセスできます。
+    - **特別割引**: 最新製品の独占割引をお楽しみください。
+    - **お祭りプロモーションとプレゼント**: プレゼント企画やホリデープロモーションに参加しましょう。
 
-    👉 Ready to explore and create with us? Click [|link_sf_facebook|] and join today!
+    👉 私たちと一緒に探求し創造する準備はできましたか？[|link_sf_facebook|]をクリックして今すぐ参加しましょう！
 
 .. _troubleshooting:
 
-Troubleshooting
-===============
+トラブルシューティング
+======================
 
-This page helps you diagnose PiPower 5 issues using the onboard LEDs, buzzer, and software tools. Start with the quick reference tables below, then follow the symptom-based guides for detailed steps.
+このページでは、内蔵LED、ブザー、およびソフトウェアツールを使用した PiPower 5 の問題診断について説明します。以下のクイックリファレンス表から始め、詳細な手順については症状別ガイドに従ってください。
 
-.. contents:: Table of Contents
+.. contents:: 目次
    :local:
    :depth: 2
 
 
-----
-LED & Buzzer Quick Reference
+----------------------------
+LED & ブザークイックリファレンス
 ----------------------------
 
-Before diving into specific symptoms, use these tables to interpret what the board is telling you.
+特定の症状に入る前に、これらの表を使用してボードが伝えている内容を解釈してください。
 
-Power & Status LEDs
-+++++++++++++++++++
+電源 & ステータス LED
++++++++++++++++++++++
 
 .. list-table::
    :header-rows: 1
    :widths: 15 25 60
 
    * - LED
-     - State
-     - What It Means
-   * - **PWR LED** (green)
+     - 状態
+     - 意味
+   * - **PWR LED** (緑)
      - ON
-     - Output power is active — the board is supplying 5V to your device.
+     - 出力電源がアクティブ — ボードがデバイスに5Vを供給しています。
    * -
      - OFF
-     - Output is off. Press the power button once to turn it on.
-   * - **BAT LED** (yellow)
+     - 出力がオフです。電源ボタンを1回押してオンにします。
+   * - **BAT LED** (黄)
      - ON
-     - Battery is currently supplying power. If external power is connected, this indicates insufficient input power.
+     - バッテリーが現在電力を供給しています。外部電源が接続されている場合、入力電力が不十分であることを示します。
    * -
      - OFF
-     - Battery is in standby — external power is sufficient.
-   * - **Reverse Battery LEDs** (2× red)
-     - ON (both)
-     - Battery polarity is reversed! Disconnect immediately and correct the wiring.
+     - バッテリーはスタンバイ状態 — 外部電源は十分です。
+   * - **逆接続LED** (2× 赤)
+     - ON (両方)
+     - バッテリーの極性が逆です！すぐに切断して配線を修正してください。
 
-Battery Level LEDs
-++++++++++++++++++
+バッテリーレベル LED
+++++++++++++++++++++
 
 .. list-table::
    :header-rows: 1
    :widths: 20 80
 
-   * - LED Pattern
-     - Meaning
-   * - 4 LEDs lit
-     - Battery > 80%
-   * - 3 LEDs lit
-     - Battery 60% – 80%
-   * - 2 LEDs lit
-     - Battery 40% – 60%
-   * - 1 LED lit
-     - Battery 20% – 40%
-   * - First LED flashing
-     - Battery < 20% — charge soon
-   * - LEDs cycling sequentially
-     - Charging in progress
-   * - Middle two LEDs flashing
-     - Waiting for shutdown signal from Raspberry Pi
-   * - All LEDs off
-     - Board unpowered or in sleep mode
+   * - LED パターン
+     - 意味
+   * - 4 LED 点灯
+     - バッテリー > 80%
+   * - 3 LED 点灯
+     - バッテリー 60% – 80%
+   * - 2 LED 点灯
+     - バッテリー 40% – 60%
+   * - 1 LED 点灯
+     - バッテリー 20% – 40%
+   * - 最初のLEDが点滅
+     - バッテリー < 20% — 充電してください
+   * - LEDが順次サイクル点灯
+     - 充電中
+   * - 中央の2つのLEDが点滅
+     - Raspberry Piからのシャットダウン信号待ち
+   * - 全LED消灯
+     - ボードに電源がないかスリープモード
 
 .. note::
 
-   Battery LEDs remain active during charging even when the board is in the off state. They turn off only when charging is complete.
+   バッテリーLEDは、ボードがオフの状態でも充電中はアクティブのままです。充電が完了したときにのみ消灯します。
 
-Buzzer Signals
-++++++++++++++
+ブザー信号
+++++++++++
 
-If the buzzer is enabled, these sounds indicate specific events:
+ブザーが有効な場合、これらの音は特定のイベントを示します:
 
 .. list-table::
    :header-rows: 1
    :widths: 25 25 50
 
-   * - Event
-     - Typical Sound
-     - What It Means
+   * - イベント
+     - 典型的な音
+     - 意味
    * - ``battery_activated``
-     - Two ascending tones
-     - Battery has taken over power supply (external power lost or insufficient).
+     - 2つの上昇音
+     - バッテリーが電源供給を引き継ぎました (外部電源の喪失または不足)。
    * - ``low_battery``
-     - Two repeated tones of same pitch
-     - Battery level has fallen below the configured shutdown percentage. Charge immediately.
+     - 同じ高さの2つの繰り返し音
+     - バッテリーレベルが設定されたシャットダウン残量を下回りました。すぐに充電してください。
    * - ``power_disconnected``
-     - High tone → low tone
-     - External power was disconnected. System is now running on battery.
+     - 高音 → 低音
+     - 外部電源が切断されました。システムはバッテリーで動作しています。
    * - ``power_restored``
-     - Low tone → high tone
-     - External power was restored. Battery is no longer discharging.
+     - 低音 → 高音
+     - 外部電源が復旧しました。バッテリーは放電していません。
    * - ``power_insufficient``
-     - Three rapid tones of same pitch
-     - External power is connected but too weak. Battery is supplementing. Check your power adapter.
+     - 同じ高さの3つの高速音
+     - 外部電源は接続されていますが弱すぎます。バッテリーが補助しています。電源アダプターを確認してください。
    * - ``battery_critical_shutdown``
-     - Three rapid descending tones
-     - Battery capacity critically low. System will shut down.
+     - 3つの高速下降音
+     - バッテリー容量が極めて低いです。システムがシャットダウンします。
    * - ``battery_voltage_critical_shutdown``
-     - Four rapid descending tones
-     - Battery voltage critically low (failsafe). System will shut down immediately.
+     - 4つの高速下降音
+     - バッテリー電圧が極めて低いです (フェイルセーフ)。システムがすぐにシャットダウンします。
 
 .. tip::
 
-   If you never hear buzzer sounds, the buzzer may be disabled or its volume set to 0. Run ``pipower5 -bzv`` to check the current volume, or test with ``pipower5 -bzt low_battery``.
+   ブザー音がまったく聞こえない場合、ブザーが無効になっているか、音量が0に設定されている可能性があります。``pipower5 -bzv`` を実行して現在の音量を確認するか、``pipower5 -bzt low_battery`` でテストしてください。
 
 
-----
-Symptom-Based Diagnosis
------------------------
+-------------------------
+症状別診断
+-------------------------
 
-"No Power" — All LEDs Off, No Output
-+++++++++++++++++++++++++++++++++++++
+「電源が入らない」 — すべてのLEDがオフ、出力なし
+++++++++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: PWR LED off, battery LEDs off, connected device shows no power.
+**表示される症状**: PWR LEDオフ、バッテリーLEDオフ、接続されたデバイスに電源が表示されない。
 
-**Check these, in order:**
+**以下の順序で確認してください:**
 
-1. **Is the battery installed?**
-   PiPower 5 cannot operate without a battery. Ensure the battery connector (XH2.54 3P) is firmly seated. See :ref:`battery_connector`.
+1. **バッテリーは取り付けられていますか？**
+   PiPower 5 はバッテリーなしでは動作できません。バッテリーコネクタ (XH2.54 3P) がしっかりと装着されていることを確認してください。:ref:`battery_connector` を参照。
 
-2. **Is the battery completely drained?**
-   A deeply discharged battery (< 2.5V per cell) enters trickle-charge mode and may not power the board for several minutes.
+2. **バッテリーは完全に放電していませんか？**
+   深く放電したバッテリー (< セルあたり 2.5V) はトリクル充電モードに入り、数分間ボードに電力を供給できない場合があります。
 
-   - Connect external power and wait 10–15 minutes.
-   - If battery LEDs remain off after 15 minutes, the battery may be defective.
+   - 外部電源を接続し、10～15分待ちます。
+   - 15分経過してもバッテリーLEDが消灯したままの場合、バッテリーが不良の可能性があります。
 
-3. **Is external power connected correctly?**
-   - Use a USB-C PD power supply (5V–15V) or DC power via the screw terminals.
-   - Ensure the USB-C cable supports power delivery — some data-only cables will not work.
-   - Try a different power adapter and cable.
+3. **外部電源は正しく接続されていますか？**
 
-4. **Press the power button once.**
-   PiPower 5 requires a button press to activate output, unless the Default ON jumper is set.
+     - USB-C PD 電源 (5V～15V) またはスクリュー端子経由のDC電源を使用してください。
+     - USB-C ケーブルが Power Delivery に対応していることを確認してください — データ専用ケーブルは動作しません。
+     - 別の電源アダプターとケーブルを試してください。
 
-5. **Check the Default ON jumper.** See :ref:`cap_onoff`.
-   - Jumper on **ON**: Output activates automatically when external power is connected.
-   - Jumper on **OFF**: You must press the power button each time.
+4. **電源ボタンを1回押してください。**
+   PiPower 5 は、デフォルトONジャンパーが設定されていない限り、出力を有効にするためにボタン押下が必要です。
 
-6. **Check for reverse battery installation.**
-   If both red LEDs near the battery connector are lit, the battery polarity is reversed. Power off immediately, disconnect the battery, and reconnect with correct polarity. See :ref:`battery_connector`.
+5. **デフォルトONジャンパーを確認してください。** :ref:`cap_onoff` を参照。
+   - ジャンパーが **ON**: 外部電源接続時に出力が自動的に有効になります。
+   - ジャンパーが **OFF**: 毎回電源ボタンを押す必要があります。
 
-
-"BAT LED Always On" — External Power Seems Insufficient
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-**What you see**: External power is connected, but the BAT LED remains lit. The battery is discharging despite external power being present.
-
-**What this means**: The external power supply cannot meet the total power demand. The battery is supplementing the shortfall.
-
-**Check these, in order:**
-
-1. **Is your power adapter powerful enough?**
-   The formula is: *Adapter wattage ≥ Raspberry Pi power (~20–25W) + Charging power (set via DIP switch)*.
-
-   - Raspberry Pi 5 under load can draw > 25W.
-   - If charging power is set to 20W (both DIP switches ON), you need a **45W+** adapter.
-   - For a 30W adapter, reduce charging power to 10W or 5W.
-
-2. **Check the DIP switch (charging power selector).**
-   See the charging power table in :ref:`power_input`. Lower the charging power if your adapter is underpowered.
-
-3. **Try a different USB-C cable.**
-   Not all cables support USB PD at higher wattages. Use the cable that came with your power adapter.
-
-4. **Check the adapter's PD profile.**
-   Some adapters advertise high wattage but only on specific voltage/current combinations. PiPower 5 requires a PD-compliant supply. Non-PD adapters (e.g., fixed 5V-only) may not provide enough current.
-
-5. **For screw terminal input**, ensure input voltage is ≥ 9V for optimal performance. See :ref:`power_input` for the voltage-to-current limits.
+6. **バッテリーの逆取り付けを確認してください。**
+   バッテリーコネクタ付近の両方の赤色LEDが点灯している場合、バッテリーの極性が逆です。すぐに電源を切り、バッテリーを外し、正しい極性で再接続してください。:ref:`battery_connector` を参照。
 
 
-"PWR LED Off" — Device Not Receiving Power
-+++++++++++++++++++++++++++++++++++++++++++
+「BAT LEDが常時点灯」 — 外部電源が不十分な様子
+++++++++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: Battery LEDs are on (board has power), but PWR LED is off and the connected device won't boot.
+**表示される症状**: 外部電源が接続されているが、BAT LEDが点灯したまま。外部電源が存在するにもかかわらずバッテリーが放電している。
 
-**Check these:**
+**これが意味すること**: 外部電源が総電力需要を満たせていません。バッテリーが不足分を補っています。
 
-1. **Press the power button once.**
-   The board has power but output is not enabled.
+**以下の順序で確認してください:**
 
-2. **Is the GPIO header properly seated?**
-   If using a Raspberry Pi, remove and re-seat the PiPower 5 HAT. Check for bent pins or debris in the header.
+1. **電源アダプターは十分に強力ですか？**
+   計算式: *アダプターワット数 ≥ Raspberry Pi 電力 (~20～25W) + 充電電力 (DIPスイッチで設定)*
 
-3. **Try an alternative output.**
-   Connect a device to the USB-A port or the 2x4P header. If these work, the issue is with the GPIO passthrough.
+   - 負荷時の Raspberry Pi 5 は > 25W を消費する可能性があります。
+   - 充電電力が 20W に設定されている場合 (両方のDIPスイッチがON)、**45W+** のアダプターが必要です。
+   - 30W アダプターの場合は、充電電力を 10W または 5W に下げてください。
+
+2. **DIPスイッチ (充電電力セレクター) を確認してください。**
+   :ref:`power_input` の充電電力表を参照してください。アダプターが低電力の場合は充電電力を下げてください。
+
+3. **別のUSB-Cケーブルを試してください。**
+   すべてのケーブルがより高いワット数で USB PD をサポートしているわけではありません。電源アダプターに付属のケーブルを使用してください。
+
+4. **アダプターのPDプロファイルを確認してください。**
+   一部のアダプターは高いワット数を広告していますが、特定の電圧/電流の組み合わせでのみです。PiPower 5 は PD 準拠の電源が必要です。非PDアダプター (例: 5V固定のみ) は十分な電流を供給できない場合があります。
+
+5. **スクリュー端子入力の場合**、最適なパフォーマンスのために入力電圧が ≥ 9V であることを確認してください。電圧対電流の制限については :ref:`power_input` を参照してください。
 
 
-"Device Keeps Shutting Down Unexpectedly"
-+++++++++++++++++++++++++++++++++++++++++
+「PWR LEDがオフ」 — デバイスが電力を受信していない
+++++++++++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: Raspberry Pi or connected device shuts down without warning.
+**表示される症状**: バッテリーLEDはオン (ボードに電力あり) だが、PWR LEDがオフで接続デバイスが起動しない。
 
-**Check these:**
+**以下を確認してください:**
 
-1. **Check the shutdown percentage.**
-   Run ``pipower5 -sp``. If it is set high (e.g., 50% or more), the board will trigger a shutdown early. Set a lower value if needed:
+1. **電源ボタンを1回押してください。**
+   ボードに電力はありますが、出力が有効になっていません。
+
+2. **GPIOヘッダーは適切に装着されていますか？**
+   Raspberry Pi を使用している場合、PiPower 5 HATを取り外して再装着してください。ヘッダーに曲がったピンやゴミがないか確認してください。
+
+3. **代替出力を試してください。**
+   USB-Aポートまたは2x4Pヘッダーにデバイスを接続します。これらが動作する場合、問題はGPIOパススルーにあります。
+
+
+「デバイスが予期せずシャットダウンし続ける」
++++++++++++++++++++++++++++++++++++++++++++++
+
+**表示される症状**: Raspberry Pi または接続デバイスが警告なしにシャットダウンする。
+
+**以下を確認してください:**
+
+1. **シャットダウン残量を確認してください。**
+   ``pipower5 -sp`` を実行します。高く設定されている場合 (例: 50%以上)、ボードが早期にシャットダウンをトリガーします。必要に応じて低い値を設定してください:
 
    .. code-block:: shell
 
       pipower5 -sp 10
       sudo systemctl restart pipower5.service
 
-2. **Check if the battery is actually discharging.**
-   Run ``pipower5 -a`` and look at:
-   - ``source``: Should be "0 - External" when external power is connected.
-   - ``battery current``: Negative = charging, positive = discharging.
+2. **バッテリーが実際に放電しているか確認してください。**
 
-3. **For Raspberry Pi 5 with high-power peripherals (SSD, HATs)**:
-   Consider setting ``pipower5 -sp 100`` to trigger immediate safe shutdown when external power is lost. See :ref:`pipower5_tool`.
+     ``pipower5 -a`` を実行して以下を確認します:
 
-4. **Check the power adapter.**
-   If ``power_insufficient`` events are triggered (buzzer or log), the adapter is too weak. Upgrade to a higher-wattage supply or lower the charging power DIP switch.
+     - ``source``: 外部電源接続時は "0 - External" であるべきです。
+     - ``battery current``: 負 = 充電中、正 = 放電中。
 
+3. **高電力周辺機器 (SSD、HAT) を搭載した Raspberry Pi 5 の場合**:
+   外部電源喪失時に即時の安全なシャットダウンをトリガーするために ``pipower5 -sp 100`` の設定を検討してください。:ref:`pipower5_tool` を参照。
 
-"Battery Not Charging"
-++++++++++++++++++++++
-
-**What you see**: External power connected, but battery LEDs do not show the charging animation (sequential cycling).
-
-**Check these:**
-
-1. **Is the battery already full?**
-   4 solid LEDs = battery > 80%. The charging circuit may have stopped because the battery is full or in the constant-voltage taper phase.
-
-2. **Check charging status via software.**
-   Run ``pipower5 -ichg``. If it returns ``False``, the board reports it is not charging. Check ``pipower5 -bp`` for the current battery percentage.
-
-3. **Over-temperature protection active.**
-   If the board has been under heavy load in a warm environment, the charging chip may have exceeded 125°C and halted charging. Let the board cool down and try again.
-
-4. **Input voltage too low via screw terminals.**
-   If using screw terminals with voltage ≤ 6.5V, the charging current is limited. Use ≥ 9V for reliable charging.
-
-5. **Check the battery health.**
-   A battery that never reaches full charge or charges very slowly may have degraded cells. Try a different compatible battery (7.4V 2-cell Li-ion, XH2.54 3P).
+4. **電源アダプターを確認してください。**
+   ``power_insufficient`` イベントがトリガーされている場合 (ブザーまたはログ)、アダプターが弱すぎます。より高いワット数の電源にアップグレードするか、充電電力DIPスイッチを下げてください。
 
 
-"I2C Communication Fails" — `pipower5` Command Returns Errors
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+「バッテリーが充電されない」
+++++++++++++++++++++++++++++
 
-**What you see**: Running ``pipower5 -a`` produces an error or no data.
+**表示される症状**: 外部電源が接続されているが、バッテリーLEDが充電アニメーション (順次サイクル) を表示しない。
 
-**Check these:**
+**以下を確認してください:**
 
-1. **Is I2C enabled on the Raspberry Pi?**
-   Run ``sudo raspi-config`` → Interface Options → I2C → Enable.
+1. **バッテリーは既に満充電ですか？**
+   4つのLEDが点灯 = バッテリー > 80%。バッテリーが満充電または定電圧テーパーフェーズにあるため、充電回路が停止している可能性があります。
 
-2. **Is the I2C device detected?**
+2. **ソフトウェアで充電状態を確認してください。**
+   ``pipower5 -ichg`` を実行します。``False`` を返す場合、ボードは充電していないと報告しています。``pipower5 -bp`` で現在のバッテリー残量を確認してください。
+
+3. **過熱保護がアクティブ。**
+   ボードが暖かい環境で高負荷時に使用されていた場合、充電チップが125°Cを超えて充電を停止した可能性があります。ボードを冷やしてから再試行してください。
+
+4. **スクリュー端子経由の入力電圧が低すぎる。**
+   スクリュー端子を使用して電圧 ≤ 6.5V の場合、充電電流が制限されます。信頼性の高い充電には ≥ 9V を使用してください。
+
+5. **バッテリーの状態を確認してください。**
+   満充電に達しない、または非常にゆっくりと充電されるバッテリーは、セルが劣化している可能性があります。別の互換性のあるバッテリー (7.4V 2セル Li-ion、XH2.54 3P) を試してください。
+
+
+「I2C通信が失敗する」 — ``pipower5`` コマンドがエラーを返す
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+**表示される症状**: ``pipower5 -a`` を実行するとエラーが発生するかデータが表示されない。
+
+**以下を確認してください:**
+
+1. **Raspberry PiでI2Cが有効になっていますか？**
+   ``sudo raspi-config`` → Interface Options → I2C → Enable を実行します。
+
+2. **I2Cデバイスが検出されていますか？**
 
    .. code-block:: shell
 
       sudo i2cdetect -y 1
 
-   PiPower 5 should appear at address ``0x5a``. If no device shows up:
+   PiPower 5 はアドレス ``0x5a`` に表示されるはずです。デバイスが表示されない場合:
 
-   - Reseat the HAT on the GPIO header.
-   - Check that ``i2c-dev`` is loaded: ``lsmod | grep i2c``.
-   - Verify ``dtparam=i2c_arm=on`` is in ``/boot/firmware/config.txt``.
+   - HATをGPIOヘッダーに再装着してください。
+   - ``i2c-dev`` がロードされていることを確認: ``lsmod | grep i2c``。
+   - ``dtparam=i2c_arm=on`` が ``/boot/firmware/config.txt`` にあることを確認してください。
 
-3. **Is the `pipower5` service running?**
+3. **``pipower5`` サービスが実行中ですか？**
 
    .. code-block:: shell
 
       sudo systemctl status pipower5.service
 
-   If inactive, start it: ``sudo systemctl start pipower5.service``.
+   非アクティブな場合、起動します: ``sudo systemctl start pipower5.service``。
 
-4. **Multiple I2C devices conflict?**
-   PiPower 5 uses I2C address ``0x5a``. Check that no other HAT or device is using this address. See :ref:`pin_header`.
+4. **複数のI2Cデバイスの競合？**
+   PiPower 5 は I2C アドレス ``0x5a`` を使用します。他のHATやデバイスがこのアドレスを使用していないことを確認してください。:ref:`pin_header` を参照。
 
-5. **Reboot.**
-   Sometimes a cold restart of both the Raspberry Pi and PiPower 5 resolves I2C bus issues. Power off completely, wait 10 seconds, then power on.
+5. **再起動。**
+   Raspberry Pi と PiPower 5 の両方をコールドリスタートすると、I2Cバスの問題が解決することがあります。完全に電源を切り、10秒待ってから電源を入れます。
 
 
-"Buzzer Silent" — No Sound on Events
-+++++++++++++++++++++++++++++++++++++
+「ブザーが無音」 — イベント時に音がしない
+++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: Events occur (power disconnect, low battery, etc.) but no buzzer sound.
+**表示される症状**: イベントが発生している (電源切断、低バッテリーなど) がブザー音がしない。
 
-**Check these:**
+**以下を確認してください:**
 
-1. **Check buzzer volume.**
+1. **ブザー音量を確認してください。**
 
    .. code-block:: shell
 
       pipower5 -bzv
 
-   If it returns 0, the buzzer is muted. Set a volume (1–10):
+   0 が返された場合、ブザーはミュートされています。音量を設定します (1～10):
 
    .. code-block:: shell
 
       pipower5 -bzv 5
       sudo systemctl restart pipower5.service
 
-2. **Check which events have buzzer enabled.**
+2. **どのイベントでブザーが有効になっているか確認してください。**
 
    .. code-block:: shell
 
       pipower5 -bzo
 
-   Ensure the event you expect is in the list. To add an event:
+   期待するイベントがリストにあることを確認してください。イベントを追加するには:
 
    .. code-block:: shell
 
       pipower5 -bzo low_battery,power_disconnected
 
-3. **Test the buzzer directly.**
+3. **ブザーを直接テストしてください。**
 
    .. code-block:: shell
 
       pipower5 -bzt low_battery
 
-   If you hear sound, the buzzer hardware is working — the issue is with event configuration.
+   音が聞こえる場合、ブザーハードウェアは動作しています — 問題はイベント設定にあります。
 
 
-"Raspberry Pi Shows Low Voltage Warning"
-++++++++++++++++++++++++++++++++++++++++
+「Raspberry Piが低電圧警告を表示する」
++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: The Raspberry Pi desktop or ``dmesg`` shows under-voltage warnings.
+**表示される症状**: Raspberry Pi のデスクトップまたは ``dmesg`` が低電圧警告を表示する。
 
-**This is expected behavior in some cases:**
+**これは場合によっては想定される動作です:**
 
-- When powering a Raspberry Pi from the PiPower 5 USB-A port (instead of the GPIO header), the Pi may report a non-PD power supply warning. This can be safely ignored.
-- If using the GPIO header and still seeing warnings, the PiPower 5 output may be under heavy load. Check the total current draw of your setup.
+- GPIOヘッダーではなく PiPower 5 USB-Aポートから Raspberry Pi に給電する場合、Piが非PD電源警告を報告することがあります。これは安全に無視できます。
+- GPIOヘッダーを使用していても警告が表示される場合、PiPower 5 出力が高負荷の可能性があります。セットアップの総電流消費を確認してください。
 
-**Check these:**
+**以下を確認してください:**
 
-1. Run ``pipower5 -a`` and check ``Output: voltage``. It should be stable around 5.2–5.3V. If it drops below 5.0V under load, total current draw may exceed the 5A limit.
+1. ``pipower5 -a`` を実行して ``Output: voltage`` を確認します。5.2～5.3V前後で安定しているはずです。負荷時に5.0Vを下回る場合、総電流消費が5A制限を超えている可能性があります。
 
-2. Disconnect non-essential USB peripherals and re-test.
+2. 不要なUSB周辺機器を外して再テストしてください。
 
-3. If the issue persists, the DC-DC converter may be faulty. Contact support.
+3. 問題が解決しない場合、DC-DCコンバーターが故障している可能性があります。サポートにお問い合わせください。
 
 
-----
-Software Diagnostic Commands
+----------------------------
+ソフトウェア診断コマンド
 ----------------------------
 
-The ``pipower5`` CLI tool is your primary diagnostic interface. Here are the most useful commands:
+``pipower5`` CLIツールは主要な診断インターフェースです。最も有用なコマンドは以下の通りです:
 
 .. list-table::
    :header-rows: 1
    :widths: 35 65
 
-   * - Command
-     - What It Tells You
+   * - コマンド
+     - 情報内容
    * - ``pipower5 -a``
-     - Complete status snapshot: input/output voltage, battery state, charging status, shutdown request, button state.
+     - 完全なステータススナップショット: 入出力電圧、バッテリー状態、充電状態、シャットダウン要求、ボタン状態。
    * - ``pipower5 -bp``
-     - Battery percentage.
+     - バッテリー残量。
    * - ``pipower5 -ichg``
-     - Whether the battery is currently charging (``True`` / ``False``).
+     - バッテリーが充電中かどうか (``True`` / ``False``)。
    * - ``pipower5 -ii``
-     - Whether external power is connected.
+     - 外部電源が接続されているかどうか。
    * - ``pipower5 -sp``
-     - Current shutdown percentage threshold.
+     - 現在のシャットダウン残量閾値。
    * - ``pipower5 -sr``
-     - Current shutdown request status (0 = None, 1 = Low Battery, 2 = Button).
+     - 現在のシャットダウン要求状態 (0 = なし、1 = 低バッテリー、2 = ボタン)。
    * - ``pipower5 -pb``
-     - Current power button state.
+     - 現在の電源ボタン状態。
    * - ``pipower5 -bzv``
-     - Current buzzer volume.
+     - 現在のブザー音量。
    * - ``pipower5 -fv``
-     - Firmware version (verify you're on the latest).
+     - ファームウェアバージョン (最新であることを確認)。
    * - ``pipower5 -c``
-     - Full configuration dump.
+     - 完全な設定ダンプ。
    * - ``pipower5 -pfs 60``
-     - Run a 60-second power failure simulation to test battery runtime.
+     - 60秒間の停電シミュレーションを実行してバッテリー駆動時間をテスト。
    * - ``sudo systemctl status pipower5.service``
-     - Check if the PiPower 5 background service is running.
+     - PiPower 5 バックグラウンドサービスが実行中かどうかを確認。
    * - ``cat /opt/pipower5/log``
-     - View service logs for error messages.
+     - サービルログでエラーメッセージを確認。
 
 .. tip::
 
-   For a quick health check, run ``pipower5 -a`` and verify:
+   クイックヘルスチェックとして ``pipower5 -a`` を実行し、以下を確認してください:
 
-   - ``shutdown request`` is ``0 - NONE`` (no pending shutdown).
-   - ``battery percentage`` is above your ``shutdown percentage``.
-   - ``Output: voltage`` is between 5.1V and 5.4V.
+   - ``shutdown request`` が ``0 - NONE`` (保留中のシャットダウンなし)。
+   - ``battery percentage`` が ``shutdown percentage`` を上回っている。
+   - ``Output: voltage`` が 5.1V～5.4V の間。
 
 
-----
-Still Having Issues?
---------------------
+--------------
+まだ問題がありますか？
+--------------
 
-If none of the above resolves your problem, collect the following information before contacting support:
+上記のいずれでも問題が解決しない場合、サポートに連絡する前に以下の情報を収集してください:
 
-1. **System information**:
+1. **システム情報**:
 
    .. code-block:: shell
 
@@ -415,17 +418,17 @@ If none of the above resolves your problem, collect the following information be
       pipower5 -fv
       pipower5 -c
 
-2. **Service logs**:
+2. **サービルログ**:
 
    .. code-block:: shell
 
       cat /opt/pipower5/log
       sudo journalctl -u pipower5.service --no-pager -n 100
 
-3. **Hardware details**:
-   - Raspberry Pi model
-   - Power adapter model and rated wattage
-   - Battery type and age
-   - PiPower 5 DIP switch settings
-   - SDSIG and Default ON jumper positions
+3. **ハードウェア詳細**:
 
+     - Raspberry Pi モデル
+     - 電源アダプターのモデルと定格ワット数
+     - バッテリータイプと使用期間
+     - PiPower 5 DIPスイッチ設定
+     - SDSIG およびデフォルトONジャンパー位置
