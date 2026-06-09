@@ -145,7 +145,15 @@ LED & ブザークイックリファレンス
    - 外部電源を接続し、10～15分待ちます。
    - 15分経過してもバッテリーLEDが消灯したままの場合、バッテリーが不良の可能性があります。
 
+<<<<<<< Updated upstream
 3. **外部電源は正しく接続されていますか？**
+=======
+3. **Ist die externe Stromversorgung korrekt angeschlossen?**
+
+     - Verwenden Sie ein USB-C PD-Netzteil (5V–15V) oder Gleichstrom über die Schraubklemmen.
+     - Stellen Sie sicher, dass das USB-C-Kabel Power Delivery unterstützt — reine Datenkabel funktionieren nicht.
+     - Versuchen Sie ein anderes Netzteil und Kabel.
+>>>>>>> Stashed changes
 
      - USB-C PD 電源 (5V～15V) またはスクリュー端子経由のDC電源を使用してください。
      - USB-C ケーブルが Power Delivery に対応していることを確認してください — データ専用ケーブルは動作しません。
@@ -222,9 +230,18 @@ LED & ブザークイックリファレンス
       pipower5 -sp 10
       sudo systemctl restart pipower5.service
 
+<<<<<<< Updated upstream
 2. **バッテリーが実際に放電しているか確認してください。**
 
      ``pipower5 -a`` を実行して以下を確認します:
+=======
+2. **Überprüfen Sie, ob sich der Akku tatsächlich entlädt.**
+
+     Führen Sie ``pipower5 -a`` aus und achten Sie auf:
+
+     - ``source``: Sollte "0 - External" sein, wenn externe Stromversorgung angeschlossen ist.
+     - ``battery current``: Negativ = Laden, positiv = Entladen.
+>>>>>>> Stashed changes
 
      - ``source``: 外部電源接続時は "0 - External" であるべきです。
      - ``battery current``: 負 = 充電中、正 = 放電中。
@@ -425,6 +442,7 @@ LED & ブザークイックリファレンス
       cat /opt/pipower5/log
       sudo journalctl -u pipower5.service --no-pager -n 100
 
+<<<<<<< Updated upstream
 3. **ハードウェア詳細**:
 
      - Raspberry Pi モデル
@@ -432,3 +450,12 @@ LED & ブザークイックリファレンス
      - バッテリータイプと使用期間
      - PiPower 5 DIPスイッチ設定
      - SDSIG およびデフォルトONジャンパー位置
+=======
+3. **Hardware-Details**:
+
+     - Raspberry Pi-Modell
+     - Netzteil-Modell und Nennwattzahl
+     - Akku-Typ und Alter
+     - PiPower 5 DIP-Schalter-Einstellungen
+     - SDSIG- und Default-ON-Jumper-Positionen
+>>>>>>> Stashed changes
