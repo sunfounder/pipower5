@@ -72,7 +72,6 @@ def main():
     parser.add_argument('-ii', '--is-input-plugged_in', action='store_true', help='Read is input plugged in')
     parser.add_argument('-ichg', '--is-charging', action='store_true', help='Read is charging')
     parser.add_argument('-do', '--default-on', action='store_true', help='Read default on')
-    parser.add_argument('-sr', '--shutdown-request', action='store_true', help='Read shutdown request')
     parser.add_argument('-pb', '--power-btn', action='store_true', help='Read power button')
     parser.add_argument('-cc', '--charging-current', action='store_true', help='Max charging current')
     parser.add_argument('-a', '--all', action='store_true', help='Show all status')
@@ -248,9 +247,6 @@ def main():
         print(f"Charging: {pipower5.read_is_charging()}")
     if args.default_on:
         print(f"Default on: {'on' if pipower5.read_default_on() else 'off'}")
-    if args.shutdown_request:
-        shutdown_request = pipower5.read_shutdown_request()
-        print(f"Shutdown request: {int(shutdown_request)} - {shutdown_request.name}")
     if args.power_btn:
         button_state = pipower5.read_power_btn()
         print(f"Power button: {int(button_state)} - {button_state.name}")
@@ -259,7 +255,6 @@ def main():
     if args.all:
         data_buffer = pipower5.read_all()
         #
-        shutdown_request = pipower5.read_shutdown_request()
         button_state = pipower5.read_power_btn()
         print(f'''
 Input:
@@ -280,7 +275,6 @@ Battery:
     charging: {data_buffer['is_charging']}
 
 Internal:
-    shutdown request: {int(shutdown_request)} - {shutdown_request.name}
     power button: {int(button_state)} - {button_state.name}
     max charging current: {pipower5.get_max_charge_current()} mA
     default on: {'on' if pipower5.read_default_on() else 'off'}

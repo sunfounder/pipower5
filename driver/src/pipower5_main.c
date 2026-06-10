@@ -97,6 +97,9 @@ static void pipower5_poll_work(struct work_struct *work) {
       power_supply_changed(pi_dev->power_supply);
     }
 
+    /* Check for power button state change */
+    pipower5_button_check(pi_dev);
+
     /* Check for shutdown request */
     if (pi_dev->shutdown_request != SHUTDOWN_REQUEST_NONE) {
       pipower5_handle_shutdown(pi_dev);
@@ -208,6 +211,9 @@ static int pipower5_probe(struct i2c_client *client) {
     return ret;
   }
 
+  pipower5_log_event(pi_dev, "STARTUP driver v%s bat=%d%% bat_voltage=%dmV",
+                     PIPOWER5_DRIVER_VERSION,
+                     pi_dev->battery_percentage, pi_dev->battery_voltage);
   dev_info(dev, "PiPower5 driver initialized successfully\n");
 
   return 0;

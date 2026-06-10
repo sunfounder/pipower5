@@ -107,8 +107,6 @@ class PiPower5():
         return bool(self._read_sysfs_int("is_charging"))
     def read_power_source(self):
         return PowerSource(self._read_sysfs_int("power_source"))
-    def read_shutdown_request(self):
-        return ShutdownRequest(self._read_sysfs_int("shutdown_request"))
     def read_shutdown_percentage(self):
         return self._read_sysfs_int("shutdown_percentage")
     def read_firmware_version(self):

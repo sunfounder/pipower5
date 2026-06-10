@@ -190,21 +190,6 @@ static ssize_t is_charging_show(struct device *dev,
 
 static DEVICE_ATTR_RO(is_charging);
 
-/* Shutdown request attribute */
-static ssize_t shutdown_request_show(struct device *dev,
-                                     struct device_attribute *attr, char *buf) {
-  struct pipower5_device *pi_dev = dev_get_drvdata(dev);
-  int ret;
-
-  mutex_lock(&pi_dev->lock);
-  ret = snprintf(buf, PAGE_SIZE, "%u\n", pi_dev->shutdown_request);
-  mutex_unlock(&pi_dev->lock);
-
-  return ret;
-}
-
-static DEVICE_ATTR_RO(shutdown_request);
-
 /* Firmware version attribute */
 static ssize_t firmware_version_show(struct device *dev,
                                      struct device_attribute *attr, char *buf) {
@@ -638,6 +623,30 @@ static ssize_t battery_power_show(struct device *dev,
 
 static DEVICE_ATTR_RO(battery_power);
 
+/* Events log attribute */
+static ssize_t events_show(struct device *dev,
+                           struct device_attribute *attr, char *buf) {
+  struct pipower5_device *pi_dev = dev_get_drvdata(dev);
+  int len = 0;
+  int i, idx;
+  unsigned long now = jiffies;
+
+  mutex_lock(&pi_dev->lock);
+  for (i = 0; i < pi_dev->event_count; i++) {
+    idx = (pi_dev->event_head - pi_dev->event_count + i + PIPOWER5_EVENT_LOG_SIZE)
+          % PIPOWER5_EVENT_LOG_SIZE;
+    unsigned long age_sec = (now - pi_dev->event_times[idx]) / HZ;
+    len += snprintf(buf + len, PAGE_SIZE - len,
+                    "[%lus ago] %s\n", age_sec, pi_dev->event_log[idx]);
+  }
+  mutex_unlock(&pi_dev->lock);
+
+  if (len == 0)
+    len = snprintf(buf, PAGE_SIZE, "(no events yet)\n");
+  return len;
+}
+static DEVICE_ATTR_RO(events);
+
 /* Output power attribute (voltage * current, mW) */
 static ssize_t output_power_show(struct device *dev,
                                  struct device_attribute *attr, char *buf) {
@@ -671,7 +680,6 @@ static struct attribute *pipower5_attrs[] = {
     &dev_attr_power_source.attr,
     &dev_attr_is_input_plugged_in.attr,
     &dev_attr_is_charging.attr,
-    &dev_attr_shutdown_request.attr,
     &dev_attr_firmware_version.attr,
     &dev_attr_default_on.attr,
     &dev_attr_board_id.attr,
@@ -681,6 +689,7 @@ static struct attribute *pipower5_attrs[] = {
     &dev_attr_charge_current_max.attr,
     &dev_attr_buzzer_volume.attr,
     &dev_attr_buzzer_play.attr,
+    &dev_attr_events.attr,
     &dev_attr_driver_version.attr,
     NULL,
 };

@@ -70,6 +70,10 @@ void pipower5_button_check(struct pipower5_device *pi_dev)
     if (pi_dev->input_dev && pi_dev->power_button_state != pi_dev->last_power_button_state) {
         input_report_key(pi_dev->input_dev, KEY_POWER, pi_dev->power_button_state);
         input_sync(pi_dev->input_dev);
+
+        if (pi_dev->power_button_state)
+            pipower5_log_event(pi_dev, "BUTTON pressed");
+
         pi_dev->last_power_button_state = pi_dev->power_button_state;
     }
 }

@@ -127,6 +127,14 @@ struct pipower5_device {
   int buzzer_note_count;
   int buzzer_note_index;
   bool buzzer_playing;
+
+  /* Event log ring buffer */
+  #define PIPOWER5_EVENT_LOG_SIZE 16
+  #define PIPOWER5_EVENT_MSG_LEN 128
+  char event_log[PIPOWER5_EVENT_LOG_SIZE][PIPOWER5_EVENT_MSG_LEN];
+  unsigned long event_times[PIPOWER5_EVENT_LOG_SIZE];
+  int event_head;
+  int event_count;
 };
 
 /*
@@ -148,6 +156,7 @@ int pipower5_create_upower(struct pipower5_device *pi_dev);
 void pipower5_remove_upower(struct pipower5_device *pi_dev);
 
 /* Function prototypes for shutdown operations */
+void pipower5_log_event(struct pipower5_device *pi_dev, const char *fmt, ...);
 void pipower5_handle_shutdown(struct pipower5_device *pi_dev);
 
 #endif /* _PIPOWER5_H */

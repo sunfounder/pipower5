@@ -187,9 +187,11 @@ int pipower5_update_status(struct pipower5_device *pi_dev) {
     goto out;
 
   ret = __pipower5_read_byte(pi_dev, REG_READ_POWER_BUTTON_STATE);
-  if (ret >= 0)
+  if (ret >= 0) {
     pi_dev->power_button_state = (u8)ret;
-  else
+    /* Reset button state register so next poll gets fresh value */
+    __pipower5_write_byte(pi_dev, REG_WRITE_POWER_BTN_STATE, 0);
+  } else
     goto out;
 
   ret = __pipower5_read_byte(pi_dev, REG_READ_CHARGE_CURRENT_MAX);
