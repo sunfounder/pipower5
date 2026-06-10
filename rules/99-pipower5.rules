@@ -1,0 +1,12 @@
+# pipower5 uevent rules
+# Events: low_battery power_disconnected power_restored
+#         battery_activated power_insufficient
+#         low_battery shutdown button low_voltage
+#
+# Uncomment and customize:
+
+# Low battery: send email notification
+# ACTION=="change", SUBSYSTEM=="pipower5", ENV{PIPOWER5_EVENT}=="low_battery", #   RUN+="/usr/local/bin/pipower5-send-mail $env{PIPOWER5_EVENT}"
+
+# Power disconnected: log event
+# ACTION=="change", SUBSYSTEM=="pipower5", ENV{PIPOWER5_EVENT}=="power_disconnected", #   RUN+="/usr/bin/logger -t pipower5 "Power disconnected""

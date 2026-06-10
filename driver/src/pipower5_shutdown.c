@@ -52,10 +52,21 @@ void pipower5_handle_shutdown(struct pipower5_device *pi_dev)
     return;
   }
 
-  pipower5_log_event(pi_dev,
-    "SHUTDOWN reason=%s bat=%d%% bat_voltage=%dmV input_plugged=%d",
-    reason, pi_dev->battery_percentage, pi_dev->battery_voltage,
-    pi_dev->is_input_plugged_in);
+  {
+    char *envp[] = { NULL, NULL };
+    char event_buf[64];
+
+    snprintf(event_buf, sizeof(event_buf),
+             "PIPOWER5_EVENT=%s", reason);
+    envp[0] = event_buf;
+
+    pipower5_log_event(pi_dev,
+      "SHUTDOWN reason=%s bat=%d%% bat_voltage=%dmV input_plugged=%d",
+      reason, pi_dev->battery_percentage, pi_dev->battery_voltage,
+      pi_dev->is_input_plugged_in);
+
+    kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_OFFLINE, envp);
+  }
 
   kernel_power_off();
 }

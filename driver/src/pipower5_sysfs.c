@@ -581,6 +581,77 @@ void pipower5_buzzer_init(struct pipower5_device *pi_dev) {
   pi_dev->buzzer_playing = false;
 }
 
+/* ── Event-triggered buzzer ────────────────────────────────────────────── */
+
+/* Default sequences (freq,dur;freq,dur;...) — matching old Python config */
+static const char *buzzer_default_seq[] = {
+  "1046,50;0,100;1975,50",                    /* battery_activated */
+  "1046,50;0,100;1046,50",                    /* low_battery */
+  "1174,50;0,100;784,50",                     /* power_disconnected */
+  "784,50;0,100;1174,50",                     /* power_restored */
+  "987,50;0,100;987,50;0,100;987,100",        /* power_insufficient */
+  "2093,50;0,60;2093,50;0,60;2093,100",       /* critical_shutdown */
+  "2093,50;0,60;2093,50;0,60;2093,100;0,60;2093,100", /* voltage_critical */
+};
+
+/* Trigger buzzer for event. Called from poll_work when events fire. */
+void pipower5_buzzer_event(struct pipower5_device *pi_dev, int event_id)
+{
+  const char *seq;
+  char *tmp, *pair, *token;
+  int i = 0;
+  unsigned int freq, dur;
+
+  if (event_id < 0 || event_id >= BUZZ_EVENT_COUNT)
+    return;
+  if (!(buzz_on & (1 << event_id)))
+    return;
+
+  seq = buzzer_default_seq[event_id];
+  if (!seq || !*seq)
+    return;
+
+  cancel_delayed_work_sync(&pi_dev->buzzer_work);
+  pi_dev->buzzer_note_count = 0;
+  pi_dev->buzzer_note_index = 0;
+  pi_dev->buzzer_playing = false;
+
+  tmp = kstrdup(seq, GFP_KERNEL);
+  if (!tmp) return;
+
+  pair = tmp;
+  while ((token = strsep(&pair, ";")) != NULL) {
+    while (*token == ' ' || *token == '\t') token++;
+    if (*token == '\0') continue;
+    if (i >= PIPOWER5_MAX_BUZZER_SEQUENCE) break;
+    if (sscanf(token, "%u,%u", &freq, &dur) != 2) continue;
+    pi_dev->buzzer_notes[i].freq = (u16)freq;
+    pi_dev->buzzer_notes[i].duration_ms = (u16)dur;
+    i++;
+  }
+  kfree(tmp);
+  pi_dev->buzzer_note_count = i;
+  if (i > 0) {
+    pi_dev->buzzer_note_index = 0;
+    pi_dev->buzzer_playing = false;
+    queue_delayed_work(pi_dev->wq, &pi_dev->buzzer_work, 0);
+  }
+}
+
+/* buzz_on sysfs: show/set 8-bit mask */
+static ssize_t buzz_on_show(struct device *dev, struct device_attribute *attr,
+                            char *buf) {
+  return snprintf(buf, PAGE_SIZE, "0x%02X\n", (unsigned int)buzz_on);
+}
+static ssize_t buzz_on_store(struct device *dev, struct device_attribute *attr,
+                             const char *buf, size_t count) {
+  unsigned long val;
+  if (kstrtoul(buf, 0, &val) == 0)
+    buzz_on = (unsigned int)(val & 0x7F);
+  return count;
+}
+static DEVICE_ATTR_RW(buzz_on);
+
 /* Driver version attribute */
 static ssize_t driver_version_show(struct device *dev,
                                    struct device_attribute *attr, char *buf) {
@@ -688,6 +759,7 @@ static struct attribute *pipower5_attrs[] = {
     &dev_attr_power_button_state.attr,
     &dev_attr_charge_current_max.attr,
     &dev_attr_buzzer_volume.attr,
+    &dev_attr_buzz_on.attr,
     &dev_attr_buzzer_play.attr,
     &dev_attr_events.attr,
     &dev_attr_driver_version.attr,

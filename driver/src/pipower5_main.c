@@ -35,6 +35,19 @@ static void pipower5_poll_work(struct work_struct *work);
 
 static struct class *pipower5_class;
 
+/* ── Module parameters (persisted via /etc/modprobe.d/pipower5.conf) ── */
+static unsigned int buzz_on = 0x7F;
+module_param(buzz_on, uint, 0644);
+MODULE_PARM_DESC(buzz_on, "Buzzer event bitmask (default 0x7F = all on)");
+
+static unsigned int buzzer_volume = 3;
+module_param_named(volume, buzzer_volume, uint, 0644);
+MODULE_PARM_DESC(volume, "Buzzer volume 0-10 (default 3)");
+
+static unsigned int shutdown_pct = 10;
+module_param_named(shutdown_percentage, shutdown_pct, uint, 0644);
+MODULE_PARM_DESC(shutdown_percentage, "Auto-shutdown battery % (default 10)");
+
 /*
  * Fix sysfs permissions for non-root users.
  * class_create() / device_create() may create directories without the
@@ -121,40 +134,56 @@ static void pipower5_poll_work(struct work_struct *work) {
 
       /* POWER_DISCONNECTED / POWER_RESTORED */
       if (pi_dev->is_input_plugged_in != pi_dev->last_is_input_plugged_in) {
-        if (pi_dev->is_input_plugged_in)
+        char *envp[] = { NULL, NULL, NULL, NULL };
+        if (pi_dev->is_input_plugged_in) {
+          envp[0] = "PIPOWER5_EVENT=power_restored";
           pipower5_log_event(pi_dev, "POWER_RESTORED");
-        else
+        } else {
+          envp[0] = "PIPOWER5_EVENT=power_disconnected";
           pipower5_log_event(pi_dev, "POWER_DISCONNECTED");
+        }
+        kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
+        pipower5_buzzer_event(pi_dev,
+          pi_dev->is_input_plugged_in ?
+          BUZZ_POWER_RESTORED : BUZZ_POWER_DISCONNECTED);
       }
 
       /* BATTERY_ACTIVATED: switched to battery power */
       if (pi_dev->power_source != pi_dev->last_power_source &&
           pi_dev->power_source == 1) {
+        char *envp[] = { "PIPOWER5_EVENT=battery_activated", NULL };
         pipower5_log_event(pi_dev, "BATTERY_ACTIVATED bat=%d%%",
                            pi_dev->battery_percentage);
+        kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
+        pipower5_buzzer_event(pi_dev, BUZZ_BATTERY_ACTIVATED);
       }
 
       /* POWER_INSUFFICIENT: input plugged in but battery still discharging.
-       * Rate-limited: only log if input state changed or every 60s. */
+       * Rate-limited to once per 60s or on state change. */
       if (pi_dev->is_input_plugged_in && !pi_dev->is_charging &&
           batt_cur < -20) {
         static unsigned long last_pwr_insuf_log;
         if (time_after(jiffies, last_pwr_insuf_log + 60 * HZ) ||
             pi_dev->is_input_plugged_in != pi_dev->last_is_input_plugged_in) {
+          char *envp[] = { "PIPOWER5_EVENT=power_insufficient", NULL };
           pipower5_log_event(pi_dev, "POWER_INSUFFICIENT bat=%d%% cur=%dmA",
                              pi_dev->battery_percentage, batt_cur);
+          kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
+          pipower5_buzzer_event(pi_dev, BUZZ_POWER_INSUFFICIENT);
           last_pwr_insuf_log = jiffies;
         }
       }
 
-      /* LOW_BATTERY: percentage below shutdown threshold.
-       * Rate-limited: once every 60s. */
+      /* LOW_BATTERY: percentage below shutdown threshold. Rate-limited 60s. */
       if (pi_dev->battery_percentage < pi_dev->shutdown_percentage) {
         static unsigned long last_low_bat_log;
         if (time_after(jiffies, last_low_bat_log + 60 * HZ)) {
+          char *envp[] = { "PIPOWER5_EVENT=low_battery", NULL };
           pipower5_log_event(pi_dev, "LOW_BATTERY bat=%d%% threshold=%d%%",
                              pi_dev->battery_percentage,
                              pi_dev->shutdown_percentage);
+          kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
+          pipower5_buzzer_event(pi_dev, BUZZ_LOW_BATTERY);
           last_low_bat_log = jiffies;
         }
       }
@@ -245,6 +274,12 @@ static int pipower5_probe(struct i2c_client *client) {
     device_destroy(pipower5_class, MKDEV(0, 0));
     return ret;
   }
+
+  /* Apply module parameters to hardware */
+  pi_dev->buzzer_volume = (u8)buzzer_volume;
+  pi_dev->shutdown_percentage = (u8)shutdown_pct;
+  __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL, (u8)buzzer_volume);
+  __pipower5_write_byte(pi_dev, REG_WRITE_SHUTDOWN_PERCENTAGE, (u8)shutdown_pct);
 
   /* Initialize buzzer playback */
   pipower5_buzzer_init(pi_dev);

@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+"""pipower5 email notifier ¡ª triggered by udev via uevent."""
+import sys
+import json
+import smtplib
+from email.mime.text import MIMEText
+from pathlib import Path
+
+EVENT = sys.argv[1] if len(sys.argv) > 1 else "unknown"
+SYSFS = "/sys/class/pipower5/pipower5"
+CONFIG = Path.home() / ".config" / "pipower5" / "email.json"
+
+def read_sysfs(name):
+    return (Path(SYSFS) / name).read_text().strip()
+
+def load_config():
+    if CONFIG.exists():
+        return json.loads(CONFIG.read_text())
+    return {}
+
+def send_email(cfg, subject, body):
+    if not cfg.get("smtp_server") or not cfg.get("send_to"):
+        return
+    msg = MIMEText(body, "html")
+    msg["Subject"] = subject
+    msg["From"] = cfg.get("smtp_email", "")
+    msg["To"] = cfg.get("send_to", "")
+
+    if cfg.get("smtp_security") == "ssl":
+        s = smtplib.SMTP_SSL(cfg["smtp_server"], cfg.get("smtp_port", 465))
+    else:
+        s = smtplib.SMTP(cfg["smtp_server"], cfg.get("smtp_port", 587))
+        if cfg.get("smtp_security") == "tls":
+            s.starttls()
+    if cfg.get("smtp_password"):
+        s.login(cfg["smtp_email"], cfg["smtp_password"])
+    s.send_message(msg)
+    s.quit()
+
+cfg = load_config()
+bat_pct = read_sysfs("battery_percentage")
+bat_mv  = read_sysfs("battery_voltage")
+body = f"""<h3>PiPower5: {EVENT}</h3>
+<p>Battery: {bat_pct}% ({int(bat_mv)/1000:.1f}V)<br>
+Input: {"plugged" if read_sysfs('is_input_plugged_in') == '1' else 'unplugged'}<br>
+Charging: {"yes" if read_sysfs('is_charging') == '1' else 'no'}</p>"""
+
+send_email(cfg, f"[PiPower5] {EVENT}", body)

@@ -161,6 +161,24 @@ int pipower5_update_status(struct pipower5_device *pi_dev);
 int pipower5_create_sysfs(struct pipower5_device *pi_dev);
 void pipower5_remove_sysfs(struct pipower5_device *pi_dev);
 void pipower5_buzzer_init(struct pipower5_device *pi_dev);
+void pipower5_buzzer_event(struct pipower5_device *pi_dev, int event_id);
+
+/* Module parameters (extern for sysfs access) */
+extern unsigned int buzz_on;
+extern unsigned int buzzer_volume;
+extern unsigned int shutdown_pct;
+
+/* Buzzer event IDs */
+enum buzzer_event {
+  BUZZ_BATTERY_ACTIVATED = 0,
+  BUZZ_LOW_BATTERY,
+  BUZZ_POWER_DISCONNECTED,
+  BUZZ_POWER_RESTORED,
+  BUZZ_POWER_INSUFFICIENT,
+  BUZZ_BATTERY_CRITICAL_SHUTDOWN,
+  BUZZ_BATTERY_VOLTAGE_CRITICAL,
+  BUZZ_EVENT_COUNT,
+};
 
 /* Function prototypes for upower operations */
 int pipower5_create_upower(struct pipower5_device *pi_dev);
