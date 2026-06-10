@@ -1,6 +1,6 @@
 # PiPower 5 Documentation Repository
 
-> **Synced from canonical source.** This CLAUDE.md is synced from the English source repository (`docs` branch). The authoritative version lives in the main workspace. When adding rules, update the canonical file first, then propagate here. This branch: `docs-fr` — French translation.
+> **Synced from canonical source.** This CLAUDE.md is synced from the English source repository (`docs` branch). The authoritative version lives in the main workspace. When adding rules, update the canonical file first, then propagate here. This branch: `docs-it` — Italian translation.
 
 ## Project Identity
 

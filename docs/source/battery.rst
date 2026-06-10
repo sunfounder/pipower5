@@ -1,4 +1,4 @@
-Batterie
+Batteria
 =================
 
 .. image:: img/vh2pin_battery.png
@@ -9,16 +9,16 @@ Batterie
 
    <br/>
 
-* **VCC** : Borne positive de la batterie.
-* **GND** : Borne négative de la batterie.
+* **VCC** : Terminale positivo della batteria.
+* **GND** : Terminale negativo della batteria.
 
-Il s'agit d'un pack batterie personnalisé fabriqué par SunFounder, composé de deux batteries 18650 d'une capacité de 2000mAh. Le connecteur est VH3.96 2P, qui peut être chargé directement après avoir été inséré dans le shield.
+Si tratta di un pacco batteria personalizzato prodotto da SunFounder, composto da due batterie 18650 con una capacità di 2000mAh. Il connettore è VH3.96 2P, che può essere caricato direttamente dopo essere stato inserito nello shield.
 
-**Caractéristiques**
+**Caratteristiche**
 
-* **Composition** : Li-ion
-* **Capacité de la batterie** : 2000mAh, 14,8Wh
-* **Poids de la batterie** : 90,8g
-* **Nombre de cellules** : 2
-* **Connecteur** : VH3.96 2 broches
-* **Protection contre la décharge excessive** : 6,0V
+* **Composizione** : Ioni di litio
+* **Capacità della batteria** : 2000mAh, 14,8Wh
+* **Peso della batteria** : 90,8g
+* **Numero di celle** : 2
+* **Connettore** : VH3.96 2 pin
+* **Protezione da scarica eccessiva** : 6,0V

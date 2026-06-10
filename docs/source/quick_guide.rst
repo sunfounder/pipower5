@@ -1,63 +1,63 @@
-Guide de démarrage rapide
+Guida rapida
 ===============================
 
-Ce guide vous aide à démarrer rapidement avec le PiPower 5 après l'assemblage matériel.
+Questa guida ti aiuta a iniziare rapidamente con PiPower 5 dopo l'assemblaggio hardware.
 
-Charger la batterie
+Caricare la batteria
 ----------------------------------------------------
 
-Avant la première utilisation, chargez complètement la batterie.
+Prima del primo utilizzo, caricare completamente la batteria.
 
-Recommandations :
+Raccomandazioni:
 
-- Utilisez un adaptateur secteur USB-C de haute qualité
-- Une alimentation 5V 5A est recommandée pour le Raspberry Pi 5
-- Des adaptateurs de puissance supérieure sont recommandés lors de l'utilisation de SSD ou d'autres périphériques haute puissance
+- Utilizzare un adattatore di alimentazione USB-C di alta qualità
+- Per Raspberry Pi 5 si consiglia un alimentatore da 5V 5A
+- Si consigliano adattatori di potenza superiore quando si utilizzano SSD o altre periferiche ad alta potenza
 
-Pendant la charge :
+Durante la carica:
 
-- Utilisez une alimentation USB-C de haute qualité pour charger le PiPower 5.
+- Utilizzare un alimentatore USB-C di alta qualità per caricare PiPower 5.
 
   .. image:: img/power_input.png
      :width: 50%
      :align: center
 
-- Pendant la charge, les LED indicatrices de batterie s'allument progressivement en séquence.
+- Durante la carica, i LED indicatori della batteria si accendono progressivamente in sequenza.
 
   .. image:: img/battery_indicator.png
      :width: 50%
      :align: center
 
-  L'état de la batterie est indiqué par le nombre de LED allumées :
+  Lo stato della batteria è indicato dal numero di LED accesi:
 
-  * **4 LED allumées** : Batterie > 80%
-  * **3 LED allumées** : 60% < Batterie < 80%
-  * **2 LED allumées** : 40% < Batterie < 60%
-  * **1 LED allumée** : 20% < Batterie < 40%
-  * **Première LED clignotante** : Batterie < 20%
-  * **Les LED s'allument progressivement en cycle** : Charge en cours
-  * **Deux LED centrales clignotantes** : En attente du signal d'arrêt
-  * **Toutes les LED éteintes** : Hors tension ou en mode veille
-  * Pendant la charge, l'indicateur reste allumé **même à l'état éteint** jusqu'à ce que la charge soit complète.
+  * **4 LED accesi**: Batteria > 80%
+  * **3 LED accesi**: 60% < Batteria < 80%
+  * **2 LED accesi**: 40% < Batteria < 60%
+  * **1 LED acceso**: 20% < Batteria < 40%
+  * **Primo LED lampeggiante**: Batteria < 20%
+  * **I LED si accendono progressivamente in ciclo**: Ricarica in corso
+  * **Due LED centrali lampeggianti**: In attesa del segnale di spegnimento
+  * **Tutti i LED spenti**: Dispositivo spento o in modalità sospensione
+  * Durante la carica, l'indicatore rimane acceso **anche a dispositivo spento** fino al completamento della carica.
 
-Mise sous tension
+Accensione
 ----------------------------------------------------
 
-Pour les appareils Raspberry Pi, aucun câblage d'alimentation supplémentaire n'est requis. Le PiPower 5 fournit l'alimentation directement via le connecteur GPIO.
+Per i dispositivi Raspberry Pi, non è richiesto alcun cablaggio di alimentazione aggiuntivo. PiPower 5 fornisce alimentazione direttamente attraverso il connettore GPIO.
 
-Pour les autres appareils, vous pouvez les alimenter en utilisant :
+Per altri dispositivi, è possibile alimentarli utilizzando:
 
-- Le port de sortie USB-A
-- Les broches 5V/GND à côté du port USB-A
+- La porta di uscita USB-A
+- I pin 5V/GND accanto alla porta USB-A
 
 .. image:: img/power_output.png
    :width: 50%
    :align: center
 
-Appuyez une fois sur le bouton d'alimentation pour allumer le PiPower 5. Lorsqu'il est sous tension :
+Premere una volta il pulsante di accensione per accendere PiPower 5. Quando è acceso:
 
-- La **LED PWR** s'allume
-- L'appareil connecté commence à recevoir l'alimentation du PiPower 5
+- Il **LED PWR** si accende
+- Il dispositivo collegato inizia a ricevere alimentazione da PiPower 5
 
 .. image:: img/pwr_led.png
    :width: 50%
@@ -67,29 +67,29 @@ Appuyez une fois sur le bouton d'alimentation pour allumer le PiPower 5. Lorsqu'
     :start-after: start_install_pipower5
     :end-before: end_install_pipower5
 
-Ouvrir le tableau de bord Web
+Aprire il pannello di controllo Web
 ----------------------------------------------------
 
-Après l'installation, ouvrez le tableau de bord dans votre navigateur :
+Dopo l'installazione, aprire il pannello di controllo nel browser:
 
 .. code-block:: text
 
-   http://<adresse-ip-raspberry-pi>:34001
+   http://<indirizzo-ip-raspberry-pi>:34001
 
-Le tableau de bord vous permet de :
+Il pannello di controllo consente di:
 
-- Voir le pourcentage de la batterie
-- Surveiller l'état de charge
-- Vérifier la tension et le courant
-- Configurer le pourcentage d'arrêt
-- Gérer les notifications
+- Visualizzare la percentuale della batteria
+- Monitorare lo stato di carica
+- Controllare tensione e corrente
+- Configurare la percentuale di spegnimento
+- Gestire le notifiche
 
 .. image:: img/web_dashboard.png
    :width: 100%
    :align: center
 
 
-Arrêt sécurisé
+Spegnimento sicuro
 ----------------------------------------------------
 
 .. include:: /pipower5_software.rst
@@ -98,14 +98,14 @@ Arrêt sécurisé
 
 .. note::
 
-   Pour les fonctionnalités avancées et les options de configuration détaillées, y compris :
+   Per funzionalità avanzate e opzioni di configurazione dettagliate, tra cui:
 
-   - Commandes de surveillance de l'alimentation
-   - Paramètres de notification
-   - Alertes par buzzer
-   - Alertes par email
-   - Configuration avancée
+   - Comandi di monitoraggio dell'alimentazione
+   - Impostazioni di notifica
+   - Avvisi acustici (buzzer)
+   - Avvisi email
+   - Configurazione avanzata
 
-   Veuillez vous référer à :
+   Consultare:
 
    * :ref:`pipower5_tool`

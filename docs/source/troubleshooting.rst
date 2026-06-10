@@ -1,416 +1,416 @@
 .. note::
 
-    Bonjour, bienvenue dans la communauté SunFounder des passionnés de Raspberry Pi, Arduino et ESP32 sur Facebook ! Explorez plus en profondeur Raspberry Pi, Arduino et ESP32 avec d'autres passionnés.
+    Ciao, benvenuto nella community SunFounder degli appassionati di Raspberry Pi, Arduino e ESP32 su Facebook! Approfondisci Raspberry Pi, Arduino e ESP32 con altri appassionati.
 
-    **Pourquoi nous rejoindre ?**
+    **Perché unirsi?**
 
-    - **Assistance d'experts** : Résolvez les problèmes post-achat et les défis techniques avec l'aide de notre communauté et de notre équipe.
-    - **Apprendre et partager** : Échangez des astuces et des tutoriels pour améliorer vos compétences.
-    - **Aperçus exclusifs** : Accédez en avant-première aux annonces de nouveaux produits et aux aperçus.
-    - **Réductions spéciales** : Profitez de remises exclusives sur nos produits les plus récents.
-    - **Promotions festives et cadeaux** : Participez à des concours et à des promotions saisonnières.
+    - **Supporto esperto**: Risolvi i problemi post-vendita e le sfide tecniche con l'aiuto della nostra community e del nostro team.
+    - **Impara e condividi**: Scambia consigli e tutorial per migliorare le tue competenze.
+    - **Anteprime esclusive**: Accedi in anteprima agli annunci di nuovi prodotti e alle anticipazioni.
+    - **Sconti speciali**: Goditi sconti esclusivi sui nostri prodotti più recenti.
+    - **Promozioni festive e omaggi**: Partecipa a concorsi e promozioni stagionali.
 
-    👉 Prêt à explorer et à créer avec nous ? Cliquez [|link_sf_facebook|] et rejoignez-nous dès aujourd'hui !
+    👉 Pronto a esplorare e creare con noi? Clicca [|link_sf_facebook|] e unisciti oggi!
 
 .. _troubleshooting:
 
-Dépannage
-===============
+Risoluzione dei problemi
+=========================
 
-Cette page vous aide à diagnostiquer les problèmes du PiPower 5 en utilisant les LED intégrées, le buzzer et les outils logiciels. Commencez par les tableaux de référence rapide ci-dessous, puis suivez les guides basés sur les symptômes pour des étapes détaillées.
+Questa pagina aiuta a diagnosticare i problemi di PiPower 5 utilizzando i LED integrati, il buzzer e gli strumenti software. Inizia con le tabelle di riferimento rapido qui sotto, quindi segui le guide basate sui sintomi per i passaggi dettagliati.
 
-.. contents:: Table des matières
+.. contents:: Indice
    :local:
    :depth: 2
 
 
 -----------------------------------
-Référence rapide LED et buzzer
+Riferimento rapido LED e buzzer
 -----------------------------------
 
-Avant de plonger dans les symptômes spécifiques, utilisez ces tableaux pour interpréter ce que la carte vous indique.
+Prima di addentrarsi nei sintomi specifici, utilizza queste tabelle per interpretare ciò che la scheda ti sta comunicando.
 
-LED d'alimentation et d'état
-++++++++++++++++++++++++++++++
+LED di alimentazione e stato
++++++++++++++++++++++++++++++
 
 .. list-table::
    :header-rows: 1
    :widths: 15 25 60
 
    * - LED
-     - État
-     - Signification
-   * - **LED PWR** (verte)
+     - Stato
+     - Significato
+   * - **LED PWR** (verde)
      - ON
-     - La puissance de sortie est active — la carte fournit 5V à votre appareil.
+     - La potenza di uscita è attiva — la scheda sta fornendo 5V al tuo dispositivo.
    * -
      - OFF
-     - La sortie est désactivée. Appuyez une fois sur le bouton d'alimentation pour l'activer.
-   * - **LED BAT** (jaune)
+     - L'uscita è disattivata. Premi una volta il pulsante di accensione per attivarla.
+   * - **LED BAT** (giallo)
      - ON
-     - La batterie fournit actuellement l'alimentation. Si l'alimentation externe est connectée, cela indique une puissance d'entrée insuffisante.
+     - La batteria sta attualmente fornendo alimentazione. Se l'alimentazione esterna è collegata, questo indica una potenza di ingresso insufficiente.
    * -
      - OFF
-     - La batterie est en veille — l'alimentation externe est suffisante.
-   * - **LED de batterie inversée** (2× rouge)
-     - ON (les deux)
-     - La polarité de la batterie est inversée ! Déconnectez immédiatement et corrigez le câblage.
+     - La batteria è in standby — l'alimentazione esterna è sufficiente.
+   * - **LED batteria invertita** (2× rosso)
+     - ON (entrambi)
+     - La polarità della batteria è invertita! Scollegare immediatamente e correggere il cablaggio.
 
-LED de niveau de batterie
-+++++++++++++++++++++++++++
+LED livello batteria
++++++++++++++++++++++
 
 .. list-table::
    :header-rows: 1
    :widths: 20 80
 
-   * - Schéma des LED
-     - Signification
-   * - 4 LED allumées
-     - Batterie > 80%
-   * - 3 LED allumées
-     - Batterie 60% – 80%
-   * - 2 LED allumées
-     - Batterie 40% – 60%
-   * - 1 LED allumée
-     - Batterie 20% – 40%
-   * - Première LED clignotante
-     - Batterie < 20% — charger bientôt
-   * - LED défilant séquentiellement
-     - Charge en cours
-   * - Deux LED centrales clignotantes
-     - En attente du signal d'arrêt du Raspberry Pi
-   * - Toutes les LED éteintes
-     - Carte hors tension ou en mode veille
+   * - Schema LED
+     - Significato
+   * - 4 LED accesi
+     - Batteria > 80%
+   * - 3 LED accesi
+     - Batteria 60% – 80%
+   * - 2 LED accesi
+     - Batteria 40% – 60%
+   * - 1 LED acceso
+     - Batteria 20% – 40%
+   * - Primo LED lampeggiante
+     - Batteria < 20% — caricare presto
+   * - LED a scorrimento sequenziale
+     - Ricarica in corso
+   * - Due LED centrali lampeggianti
+     - In attesa del segnale di spegnimento dal Raspberry Pi
+   * - Tutti i LED spenti
+     - Scheda spenta o in modalità sospensione
 
 .. note::
 
-   Les LED de batterie restent actives pendant la charge même lorsque la carte est à l'état éteint. Elles s'éteignent uniquement lorsque la charge est terminée.
+   I LED della batteria rimangono attivi durante la carica anche quando la scheda è spenta. Si spengono solo al completamento della carica.
 
-Signaux du buzzer
+Segnali del buzzer
 +++++++++++++++++++
 
-Si le buzzer est activé, ces sons indiquent des événements spécifiques :
+Se il buzzer è abilitato, questi suoni indicano eventi specifici:
 
 .. list-table::
    :header-rows: 1
    :widths: 25 25 50
 
-   * - Événement
-     - Son typique
-     - Signification
+   * - Evento
+     - Suono tipico
+     - Significato
    * - ``battery_activated``
-     - Deux tonalités ascendantes
-     - La batterie a pris le relais de l'alimentation (alimentation externe perdue ou insuffisante).
+     - Due toni ascendenti
+     - La batteria ha preso il controllo dell'alimentazione (alimentazione esterna persa o insufficiente).
    * - ``low_battery``
-     - Deux tonalités répétées de même hauteur
-     - Le niveau de la batterie est descendu en dessous du pourcentage d'arrêt configuré. Chargez immédiatement.
+     - Due toni ripetuti della stessa altezza
+     - Il livello della batteria è sceso al di sotto della percentuale di spegnimento configurata. Caricare immediatamente.
    * - ``power_disconnected``
-     - Tonalité haute → tonalité basse
-     - L'alimentation externe a été déconnectée. Le système fonctionne maintenant sur batterie.
+     - Tono alto → tono basso
+     - L'alimentazione esterna è stata scollegata. Il sistema ora funziona a batteria.
    * - ``power_restored``
-     - Tonalité basse → tonalité haute
-     - L'alimentation externe a été rétablie. La batterie ne se décharge plus.
+     - Tono basso → tono alto
+     - L'alimentazione esterna è stata ripristinata. La batteria non si sta più scaricando.
    * - ``power_insufficient``
-     - Trois tonalités rapides de même hauteur
-     - L'alimentation externe est connectée mais trop faible. La batterie fournit un complément. Vérifiez votre adaptateur secteur.
+     - Tre toni rapidi della stessa altezza
+     - L'alimentazione esterna è collegata ma troppo debole. La batteria sta supplementando. Verifica l'adattatore di alimentazione.
    * - ``battery_critical_shutdown``
-     - Trois tonalités descendantes rapides
-     - La capacité de la batterie est extrêmement faible. Le système va s'arrêter.
+     - Tre toni discendenti rapidi
+     - Capacità della batteria criticamente bassa. Il sistema si spegnerà.
    * - ``battery_voltage_critical_shutdown``
-     - Quatre tonalités descendantes rapides
-     - La tension de la batterie est extrêmement faible (sécurité). Le système va s'arrêter immédiatement.
+     - Quattro toni discendenti rapidi
+     - Tensione della batteria criticamente bassa (sicurezza). Il sistema si spegnerà immediatamente.
 
 .. tip::
 
-   Si vous n'entendez jamais les sons du buzzer, le buzzer est peut-être désactivé ou son volume réglé sur 0. Exécutez ``pipower5 -bzv`` pour vérifier le volume actuel, ou testez avec ``pipower5 -bzt low_battery``.
+   Se non si sentono mai i suoni del buzzer, il buzzer potrebbe essere disabilitato o il suo volume impostato a 0. Eseguire ``pipower5 -bzv`` per controllare il volume corrente, o testare con ``pipower5 -bzt low_battery``.
 
 
 ---------------------------------
-Diagnostic basé sur les symptômes
+Diagnosi basata sui sintomi
 ---------------------------------
 
-« Pas d'alimentation » — Toutes les LED éteintes, pas de sortie
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+"Nessuna alimentazione" — Tutti i LED spenti, nessuna uscita
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-**Ce que vous voyez** : LED PWR éteinte, LED de batterie éteintes, l'appareil connecté n'affiche aucune alimentation.
+**Cosa si vede**: LED PWR spento, LED batteria spenti, il dispositivo collegato non mostra alimentazione.
 
-**Vérifiez ces points, dans l'ordre :**
+**Verificare questi punti, nell'ordine:**
 
-1. **La batterie est-elle installée ?**
-   Le PiPower 5 ne peut pas fonctionner sans batterie. Assurez-vous que le connecteur de batterie (XH2.54 3P) est fermement inséré. Voir :ref:`battery_connector`.
+1. **La batteria è installata?**
+   PiPower 5 non può funzionare senza batteria. Assicurarsi che il connettore della batteria (XH2.54 3P) sia saldamente inserito. Vedi :ref:`battery_connector`.
 
-2. **La batterie est-elle complètement déchargée ?**
-   Une batterie profondément déchargée (< 2,5V par cellule) entre en mode de charge d'entretien et peut ne pas alimenter la carte pendant plusieurs minutes.
+2. **La batteria è completamente scarica?**
+   Una batteria profondamente scarica (< 2,5V per cella) entra in modalità di carica di mantenimento e potrebbe non alimentare la scheda per diversi minuti.
 
-   - Connectez l'alimentation externe et attendez 10–15 minutes.
-   - Si les LED de batterie restent éteintes après 15 minutes, la batterie est peut-être défectueuse.
+   - Collegare l'alimentazione esterna e attendere 10–15 minuti.
+   - Se i LED della batteria rimangono spenti dopo 15 minuti, la batteria potrebbe essere difettosa.
 
-3. **L'alimentation externe est-elle correctement connectée ?**
+3. **L'alimentazione esterna è collegata correttamente?**
 
-     - Utilisez une alimentation USB-C PD (5V–15V) ou une alimentation CC via les bornes à vis.
-     - Assurez-vous que le câble USB-C prend en charge la fourniture d'énergie — certains câbles de données uniquement ne fonctionneront pas.
-     - Essayez un autre adaptateur secteur et câble.
+     - Utilizzare un alimentatore USB-C PD (5V–15V) o alimentazione CC tramite i morsetti a vite.
+     - Assicurarsi che il cavo USB-C supporti la fornitura di energia — alcuni cavi solo dati non funzioneranno.
+     - Provare un altro adattatore di alimentazione e cavo.
 
-4. **Appuyez une fois sur le bouton d'alimentation.**
-   Le PiPower 5 nécessite un appui sur le bouton pour activer la sortie, sauf si le cavalier Default ON est réglé.
+4. **Premere una volta il pulsante di accensione.**
+   PiPower 5 richiede la pressione del pulsante per attivare l'uscita, a meno che il ponticello Default ON non sia impostato.
 
-5. **Vérifiez le cavalier Default ON.** Voir :ref:`cap_onoff`.
-   - Cavalier sur **ON** : La sortie s'active automatiquement lorsque l'alimentation externe est connectée.
-   - Cavalier sur **OFF** : Vous devez appuyer sur le bouton d'alimentation à chaque fois.
+5. **Controllare il ponticello Default ON.** Vedi :ref:`cap_onoff`.
+   - Ponticello su **ON**: L'uscita si attiva automaticamente quando l'alimentazione esterna è collegata.
+   - Ponticello su **OFF**: È necessario premere il pulsante di accensione ogni volta.
 
-6. **Vérifiez l'installation inversée de la batterie.**
-   Si les deux LED rouges près du connecteur de batterie sont allumées, la polarité de la batterie est inversée. Mettez hors tension immédiatement, déconnectez la batterie et reconnectez avec la polarité correcte. Voir :ref:`battery_connector`.
-
-
-« LED BAT toujours allumée » — L'alimentation externe semble insuffisante
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-**Ce que vous voyez** : L'alimentation externe est connectée, mais la LED BAT reste allumée. La batterie se décharge malgré la présence d'une alimentation externe.
-
-**Ce que cela signifie** : L'alimentation externe ne peut pas répondre à la demande totale de puissance. La batterie comble le déficit.
-
-**Vérifiez ces points, dans l'ordre :**
-
-1. **Votre adaptateur secteur est-il assez puissant ?**
-   La formule est : *Puissance de l'adaptateur ≥ Puissance du Raspberry Pi (~20–25W) + Puissance de charge (définie via le DIP switch)*.
-
-   - Le Raspberry Pi 5 sous charge peut consommer > 25W.
-   - Si la puissance de charge est réglée sur 20W (les deux DIP switches sur ON), vous avez besoin d'un adaptateur **45W+**.
-   - Pour un adaptateur 30W, réduisez la puissance de charge à 10W ou 5W.
-
-2. **Vérifiez le DIP switch (sélecteur de puissance de charge).**
-   Consultez le tableau de puissance de charge dans :ref:`power_input`. Réduisez la puissance de charge si votre adaptateur est sous-dimensionné.
-
-3. **Essayez un autre câble USB-C.**
-   Tous les câbles ne prennent pas en charge l'USB PD à des puissances élevées. Utilisez le câble fourni avec votre adaptateur secteur.
-
-4. **Vérifiez le profil PD de l'adaptateur.**
-   Certains adaptateurs annoncent une puissance élevée mais uniquement sur des combinaisons tension/courant spécifiques. Le PiPower 5 nécessite une alimentation conforme PD. Les adaptateurs non-PD (par ex., 5V fixe uniquement) peuvent ne pas fournir assez de courant.
-
-5. **Pour l'entrée par bornes à vis**, assurez-vous que la tension d'entrée est ≥ 9V pour des performances optimales. Voir :ref:`power_input` pour les limites tension-courant.
+6. **Verificare l'installazione invertita della batteria.**
+   Se entrambi i LED rossi vicino al connettore della batteria sono accesi, la polarità della batteria è invertita. Spegnere immediatamente, scollegare la batteria e ricollegare con la polarità corretta. Vedi :ref:`battery_connector`.
 
 
-« LED PWR éteinte » — L'appareil ne reçoit pas d'alimentation
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+"LED BAT sempre acceso" — L'alimentazione esterna sembra insufficiente
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-**Ce que vous voyez** : Les LED de batterie sont allumées (la carte est alimentée), mais la LED PWR est éteinte et l'appareil connecté ne démarre pas.
+**Cosa si vede**: L'alimentazione esterna è collegata, ma il LED BAT rimane acceso. La batteria si sta scaricando nonostante la presenza di alimentazione esterna.
 
-**Vérifiez ces points :**
+**Cosa significa**: L'alimentatore esterno non riesce a soddisfare la domanda totale di potenza. La batteria sta colmando il deficit.
 
-1. **Appuyez une fois sur le bouton d'alimentation.**
-   La carte est alimentée mais la sortie n'est pas activée.
+**Verificare questi punti, nell'ordine:**
 
-2. **Le connecteur GPIO est-il correctement inséré ?**
-   Si vous utilisez un Raspberry Pi, retirez et réinsérez le HAT PiPower 5. Vérifiez l'absence de broches tordues ou de débris dans le connecteur.
+1. **L'adattatore di alimentazione è sufficientemente potente?**
+   La formula è: *Potenza adattatore ≥ Potenza Raspberry Pi (~20–25W) + Potenza di carica (impostata tramite DIP switch)*.
 
-3. **Essayez une sortie alternative.**
-   Connectez un appareil au port USB-A ou au connecteur 2x4P. Si ceux-ci fonctionnent, le problème vient du passthrough GPIO.
+   - Raspberry Pi 5 sotto carico può assorbire > 25W.
+   - Se la potenza di carica è impostata a 20W (entrambi i DIP switch su ON), è necessario un adattatore da **45W+**.
+   - Per un adattatore da 30W, ridurre la potenza di carica a 10W o 5W.
+
+2. **Controllare il DIP switch (selettore potenza di carica).**
+   Consultare la tabella della potenza di carica in :ref:`power_input`. Ridurre la potenza di carica se l'adattatore è sottodimensionato.
+
+3. **Provare un altro cavo USB-C.**
+   Non tutti i cavi supportano USB PD a potenze elevate. Utilizzare il cavo fornito con l'adattatore di alimentazione.
+
+4. **Verificare il profilo PD dell'adattatore.**
+   Alcuni adattatori dichiarano potenze elevate ma solo su combinazioni specifiche di tensione/corrente. PiPower 5 richiede un'alimentazione conforme PD. Gli adattatori non-PD (es. solo 5V fisso) potrebbero non fornire corrente sufficiente.
+
+5. **Per l'ingresso tramite morsetti a vite**, assicurarsi che la tensione di ingresso sia ≥ 9V per prestazioni ottimali. Vedi :ref:`power_input` per i limiti tensione-corrente.
 
 
-« L'appareil s'arrête de façon inattendue »
-+++++++++++++++++++++++++++++++++++++++++++++
+"LED PWR spento" — Il dispositivo non riceve alimentazione
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-**Ce que vous voyez** : Le Raspberry Pi ou l'appareil connecté s'arrête sans avertissement.
+**Cosa si vede**: I LED della batteria sono accesi (la scheda è alimentata), ma il LED PWR è spento e il dispositivo collegato non si avvia.
 
-**Vérifiez ces points :**
+**Verificare questi punti:**
 
-1. **Vérifiez le pourcentage d'arrêt.**
-   Exécutez ``pipower5 -sp``. S'il est réglé haut (par ex., 50% ou plus), la carte déclenchera un arrêt précoce. Définissez une valeur plus basse si nécessaire :
+1. **Premere una volta il pulsante di accensione.**
+   La scheda è alimentata ma l'uscita non è abilitata.
+
+2. **Il connettore GPIO è inserito correttamente?**
+   Se si utilizza un Raspberry Pi, rimuovere e reinserire il HAT PiPower 5. Verificare l'assenza di pin piegati o detriti nel connettore.
+
+3. **Provare un'uscita alternativa.**
+   Collegare un dispositivo alla porta USB-A o al connettore 2x4P. Se questi funzionano, il problema è nel passthrough GPIO.
+
+
+"Il dispositivo si spegne inaspettatamente"
+++++++++++++++++++++++++++++++++++++++++++++
+
+**Cosa si vede**: Il Raspberry Pi o il dispositivo collegato si spegne senza preavviso.
+
+**Verificare questi punti:**
+
+1. **Controllare la percentuale di spegnimento.**
+   Eseguire ``pipower5 -sp``. Se è impostata alta (es. 50% o più), la scheda attiverà uno spegnimento precoce. Impostare un valore più basso se necessario:
 
    .. code-block:: shell
 
       pipower5 -sp 10
       sudo systemctl restart pipower5.service
 
-2. **Vérifiez si la batterie se décharge réellement.**
+2. **Verificare se la batteria si sta effettivamente scaricando.**
 
-     Exécutez ``pipower5 -a`` et regardez :
+     Eseguire ``pipower5 -a`` e controllare:
 
-     - ``source`` : Doit être "0 - External" lorsque l'alimentation externe est connectée.
-     - ``battery current`` : Négatif = charge, Positif = décharge.
+     - ``source``: Dovrebbe essere "0 - External" quando l'alimentazione esterna è collegata.
+     - ``battery current``: Negativo = carica, Positivo = scarica.
 
-3. **Pour Raspberry Pi 5 avec périphériques haute puissance (SSD, HAT)** :
-   Envisagez de définir ``pipower5 -sp 100`` pour déclencher un arrêt sécurisé immédiat lorsque l'alimentation externe est perdue. Voir :ref:`pipower5_tool`.
+3. **Per Raspberry Pi 5 con periferiche ad alta potenza (SSD, HAT)**:
+   Considerare di impostare ``pipower5 -sp 100`` per attivare lo spegnimento sicuro immediato quando l'alimentazione esterna viene persa. Vedi :ref:`pipower5_tool`.
 
-4. **Vérifiez l'adaptateur secteur.**
-   Si des événements ``power_insufficient`` sont déclenchés (buzzer ou journal), l'adaptateur est trop faible. Passez à une alimentation de puissance supérieure ou réduisez le DIP switch de puissance de charge.
-
-
-« La batterie ne charge pas »
-+++++++++++++++++++++++++++++++
-
-**Ce que vous voyez** : Alimentation externe connectée, mais les LED de batterie n'affichent pas l'animation de charge (défilement séquentiel).
-
-**Vérifiez ces points :**
-
-1. **La batterie est-elle déjà pleine ?**
-   4 LED fixes = batterie > 80%. Le circuit de charge peut s'être arrêté parce que la batterie est pleine ou en phase de tension constante.
-
-2. **Vérifiez l'état de charge via le logiciel.**
-   Exécutez ``pipower5 -ichg``. S'il renvoie ``False``, la carte signale qu'elle n'est pas en charge. Vérifiez ``pipower5 -bp`` pour le pourcentage actuel de la batterie.
-
-3. **Protection contre la surchauffe active.**
-   Si la carte a été soumise à une charge élevée dans un environnement chaud, la puce de charge peut avoir dépassé 125°C et arrêté la charge. Laissez la carte refroidir et réessayez.
-
-4. **Tension d'entrée trop basse via les bornes à vis.**
-   Si vous utilisez les bornes à vis avec une tension ≤ 6,5V, le courant de charge est limité. Utilisez ≥ 9V pour une charge fiable.
-
-5. **Vérifiez l'état de la batterie.**
-   Une batterie qui n'atteint jamais la charge complète ou qui charge très lentement peut avoir des cellules dégradées. Essayez une autre batterie compatible (Li-ion 7.4V 2 cellules, XH2.54 3P).
+4. **Verificare l'adattatore di alimentazione.**
+   Se vengono attivati eventi ``power_insufficient`` (buzzer o log), l'adattatore è troppo debole. Passare a un alimentatore di potenza superiore o ridurre il DIP switch di potenza di carica.
 
 
-« Échec de la communication I2C » — La commande `pipower5` renvoie des erreurs
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+"La batteria non si carica"
+++++++++++++++++++++++++++++
 
-**Ce que vous voyez** : L'exécution de ``pipower5 -a`` produit une erreur ou aucune donnée.
+**Cosa si vede**: Alimentazione esterna collegata, ma i LED della batteria non mostrano l'animazione di carica (scorrimento sequenziale).
 
-**Vérifiez ces points :**
+**Verificare questi punti:**
 
-1. **L'I2C est-il activé sur le Raspberry Pi ?**
-   Exécutez ``sudo raspi-config`` → Interface Options → I2C → Enable.
+1. **La batteria è già piena?**
+   4 LED fissi = batteria > 80%. Il circuito di carica potrebbe essersi interrotto perché la batteria è piena o in fase di tensione costante.
 
-2. **Le périphérique I2C est-il détecté ?**
+2. **Verificare lo stato di carica via software.**
+   Eseguire ``pipower5 -ichg``. Se restituisce ``False``, la scheda segnala che non è in carica. Controllare ``pipower5 -bp`` per la percentuale attuale della batteria.
+
+3. **Protezione da sovratemperatura attiva.**
+   Se la scheda è stata sottoposta a carico elevato in un ambiente caldo, il chip di carica potrebbe aver superato 125°C e interrotto la carica. Lasciar raffreddare la scheda e riprovare.
+
+4. **Tensione di ingresso troppo bassa tramite morsetti a vite.**
+   Se si utilizzano i morsetti a vite con tensione ≤ 6,5V, la corrente di carica è limitata. Utilizzare ≥ 9V per una carica affidabile.
+
+5. **Verificare lo stato della batteria.**
+   Una batteria che non raggiunge mai la carica completa o che si carica molto lentamente potrebbe avere celle degradate. Provare un'altra batteria compatibile (Li-ion 7.4V 2 celle, XH2.54 3P).
+
+
+"Comunicazione I2C fallita" — Il comando `pipower5` restituisce errori
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+**Cosa si vede**: L'esecuzione di ``pipower5 -a`` produce un errore o nessun dato.
+
+**Verificare questi punti:**
+
+1. **L'I2C è abilitato sul Raspberry Pi?**
+   Eseguire ``sudo raspi-config`` → Interface Options → I2C → Enable.
+
+2. **Il dispositivo I2C viene rilevato?**
 
    .. code-block:: shell
 
       sudo i2cdetect -y 1
 
-   Le PiPower 5 devrait apparaître à l'adresse ``0x5a``. Si aucun périphérique n'apparaît :
+   PiPower 5 dovrebbe apparire all'indirizzo ``0x5a``. Se non appare alcun dispositivo:
 
-   - Réinsérez le HAT sur le connecteur GPIO.
-   - Vérifiez que ``i2c-dev`` est chargé : ``lsmod | grep i2c``.
-   - Vérifiez que ``dtparam=i2c_arm=on`` est dans ``/boot/firmware/config.txt``.
+   - Reinserire il HAT sul connettore GPIO.
+   - Verificare che ``i2c-dev`` sia caricato: ``lsmod | grep i2c``.
+   - Verificare che ``dtparam=i2c_arm=on`` sia in ``/boot/firmware/config.txt``.
 
-3. **Le service `pipower5` est-il en cours d'exécution ?**
+3. **Il servizio `pipower5` è in esecuzione?**
 
    .. code-block:: shell
 
       sudo systemctl status pipower5.service
 
-   S'il est inactif, démarrez-le : ``sudo systemctl start pipower5.service``.
+   Se inattivo, avviarlo: ``sudo systemctl start pipower5.service``.
 
-4. **Conflit entre plusieurs périphériques I2C ?**
-   Le PiPower 5 utilise l'adresse I2C ``0x5a``. Vérifiez qu'aucun autre HAT ou périphérique n'utilise cette adresse. Voir :ref:`pin_header`.
+4. **Conflitto tra più dispositivi I2C?**
+   PiPower 5 utilizza l'indirizzo I2C ``0x5a``. Verificare che nessun altro HAT o dispositivo stia utilizzando questo indirizzo. Vedi :ref:`pin_header`.
 
-5. **Redémarrez.**
-   Parfois, un redémarrage à froid du Raspberry Pi et du PiPower 5 résout les problèmes de bus I2C. Mettez hors tension complètement, attendez 10 secondes, puis remettez sous tension.
+5. **Riavviare.**
+   A volte un riavvio a freddo sia del Raspberry Pi che di PiPower 5 risolve i problemi del bus I2C. Spegnere completamente, attendere 10 secondi, quindi riaccendere.
 
 
-« Buzzer silencieux » — Aucun son lors des événements
-++++++++++++++++++++++++++++++++++++++++++++++++++++++
+"Buzzer silenzioso" — Nessun suono durante gli eventi
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-**Ce que vous voyez** : Des événements se produisent (déconnexion d'alimentation, batterie faible, etc.) mais aucun son du buzzer.
+**Cosa si vede**: Si verificano eventi (disconnessione alimentazione, batteria scarica, ecc.) ma nessun suono del buzzer.
 
-**Vérifiez ces points :**
+**Verificare questi punti:**
 
-1. **Vérifiez le volume du buzzer.**
+1. **Controllare il volume del buzzer.**
 
    .. code-block:: shell
 
       pipower5 -bzv
 
-   S'il renvoie 0, le buzzer est en sourdine. Définissez un volume (1–10) :
+   Se restituisce 0, il buzzer è in mute. Impostare un volume (1–10):
 
    .. code-block:: shell
 
       pipower5 -bzv 5
       sudo systemctl restart pipower5.service
 
-2. **Vérifiez quels événements ont le buzzer activé.**
+2. **Verificare quali eventi hanno il buzzer abilitato.**
 
    .. code-block:: shell
 
       pipower5 -bzo
 
-   Assurez-vous que l'événement attendu est dans la liste. Pour ajouter un événement :
+   Assicurarsi che l'evento previsto sia nell'elenco. Per aggiungere un evento:
 
    .. code-block:: shell
 
       pipower5 -bzo low_battery,power_disconnected
 
-3. **Testez le buzzer directement.**
+3. **Testare il buzzer direttamente.**
 
    .. code-block:: shell
 
       pipower5 -bzt low_battery
 
-   Si vous entendez un son, le matériel du buzzer fonctionne — le problème vient de la configuration des événements.
+   Se si sente un suono, l'hardware del buzzer funziona — il problema è nella configurazione degli eventi.
 
 
-« Le Raspberry Pi affiche un avertissement de basse tension »
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+"Il Raspberry Pi mostra un avviso di bassa tensione"
++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-**Ce que vous voyez** : Le bureau du Raspberry Pi ou ``dmesg`` affiche des avertissements de sous-tension.
+**Cosa si vede**: Il desktop del Raspberry Pi o ``dmesg`` mostra avvisi di sottotensione.
 
-**C'est un comportement normal dans certains cas :**
+**Questo è un comportamento previsto in alcuni casi:**
 
-- Lors de l'alimentation d'un Raspberry Pi depuis le port USB-A du PiPower 5 (au lieu du connecteur GPIO), le Pi peut signaler un avertissement d'alimentation non-PD. Cela peut être ignoré en toute sécurité.
-- Si vous utilisez le connecteur GPIO et voyez toujours des avertissements, la sortie du PiPower 5 est peut-être soumise à une charge élevée. Vérifiez la consommation totale de courant de votre configuration.
+- Quando si alimenta un Raspberry Pi dalla porta USB-A di PiPower 5 (invece del connettore GPIO), il Pi potrebbe segnalare un avviso di alimentazione non-PD. Questo può essere ignorato in sicurezza.
+- Se si utilizza il connettore GPIO e si vedono ancora avvisi, l'uscita di PiPower 5 potrebbe essere sotto carico elevato. Verificare l'assorbimento totale di corrente della configurazione.
 
-**Vérifiez ces points :**
+**Verificare questi punti:**
 
-1. Exécutez ``pipower5 -a`` et vérifiez ``Output: voltage``. Il devrait être stable autour de 5,2–5,3V. S'il descend en dessous de 5,0V en charge, la consommation totale de courant peut dépasser la limite de 5A.
+1. Eseguire ``pipower5 -a`` e controllare ``Output: voltage``. Dovrebbe essere stabile intorno a 5,2–5,3V. Se scende sotto 5,0V sotto carico, l'assorbimento totale di corrente potrebbe superare il limite di 5A.
 
-2. Déconnectez les périphériques USB non essentiels et retestez.
+2. Scollegare le periferiche USB non essenziali e ripetere il test.
 
-3. Si le problème persiste, le convertisseur DC-DC est peut-être défectueux. Contactez le support.
+3. Se il problema persiste, il convertitore DC-DC potrebbe essere difettoso. Contattare l'assistenza.
 
 
 --------------------------------------
-Commandes de diagnostic logiciel
+Comandi di diagnostica software
 --------------------------------------
 
-L'outil CLI ``pipower5`` est votre interface de diagnostic principale. Voici les commandes les plus utiles :
+Lo strumento CLI ``pipower5`` è l'interfaccia diagnostica principale. Ecco i comandi più utili:
 
 .. list-table::
    :header-rows: 1
    :widths: 35 65
 
-   * - Commande
-     - Ce qu'elle vous indique
+   * - Comando
+     - Cosa indica
    * - ``pipower5 -a``
-     - Aperçu complet de l'état : tension d'entrée/sortie, état de la batterie, état de charge, demande d'arrêt, état du bouton.
+     - Istantanea completa dello stato: tensione ingresso/uscita, stato batteria, stato carica, richiesta spegnimento, stato pulsante.
    * - ``pipower5 -bp``
-     - Pourcentage de la batterie.
+     - Percentuale batteria.
    * - ``pipower5 -ichg``
-     - Si la batterie est actuellement en charge (``True`` / ``False``).
+     - Se la batteria è attualmente in carica (``True`` / ``False``).
    * - ``pipower5 -ii``
-     - Si l'alimentation externe est connectée.
+     - Se l'alimentazione esterna è collegata.
    * - ``pipower5 -sp``
-     - Seuil actuel du pourcentage d'arrêt.
+     - Soglia attuale percentuale di spegnimento.
    * - ``pipower5 -sr``
-     - État actuel de la demande d'arrêt (0 = Aucune, 1 = Batterie faible, 2 = Bouton).
+     - Stato attuale richiesta spegnimento (0 = Nessuna, 1 = Batteria scarica, 2 = Pulsante).
    * - ``pipower5 -pb``
-     - État actuel du bouton d'alimentation.
+     - Stato attuale pulsante di accensione.
    * - ``pipower5 -bzv``
-     - Volume actuel du buzzer.
+     - Volume attuale buzzer.
    * - ``pipower5 -fv``
-     - Version du firmware (vérifiez que vous avez la dernière version).
+     - Versione firmware (verificare di avere l'ultima versione).
    * - ``pipower5 -c``
-     - Vidage complet de la configuration.
+     - Dump completo configurazione.
    * - ``pipower5 -pfs 60``
-     - Exécute une simulation de panne de courant de 60 secondes pour tester l'autonomie de la batterie.
+     - Esegue una simulazione di interruzione di corrente di 60 secondi per testare l'autonomia della batteria.
    * - ``sudo systemctl status pipower5.service``
-     - Vérifie si le service en arrière-plan PiPower 5 est en cours d'exécution.
+     - Verifica se il servizio in background PiPower 5 è in esecuzione.
    * - ``cat /opt/pipower5/log``
-     - Affiche les journaux de service pour les messages d'erreur.
+     - Visualizza i log di servizio per i messaggi di errore.
 
 .. tip::
 
-   Pour une vérification rapide de l'état, exécutez ``pipower5 -a`` et vérifiez :
+   Per un controllo rapido dello stato, eseguire ``pipower5 -a`` e verificare:
 
-   - ``shutdown request`` est ``0 - NONE`` (aucun arrêt en attente).
-   - ``battery percentage`` est au-dessus de votre ``shutdown percentage``.
-   - ``Output: voltage`` est entre 5,1V et 5,4V.
+   - ``shutdown request`` è ``0 - NONE`` (nessuno spegnimento in sospeso).
+   - ``battery percentage`` è al di sopra del ``shutdown percentage``.
+   - ``Output: voltage`` è tra 5,1V e 5,4V.
 
 
 --------------------------------
-Vous avez encore des problèmes ?
+Hai ancora problemi?
 --------------------------------
 
-Si aucune des solutions ci-dessus ne résout votre problème, collectez les informations suivantes avant de contacter le support :
+Se nessuna delle soluzioni sopra risolve il problema, raccogliere le seguenti informazioni prima di contattare l'assistenza:
 
-1. **Informations système** :
+1. **Informazioni di sistema**:
 
    .. code-block:: shell
 
@@ -418,18 +418,18 @@ Si aucune des solutions ci-dessus ne résout votre problème, collectez les info
       pipower5 -fv
       pipower5 -c
 
-2. **Journaux de service** :
+2. **Log di servizio**:
 
    .. code-block:: shell
 
       cat /opt/pipower5/log
       sudo journalctl -u pipower5.service --no-pager -n 100
 
-3. **Détails matériels** :
+3. **Dettagli hardware**:
 
-     - Modèle de Raspberry Pi
-     - Modèle d'adaptateur secteur et puissance nominale
-     - Type et âge de la batterie
-     - Paramètres du DIP switch du PiPower 5
-     - Positions des cavaliers SDSIG et Default ON
+     - Modello Raspberry Pi
+     - Modello adattatore di alimentazione e potenza nominale
+     - Tipo ed età della batteria
+     - Impostazioni DIP switch di PiPower 5
+     - Posizioni ponticelli SDSIG e Default ON
 

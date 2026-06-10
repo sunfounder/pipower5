@@ -1,9 +1,9 @@
 .. _pipower5_assembly:
 
-Instructions de montage
+Istruzioni di montaggio
 ---------------------------
 
-Avant d'assembler le PiPower 5, veuillez vérifier que toutes les pièces et composants sont inclus. Si des composants sont manquants ou endommagés, veuillez contacter SunFounder à service@sunfounder.com pour une assistance rapide.
+Prima di assemblare il PiPower 5, verificare che tutte le parti e i componenti siano inclusi. Se alcuni componenti sono mancanti o danneggiati, contattare SunFounder all'indirizzo service@sunfounder.com per ricevere assistenza immediata.
 
 
 

@@ -3,163 +3,163 @@ PiPower 5 HAT
 
 .. interface:
 
-Aperçu de l'interface
-----------------------
+Panoramica dell'interfaccia
+----------------------------
 
 .. image:: img/pipower5_ov.png
   :width: 100%
 
 
 
-1. **Entrée d'alimentation USB Type-C**
+1. **Ingresso alimentazione USB Type-C**
 
-   - Entrée d'alimentation externe pour alimenter le Raspberry Pi et charger la batterie simultanément.
-   - Prend en charge le protocole **USB Power Delivery (PD)**, plage d'entrée **5V–15V**.
+   - Ingresso di alimentazione esterna per alimentare il Raspberry Pi e caricare la batteria contemporaneamente.
+   - Supporta il protocollo **USB Power Delivery (PD)**, intervallo di ingresso **5V–15V**.
 
-2. **Sélecteur d'entrée d'alimentation (DIP Switch)**
+2. **Selettore ingresso alimentazione (DIP Switch)**
 
-   - Permet la sélection de différents profils de puissance d'entrée pour une configuration flexible.
+   - Consente la selezione di diversi profili di potenza in ingresso per una configurazione flessibile.
 
-3. **Cavalier Default ON**
+3. **Ponticello Default ON**
 
-   - Définit si le système doit s'allumer automatiquement lorsque l'alimentation externe est connectée alors que l'appareil est éteint.
-   - ON = Mise sous tension automatique activée, OFF = Démarrage manuel requis.
+   - Definisce se il sistema deve accendersi automaticamente quando l'alimentazione esterna è collegata mentre il dispositivo è spento.
+   - ON = Accensione automatica abilitata, OFF = Avvio manuale richiesto.
 
-4. **SDSIG (Signal d'arrêt)**
+4. **SDSIG (Segnale di spegnimento)**
 
-   - Fournit la détection d'arrêt pour le Raspberry Pi.
-   - Lorsqu'il est relié à **PI3V3**, il fonctionne avec les Raspberry Pi 4 et Pi 5.
-   - Lorsqu'il est court-circuité à la **broche 26**, il prend en charge les Pi 3 et Pi Zero.
-   - Après une configuration appropriée, le PiPower5 coupera automatiquement l'alimentation une fois le Raspberry Pi arrêté.
+   - Fornisce il rilevamento dello spegnimento per Raspberry Pi.
+   - Quando collegato a **PI3V3**, funziona con Raspberry Pi 4 e Pi 5.
+   - Quando cortocircuitato al **Pin 26**, supporta Pi 3 e Pi Zero.
+   - Dopo una corretta configurazione, PiPower5 scollegherà automaticamente l'alimentazione una volta spento il Raspberry Pi.
 
-5. **LED PWR (Indicateur d'état de sortie)**
+5. **LED PWR (Indicatore di stato uscita)**
 
-   - S'allume lorsque la sortie du système est active.
+   - Si accende quando l'uscita del sistema è attiva.
 
-6. **LED BAT (Indicateur d'état de la batterie)**
+6. **LED BAT (Indicatore di stato batteria)**
 
-   - S'allume lorsque le système est alimenté par la batterie.
-   - Un rappel pour surveiller la consommation de la batterie lors du fonctionnement sans alimentation externe.
+   - Si accende quando il sistema è alimentato dalla batteria.
+   - Un promemoria per monitorare il consumo della batteria quando si opera senza alimentazione esterna.
 
-7. **Bouton d'alimentation**
+7. **Pulsante di accensione**
 
-   - **Appui simple** : Activer la sortie d'alimentation.
-   - **Appui long (2 secondes)** : Envoie une demande d'arrêt sécurisé via I²C.
-   - **Appui long (5 secondes)** : Force une mise hors tension immédiate (arrêt brutal).
-   - **Personnalisable** : Les actions d'appui simple et double peuvent être reconfigurées par logiciel.
+   - **Pressione singola**: Attiva l'uscita di alimentazione.
+   - **Pressione prolungata (2 secondi)**: Invia una richiesta di spegnimento sicuro via I²C.
+   - **Pressione prolungata (5 secondi)**: Forza uno spegnimento immediato (spegnimento forzato).
+   - **Personalizzabile**: Le azioni di pressione singola e doppia possono essere riconfigurate via software.
 
-8. **Borne pour bouton d'alimentation externe (ZH1.5 2P)**
+8. **Terminale per pulsante di accensione esterno (ZH1.5 2P)**
 
-   - Permet la connexion d'un bouton d'alimentation physique externe.
+   - Consente il collegamento di un pulsante di accensione fisico esterno.
 
-9. **Connecteur pour bouton d'alimentation externe (2.54mm)**
+9. **Connettore per pulsante di accensione esterno (2.54mm)**
 
-   - Une option de connecteur soudable alternative pour la connexion d'un bouton d'alimentation externe.
+   - Un'opzione alternativa saldabile per il collegamento di un pulsante di accensione esterno.
 
-10. **LED indicatrices de batterie**
+10. **LED indicatori batteria**
 
-    - Affichent la capacité restante de la batterie et l'état de charge.
-    - Remarque : Même lorsque le système est éteint, les LED restent actives pendant la charge jusqu'à ce que la batterie soit complètement chargée.
+    - Visualizzano la capacità residua della batteria e lo stato di carica.
+    - Nota: Anche quando il sistema è spento, i LED rimangono attivi durante la carica fino al completamento.
 
-11. **Interface I²C (SH1.0 4P)**
+11. **Interfaccia I²C (SH1.0 4P)**
 
-    - Compatible avec les écosystèmes **Qwiic** et **STEMMA QT**.
-    - Utilisée pour la communication avec le microcontrôleur intégré et les périphériques externes.
+    - Compatibile con gli ecosistemi **Qwiic** e **STEMMA QT**.
+    - Utilizzata per la comunicazione con il microcontrollore integrato e le periferiche esterne.
 
-12. **Interface I²C (connecteur 1x4P 2.54mm)**
+12. **Interfaccia I²C (connettore 1x4P 2.54mm)**
 
-    - Sortie I²C alternative avec **sortie d'alimentation 3V3**, configurable comme toujours active ou commutée.
+    - Breakout I²C alternativo con **uscita alimentazione 3V3**, configurabile come sempre attiva o commutata.
 
-13. **Cavalier de sélection d'alimentation I²C**
+13. **Ponticello selezione alimentazione I²C**
 
-    - **PERM** : L'alimentation 3V3 est toujours active lorsque l'alimentation externe est connectée.
-    - **SHUT (par défaut)** : L'alimentation 3V3 se coupe automatiquement lorsque le système s'arrête.
+    - **PERM**: L'alimentazione 3V3 è sempre attiva quando l'alimentazione esterna è collegata.
+    - **SHUT (predefinito)**: L'alimentazione 3V3 si scollega automaticamente quando il sistema si spegne.
 
-14. **Port de sortie USB Type-A**
+14. **Porta uscita USB Type-A**
 
-    - Fournit une **sortie 5V régulée**, adaptée pour alimenter des périphériques ou d'autres appareils.
-    - Lors de l'alimentation d'un Raspberry Pi, vous pouvez rencontrer un avertissement d'alimentation non-PD, qui peut être ignoré en toute sécurité.
+    - Fornisce **uscita 5V regolata**, adatta per alimentare periferiche o altri dispositivi.
+    - Quando si alimenta un Raspberry Pi, potrebbe apparire un avviso di alimentazione non-PD, che può essere ignorato in sicurezza.
 
-15. **Connecteur de sortie d'alimentation 2x4P 2.54mm**
+15. **Connettore uscita alimentazione 2x4P 2.54mm**
 
-    - Sortie 5V supplémentaire pour les modules externes ou les SBC.
+    - Uscita 5V aggiuntiva per moduli esterni o SBC.
 
-16. **Connecteur GPIO Raspberry Pi (connecteur femelle)**
+16. **Connettore GPIO Raspberry Pi (connettore femmina)**
 
-    - Interface directe pour le Raspberry Pi, transmettant l'alimentation, l'I²C et d'autres signaux.
-    - Entièrement compatible avec le brochage du Raspberry Pi.
+    - Interfaccia diretta per Raspberry Pi, che trasmette alimentazione, I²C e altri segnali.
+    - Completamente compatibile con la piedinatura Raspberry Pi.
 
-17. **Connecteur GPIO Raspberry Pi (sortie sur broches mâles)**
+17. **Connettore GPIO Raspberry Pi (breakout pin maschi)**
 
-    - Expose les broches GPIO du Raspberry Pi pour l'empilage de HAT ou l'extension externe.
-    - **Remarque** : Les lignes I²C et la broche 26 sont déjà occupées par les fonctions du PiPower5.
-    - Vous pouvez également connecter un câble d'extension GPIO (depuis le bas du panneau latéral) pour expérimenter sur une platine d'essai.
+    - Espone i pin GPIO di Raspberry Pi per l'impilamento di HAT o espansione esterna.
+    - **Nota**: Le linee I²C e il Pin 26 sono già occupati dalle funzioni di PiPower5.
+    - È anche possibile collegare un cavo di estensione GPIO (dal fondo del pannello laterale) per sperimentare su breadboard.
 
-18. **Connecteur de batterie (XH2.54 3P)**
+18. **Connettore batteria (XH2.54 3P)**
 
-    - Interface de connexion de la batterie.
-    - Ordre des broches (de gauche à droite) : Négatif, Point milieu (entre deux cellules), Positif.
-    - Conçu pour les **batteries Li-ion/LiPo 7.4V (2 cellules)**.
+    - Interfaccia di connessione della batteria.
+    - Ordine dei pin (da sinistra a destra): Negativo, Punto medio (tra due celle), Positivo.
+    - Progettato per **batterie Li-ion/LiPo 7.4V (2 celle)**.
 
-19. **LED d'avertissement de batterie inversée**
+19. **LED di avviso batteria invertita**
 
-    - Deux LED rouges s'allument si la batterie est connectée en polarité inversée, avertissant d'une installation incorrecte.
+    - Due LED rossi si accendono se la batteria è collegata con polarità invertita, avvertendo di un'installazione errata.
 
-20. **Bornes à vis pour batterie et alimentation d'entrée**
+20. **Morsetti a vite per batteria e alimentazione in ingresso**
 
-    - Méthode de connexion alternative pour les batteries externes et les sources d'alimentation.
-    - Prend en charge une **entrée externe 5V–15V** (recommandé : >9V).
-    - Prise en charge batterie : **2 x 3.7V Li-ion / LiPo uniquement** (NON compatible avec les batteries LiFePO₄).
+    - Metodo di connessione alternativo per batterie esterne e fonti di alimentazione.
+    - Supporta **ingresso esterno 5V–15V** (consigliato: >9V).
+    - Supporto batteria: **solo 2 x 3.7V Li-ion / LiPo** (NON compatibile con batterie LiFePO₄).
 
 
-Tableau des spécifications
------------------------------
+Tabella delle specifiche
+-------------------------
 
 .. list-table::
    :header-rows: 1
    :widths: 20 20 20 20 20
 
-   * - Paramètre
-     - Minimum
-     - Typique
-     - Maximum
-     - Unité
-   * - Courant d'arrêt de la batterie
+   * - Parametro
+     - Minimo
+     - Tipico
+     - Massimo
+     - Unità
+   * - Corrente di spegnimento batteria
      - \-
      - 60
      - \-
      - µA
-   * - Courant de repos de la batterie
+   * - Corrente di riposo batteria
      - \-
      - 25
      - \-
      - mA
-   * - Tension de sortie DC-DC
+   * - Tensione uscita DC-DC
      - 5,1957
      - 5,2855
      - 5,3766
      - V
-   * - Protection contre la surchauffe DC-DC
+   * - Protezione sovratemperatura DC-DC
      - \-
      - 150
      - \-
      - ℃
-   * - Puissance de charge de la batterie
+   * - Potenza di carica batteria
      - \-
      - \-
      - 20
      - W
-   * - Protection contre la surchauffe de charge
+   * - Protezione sovratemperatura carica
      - \-
      - 125
      - \-
      - ℃
-   * - Résistance d'équilibrage
+   * - Resistore di bilanciamento
      - \-
      - 60
      - \-
      - Ω
-   * - Tension d'activation d'équilibrage
+   * - Tensione attivazione bilanciamento
      - \-
      - 4,2
      - \-
@@ -168,8 +168,8 @@ Tableau des spécifications
 
 .. _power_input:
 
-Entrée d'alimentation
-----------------------
+Ingresso alimentazione
+-----------------------
 
 .. image:: img/power_input.png
   :width: 50%
@@ -179,9 +179,9 @@ Entrée d'alimentation
 
    <br/>
 
-Lors de l'utilisation du Raspberry Pi 5, il est recommandé d'utiliser une alimentation USB PD ou une alimentation CC avec une sortie minimale de 32W. Sinon, pendant les périodes de forte consommation d'énergie, la batterie peut ne pas se charger correctement ou même épuiser sa charge en raison d'une alimentation insuffisante.
+Quando si utilizza Raspberry Pi 5, si consiglia di utilizzare un alimentatore USB PD o un alimentatore CC con un'uscita minima di 32W. In caso contrario, durante i periodi di elevato consumo energetico, la batteria potrebbe non caricarsi correttamente o addirittura scaricarsi a causa di un'alimentazione insufficiente.
 
-Vous pouvez surveiller l'indicateur **LED BAT** pour vérifier l'état de la batterie. Lorsque l'alimentation externe est suffisante, la LED BAT doit rester éteinte, indiquant que la batterie est en mode veille et ne se décharge pas. Si la LED BAT s'allume, cela signifie que la batterie alimente l'appareil, probablement en raison d'une alimentation externe insuffisante ou déconnectée. Une illumination prolongée de la LED BAT peut entraîner une décharge excessive de la batterie, l'empêchant de fonctionner comme une alimentation sans interruption (UPS) pendant les coupures de courant. Assurez-vous d'utiliser une source d'alimentation qui répond aux spécifications requises pour éviter de tels scénarios.
+È possibile monitorare l'indicatore **LED BAT** per verificare lo stato della batteria. Quando l'alimentazione esterna è sufficiente, il LED BAT dovrebbe rimanere spento, indicando che la batteria è in modalità standby e non si sta scaricando. Se il LED BAT si accende, significa che la batteria sta alimentando il dispositivo, probabilmente a causa di un'alimentazione esterna insufficiente o scollegata. Un'illuminazione prolungata del LED BAT può portare a una scarica eccessiva della batteria, impedendole di funzionare come gruppo di continuità (UPS) durante le interruzioni di corrente. Assicurarsi di utilizzare una fonte di alimentazione che soddisfi le specifiche richieste per evitare tali scenari.
 
 
 
@@ -195,35 +195,35 @@ Vous pouvez surveiller l'indicateur **LED BAT** pour vérifier l'état de la bat
    <br/>
 
 
-**Chemin d'alimentation**
+**Percorso di alimentazione**
 
-Le PiPower 5 intègre la gestion du chemin d'alimentation, permettant la commutation automatique de la source d'alimentation pour minimiser l'usure de la batterie et assurer une alimentation ininterrompue. Les fonctionnalités clés incluent :
+PiPower 5 integra la gestione del percorso di alimentazione, consentendo la commutazione automatica della fonte di alimentazione per ridurre al minimo l'usura della batteria e garantire un'alimentazione ininterrotta. Le funzionalità chiave includono:
 
-- Lorsqu'une source d'alimentation externe est connectée, la sortie 5V est fournie via un circuit abaisseur à partir de la source externe. La sortie peut être désactivée à l'aide d'un interrupteur. Si les conditions le permettent, la source d'alimentation externe peut également charger la batterie simultanément (voir la section « Courant de charge » pour plus de détails).
-- Lors de la déconnexion de la source d'alimentation externe, le système passe immédiatement à l'alimentation par batterie via un circuit abaisseur. Cette transition transparente garantit que le système continue de fonctionner normalement pendant les interruptions d'alimentation.
+- Quando è collegata una fonte di alimentazione esterna, l'uscita 5V viene fornita tramite un circuito step-down dalla fonte esterna. L'uscita può essere disattivata tramite un interruttore. Se le condizioni lo consentono, la fonte esterna può anche caricare contemporaneamente la batteria (vedere la sezione "Corrente di carica" per i dettagli).
+- Alla disconnessione della fonte di alimentazione esterna, il sistema passa immediatamente all'alimentazione a batteria tramite un circuito step-down. Questa transizione senza interruzioni garantisce che il sistema continui a funzionare normalmente durante le interruzioni di corrente.
 
-Vous pouvez vérifier l'indicateur LED BAT pour confirmer si la batterie alimente actuellement le système.
-
-
+È possibile controllare l'indicatore LED BAT per verificare se la batteria sta attualmente alimentando il sistema.
 
 
-**Courant de charge**
 
-Le courant de charge est soumis à deux types de limitations :
+
+**Corrente di carica**
+
+La corrente di carica è soggetta a due tipi di limitazioni:
 
 .. note::
 
-   Le courant de charge est déterminé à la fois par la « Limitation de charge par alimentation via bornes à vis » et la « Limitation de sélection de puissance de charge » et est contraint par la plus petite valeur des deux.
+   La corrente di carica è determinata sia dalla "Limitazione di carica da alimentazione a morsetti" che dalla "Limitazione di selezione potenza di carica" ed è vincolata dal valore più piccolo tra i due.
 
-1. Limitation de charge par alimentation via bornes à vis
+1. Limitazione di carica da alimentazione a morsetti
 
-   Lors de l'alimentation via l'entrée d'alimentation par bornes à vis, le courant de charge est automatiquement ajusté en fonction de la tension d'entrée, comme indiqué ci-dessous :
+   Quando si alimenta tramite ingresso a morsetti, la corrente di carica viene regolata automaticamente in base alla tensione di ingresso, come mostrato di seguito:
 
    .. list-table::
       :header-rows: 1
 
-      * - Tension d'entrée (VBUS)
-        - Courant de charge maximal
+      * - Tensione ingresso (VBUS)
+        - Corrente di carica massima
       * - 4,5 < VBUS ≤ 6,5V
         - 3A
       * - 6,5 < VBUS ≤ 9,5V
@@ -233,9 +233,9 @@ Le courant de charge est soumis à deux types de limitations :
       * - 13,5 < VBUS ≤ 16,5V
         - 2A
 
-2. Limitation de sélection de puissance de charge
+2. Limitazione di selezione potenza di carica
 
-   Un commutateur DIP à 2 positions sur la carte permet la sélection de différents niveaux de puissance de charge. L'allocation correspondante de la puissance de charge et de la puissance de sortie pour chaque réglage est la suivante :
+   Un DIP switch a 2 posizioni sulla scheda consente la selezione di diversi livelli di potenza di carica. L'allocazione corrispondente di potenza di carica e potenza di uscita per ogni impostazione è la seguente:
 
    .. image:: img/power_selector.png
      :width: 50%
@@ -244,9 +244,9 @@ Le courant de charge est soumis à deux types de limitations :
    .. list-table::
       :header-rows: 1
 
-      * - Charge Sel 1
-        - Charge Sel 2
-        - Puissance de charge
+      * - Carica Sel 1
+        - Carica Sel 2
+        - Potenza di carica
       * - 0
         - 0
         - 5W
@@ -261,49 +261,49 @@ Le courant de charge est soumis à deux types de limitations :
         - 20W
 
 
-**Comment choisir la puissance de charge**
+**Come scegliere la potenza di carica**
 
-La formule est :
+La formula è:
 
-*Capacité d'alimentation = Puissance requise du Raspberry Pi + Puissance de charge*
+*Capacità alimentatore = Potenza richiesta Raspberry Pi + Potenza di carica*
 
-Nous recommandons d'estimer la puissance requise du Raspberry Pi à **20W à 25W**.
+Si consiglia di stimare il fabbisogno energetico del Raspberry Pi a **20W - 25W**.
 
-- Si vous utilisez une **alimentation 30W**, réglez la puissance de charge sur **10W** ou **5W**.
-- Si vous utilisez une **alimentation 45W**, vous pouvez régler en toute sécurité la puissance de charge sur **20W**.
+- Se si utilizza un **alimentatore da 30W**, impostare la potenza di carica su **10W** o **5W**.
+- Se si utilizza un **alimentatore da 45W**, è possibile impostare in sicurezza la potenza di carica su **20W**.
 
-Si vous connaissez bien les besoins en puissance de votre Raspberry Pi, vous pouvez définir une puissance de charge plus élevée tant que vous réservez une marge suffisante pour les pics de puissance occasionnels.
+Se si conoscono bene le esigenze energetiche del proprio Raspberry Pi, è possibile impostare una potenza di carica più elevata purché si mantenga un margine sufficiente per i picchi di potenza occasionali.
 
-⚠️ Attention : une puissance insuffisante peut entraîner l'arrêt inattendu du Raspberry Pi.
-
-
+⚠️ Attenzione: una potenza insufficiente può causare lo spegnimento imprevisto del Raspberry Pi.
 
 
-**Processus de charge**
 
-- Lorsque la tension de la batterie ``VBAT <= 2,5V``, le système effectue une charge d'entretien à faible courant, environ 50 mA.
-- Lorsque ``2,5V < VBAT <= VTRKL``, la charge d'entretien se poursuit et le courant de charge de la batterie augmente à environ 200 mA.
-- Lorsque ``VTRKL < VBAT < VCV``, le système passe en charge à courant constant, fournissant un courant constant prédéfini à la batterie.
-- Une fois ``VBAT = VCV`` et que la tension de la batterie approche du niveau de charge complète, le courant de charge diminue progressivement, passant en charge à tension constante.
-- Pendant la charge à tension constante, lorsque le courant de charge descend en dessous de ``ISTOP`` et que la tension de la batterie est proche du seuil de tension constante, la charge s'arrête et la batterie entre dans un état complètement chargé.
-- Dans l'état complètement chargé, le système surveille en continu la tension de la batterie. Si la tension descend en dessous de ``VRCH``, la charge reprend automatiquement.
 
-**Fonctionnalités de protection**
+**Processo di carica**
 
-Le PiPower 5 offre des fonctionnalités de protection complètes, y compris la protection contre les sous-tensions et surtensions d'entrée, ainsi que la protection contre la surchauffe pour la puce de charge et le convertisseur DC-DC. Ces fonctionnalités assurent un fonctionnement stable et fiable du système.
+- Quando la tensione della batteria ``VBAT <= 2,5V``, il sistema esegue la carica di mantenimento a bassa corrente, circa 50 mA.
+- Quando ``2,5V < VBAT <= VTRKL``, la carica di mantenimento continua e la corrente di carica della batteria aumenta a circa 200 mA.
+- Quando ``VTRKL < VBAT < VCV``, il sistema passa alla carica a corrente costante, fornendo una corrente costante preimpostata alla batteria.
+- Una volta ``VBAT = VCV`` e la tensione della batteria si avvicina al livello di piena carica, la corrente di carica diminuisce gradualmente, passando alla carica a tensione costante.
+- Durante la carica a tensione costante, quando la corrente di carica scende al di sotto di ``ISTOP`` e la tensione della batteria è vicina alla soglia di tensione costante, la carica si interrompe e la batteria entra in uno stato di piena carica.
+- Nello stato di piena carica, il sistema monitora continuamente la tensione della batteria. Se la tensione scende al di sotto di ``VRCH``, la carica riprende automaticamente.
 
-**Équilibrage de charge**
+**Funzionalità di protezione**
 
-La puce d'équilibrage de charge intégrée active une résistance de 60Ω pour décharger la batterie à faible courant lorsqu'elle détecte que la tension d'une cellule unique dépasse 4,2V. Cette fonctionnalité aide à maintenir l'équilibre de tension entre les cellules.
+PiPower 5 offre funzionalità di protezione complete, tra cui protezione da sottotensione e sovratensione in ingresso, nonché protezione da surriscaldamento per il chip di carica e il convertitore DC-DC. Queste funzionalità garantiscono un funzionamento stabile e affidabile del sistema.
 
-**Protection de température**
+**Bilanciamento di carica**
 
-Le processus de charge est automatiquement interrompu lorsque la température interne de la puce de charge dépasse 125°C. De même, la puce DC-DC désactive la sortie lorsque sa température interne dépasse 150°C.
+Il chip di bilanciamento di carica integrato attiva un resistore da 60Ω per scaricare la batteria a bassa corrente quando rileva che la tensione di una singola cella supera 4,2V. Questa funzionalità aiuta a mantenere l'equilibrio di tensione tra le celle.
+
+**Protezione temperatura**
+
+Il processo di carica viene automaticamente interrotto quando la temperatura interna del chip di carica supera 125°C. Allo stesso modo, il chip DC-DC disabilita l'uscita quando la sua temperatura interna supera 150°C.
 
 .. _power_button:
 
-Bouton d'alimentation
------------------------
+Pulsante di accensione
+------------------------
 
 
 
@@ -317,23 +317,23 @@ Bouton d'alimentation
 
    <br/>
 
-Bouton d'alimentation intégré pour contrôler l'alimentation de la carte :
+Pulsante di accensione integrato per controllare l'alimentazione della scheda:
 
-* **Appui simple** : Active la sortie.
-* **Maintenir pendant 2 secondes jusqu'à ce que les deux LED centrales de batterie s'allument, puis relâcher** : Envoie une demande d'arrêt via I2C.
-* **Maintenir plus de 5 secondes** : Coupe directement la sortie.
+* **Pressione singola**: Attiva l'uscita.
+* **Tenere premuto per 2 secondi fino all'accensione dei due LED centrali della batteria, quindi rilasciare**: Invia una richiesta di spegnimento via I2C.
+* **Tenere premuto per più di 5 secondi**: Spegne direttamente l'uscita.
 
 
 .. _battery_indicators:
 
-Indicateurs de batterie
---------------------------------
+Indicatori batteria
+--------------------
 
-Quatre LED intégrées indiquent le niveau de la batterie et l'état de charge.
+Quattro LED integrati indicano il livello della batteria e lo stato di carica.
 
 .. note::
 
-   Si l'appareil est en charge pendant l'arrêt, le voyant indicateur continuera d'afficher l'état de charge jusqu'à ce que la charge soit terminée.
+   Se il dispositivo è in carica durante lo spegnimento, la spia indicatrice continuerà a visualizzare lo stato di carica fino al completamento.
 
 
 
@@ -346,20 +346,20 @@ Quatre LED intégrées indiquent le niveau de la batterie et l'état de charge.
 
    <br/>
 
-* **4 LED allumées** : Batterie > 80%
-* **3 LED allumées** : 60% < Batterie < 80%
-* **2 LED allumées** : 40% < Batterie < 60%
-* **1 LED allumée** : 20% < Batterie < 40%
-* **Première LED clignotante** : Batterie < 20%
-* **Les LED s'allument séquentiellement en cycle** : Charge en cours
-* **Deux LED centrales clignotantes** : En attente du signal d'arrêt
-* **Toutes les LED éteintes** : Hors tension ou en mode veille
+* **4 LED accesi**: Batteria > 80%
+* **3 LED accesi**: 60% < Batteria < 80%
+* **2 LED accesi**: 40% < Batteria < 60%
+* **1 LED acceso**: 20% < Batteria < 40%
+* **Primo LED lampeggiante**: Batteria < 20%
+* **I LED si accendono sequenzialmente in ciclo**: Ricarica in corso
+* **Due LED centrali lampeggianti**: In attesa del segnale di spegnimento
+* **Tutti i LED spenti**: Dispositivo spento o in modalità sospensione
 
 .. _battery_connector:
 
-Connecteur de batterie
-------------------------
-Connecteur de batterie VH3.96 2P et connecteur de batterie à bornes à vis.
+Connettore batteria
+--------------------
+Connettore batteria VH3.96 2P e connettore batteria a morsetti.
 
 .. image:: img/battery_pin.png
   :width: 50%
@@ -371,8 +371,8 @@ Connecteur de batterie VH3.96 2P et connecteur de batterie à bornes à vis.
 
 .. _cap_btn:
 
-Borne et connecteur pour bouton d'alimentation externe
--------------------------------------------------------
+Terminale e connettore per pulsante di accensione esterno
+----------------------------------------------------------
 
 .. image:: img/btn_jumper.png
   :width: 50%
@@ -382,12 +382,12 @@ Borne et connecteur pour bouton d'alimentation externe
 
    <br/>
 
-Cette borne ou ce connecteur est conçu pour connecter un bouton d'alimentation externe. Connectez un interrupteur momentané, tel qu'un bouton tactile ou un bouton métallique de style vintage, aux broches du cavalier. Les deux fils du bouton peuvent être connectés aux broches du cavalier dans n'importe quel sens, car la polarité n'est pas requise. Une fois connecté, vous pouvez utiliser le bouton externe comme le bouton d'alimentation intégré.
+Questo terminale o connettore è progettato per collegare un pulsante di accensione esterno. Collegare un interruttore momentaneo, come un pulsante tattile o un pulsante metallico in stile vintage, ai pin del ponticello. I due fili del pulsante possono essere collegati ai pin del ponticello in qualsiasi direzione, poiché la polarità non è richiesta. Una volta collegato, è possibile utilizzare il pulsante esterno proprio come il pulsante di accensione integrato.
 
 .. _cap_sdsig:
 
-Cavalier SDSIG
-----------------
+Ponticello SDSIG
+------------------
 
 
 
@@ -401,17 +401,17 @@ Cavalier SDSIG
 
    <br/>
 
-Fournit la détection d'arrêt pour le Raspberry Pi.
+Fornisce il rilevamento dello spegnimento per Raspberry Pi.
 
-* Lorsqu'il est relié à PI3V3, il fonctionne avec les Raspberry Pi 4 et Pi 5.
-* Lorsqu'il est court-circuité à la broche 26, il prend en charge les Pi 3 et Pi Zero.
+* Quando collegato a PI3V3, funziona con Raspberry Pi 4 e Pi 5.
+* Quando cortocircuitato al Pin 26, supporta Pi 3 e Pi Zero.
 
-Après une configuration appropriée, le PiPower5 coupera automatiquement l'alimentation une fois le Raspberry Pi arrêté.
+Dopo una corretta configurazione, PiPower5 scollegherà automaticamente l'alimentazione una volta spento il Raspberry Pi.
 
 .. _cap_onoff:
 
-Cavalier Default ON/OFF
--------------------------
+Ponticello Default ON/OFF
+---------------------------
 
 
 
@@ -425,19 +425,19 @@ Cavalier Default ON/OFF
 
    <br/>
 
-Ce cavalier est utilisé pour sélectionner si la sortie d'alimentation USB est activée par défaut après un arrêt. Utilisez le capuchon de cavalier pour connecter les broches étiquetées ON ou OFF pour faire la sélection.
+Questo ponticello viene utilizzato per selezionare se l'uscita di alimentazione USB è abilitata per impostazione predefinita dopo uno spegnimento. Utilizzare il cappuccio del ponticello per collegare i pin etichettati ON o OFF per effettuare la selezione.
 
-* Si le capuchon de cavalier est positionné à gauche et connecté à OFF, l'insertion de l'alimentation USB après un arrêt n'activera pas la sortie.
-* Si le capuchon de cavalier est positionné à droite et connecté à ON, l'insertion de l'alimentation USB après un arrêt activera la sortie.
+* Se il cappuccio del ponticello è posizionato a sinistra e collegato a OFF, l'inserimento dell'alimentazione USB dopo uno spegnimento non attiverà l'uscita.
+* Se il cappuccio del ponticello è posizionato a destra e collegato a ON, l'inserimento dell'alimentazione USB dopo uno spegnimento attiverà l'uscita.
 
-Cette fonctionnalité est généralement utilisée pour les appareils qui doivent démarrer automatiquement, tels que les serveurs personnels. Par exemple, en cas de panne de courant, le PiPower 5 prendra le relais de l'alimentation du Raspberry Pi, assurant un arrêt sécurisé. Une fois l'alimentation rétablie, le PiPower 5 allume automatiquement le Raspberry Pi, éliminant le besoin d'intervention manuelle.
+Questa funzionalità è tipicamente utilizzata per dispositivi che devono avviarsi automaticamente, come i server personali. Ad esempio, in caso di interruzione di corrente, PiPower 5 prenderà il controllo dell'alimentazione del Raspberry Pi, garantendo uno spegnimento sicuro. Una volta ripristinata l'alimentazione, PiPower 5 accende automaticamente il Raspberry Pi, eliminando la necessità di intervento manuale.
 
 .. _pin_header:
 
-Connecteurs à broches pour RPi
--------------------------------
+Connettori pin per RPi
+-----------------------
 
-Le connecteur à broches est conçu pour une connexion directe à un Raspberry Pi, incluant à la fois la communication I2C et l'alimentation électrique.
+Il connettore pin è progettato per la connessione diretta a un Raspberry Pi, includendo sia la comunicazione I2C che l'alimentazione.
 
 
 
@@ -450,14 +450,14 @@ Le connecteur à broches est conçu pour une connexion directe à un Raspberry P
 
    <br/>
 
-Le connecteur prend en charge l'empilage de HAT supplémentaires. Cependant, notez que les broches I2C et la broche 26 sont déjà connectées et peuvent nécessiter une gestion attentive pour éviter les conflits.
+Il connettore supporta l'impilamento di HAT aggiuntivi. Tuttavia, notare che i pin I2C e il pin 26 sono già collegati e potrebbero richiedere una gestione attenta per evitare conflitti.
 
 .. list-table::
    :widths: 15 15
    :header-rows: 1
 
    * - Raspberry Pi
-     - MCU intégré
+     - MCU integrato
    * - SDA
      - SDA
    * - SCL
@@ -469,8 +469,8 @@ Le connecteur prend en charge l'empilage de HAT supplémentaires. Cependant, not
    * - ID_SC
      - ID_EEPROM SCL
 
-Communication I2C
--------------------------------
+Comunicazione I2C
+------------------
 
 
 
@@ -485,9 +485,9 @@ Communication I2C
 
    <br/>
 
-Adresse I2C : 0x5C
+Indirizzo I2C: 0x5C
 
-Le microcontrôleur intégré collecte divers signaux de la carte et les stocke dans des registres. Ces signaux sont accessibles via I2C en utilisant les tables de registres suivantes.
+Il microcontrollore integrato raccoglie vari segnali dalla scheda e li memorizza nei registri. Questi segnali sono accessibili via I2C utilizzando le seguenti tabelle dei registri.
 
 .. raw:: html
 
@@ -522,20 +522,20 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
    </style>
 
    <table class="custom-register-table">
-       <caption>Table des registres</caption>
+       <caption>Tabella dei registri</caption>
        <thead>
            <tr>
-               <th>Nom</th>
-               <th>Adresse</th>
-               <th>Longueur des données</th>
-               <th>Type de données</th>
-               <th>Unité</th>
-               <th>Description</th>
+               <th>Nome</th>
+               <th>Indirizzo</th>
+               <th>Lunghezza dati</th>
+               <th>Tipo dati</th>
+               <th>Unità</th>
+               <th>Descrizione</th>
            </tr>
        </thead>
        <tbody>
            <tr>
-               <td>Tension d'entrée</td>
+               <td>Tensione ingresso</td>
                <td>0</td>
                <td>2</td>
                <td>u16</td>
@@ -543,7 +543,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Courant d'entrée</td>
+               <td>Corrente ingresso</td>
                <td>2</td>
                <td>2</td>
                <td>u16</td>
@@ -551,7 +551,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Tension de sortie</td>
+               <td>Tensione uscita</td>
                <td>4</td>
                <td>2</td>
                <td>u16</td>
@@ -559,7 +559,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Courant de sortie</td>
+               <td>Corrente uscita</td>
                <td>6</td>
                <td>2</td>
                <td>u16</td>
@@ -567,7 +567,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Tension de la batterie</td>
+               <td>Tensione batteria</td>
                <td>8</td>
                <td>2</td>
                <td>u16</td>
@@ -575,7 +575,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Courant de la batterie</td>
+               <td>Corrente batteria</td>
                <td>10</td>
                <td>2</td>
                <td>i16</td>
@@ -583,7 +583,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Pourcentage de la batterie</td>
+               <td>Percentuale batteria</td>
                <td>12</td>
                <td>1</td>
                <td>u8</td>
@@ -591,7 +591,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Capacité de la batterie</td>
+               <td>Capacità batteria</td>
                <td>13</td>
                <td>2</td>
                <td>u16</td>
@@ -599,23 +599,23 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Source d'alimentation</td>
+               <td>Fonte alimentazione</td>
                <td>15</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0 : La batterie ne fournit pas d'alimentation.<br> 1 : La batterie fournit l'alimentation.</td>
+               <td>0: Batteria non in uso.<br> 1: Batteria in uso.</td>
            </tr>
            <tr>
-               <td>État de connexion USB</td>
+               <td>Stato connessione USB</td>
                <td>16</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0 : USB débranché.<br> 1 : USB branché.</td>
+               <td>0: USB scollegato.<br> 1: USB collegato.</td>
            </tr>
            <tr>
-               <td>RÉSERVÉ</td>
+               <td>RISERVATO</td>
                <td>17</td>
                <td>1</td>
                <td>-</td>
@@ -623,31 +623,31 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>État de charge</td>
+               <td>Stato carica</td>
                <td>18</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0 : Pas en charge.<br> 1 : En charge.</td>
+               <td>0: Non in carica.<br> 1: In carica.</td>
            </tr>
            <tr>
-               <td>Puissance du ventilateur</td>
+               <td>Potenza ventola</td>
                <td>19</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Niveau de puissance du ventilateur (0–100).</td>
+               <td>Livello potenza ventola (0–100).</td>
            </tr>
            <tr>
-               <td>Demande d'arrêt</td>
+               <td>Richiesta spegnimento</td>
                <td>20</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>1 : Déclenché par batterie faible.<br>2 : Déclenché par l'appui sur le bouton d'alimentation.</td>
+               <td>1: Attivato da batteria scarica.<br>2: Attivato dalla pressione del pulsante.</td>
            </tr>
            <tr>
-               <td>Version du firmware (Majeure)</td>
+               <td>Versione firmware (Maggiore)</td>
                <td>128</td>
                <td>1</td>
                <td>u8</td>
@@ -655,7 +655,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Version du firmware (Mineure)</td>
+               <td>Versione firmware (Minore)</td>
                <td>129</td>
                <td>1</td>
                <td>u8</td>
@@ -663,7 +663,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Version du firmware (Correctif)</td>
+               <td>Versione firmware (Patch)</td>
                <td>130</td>
                <td>1</td>
                <td>u8</td>
@@ -671,15 +671,15 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Code de réinitialisation</td>
+               <td>Codice reset</td>
                <td>131</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Code de raison de réinitialisation du MCU.</td>
+               <td>Codice motivo reset MCU.</td>
            </tr>
            <tr>
-               <td>RTC Année</td>
+               <td>RTC Anno</td>
                <td>132</td>
                <td>1</td>
                <td>u8</td>
@@ -687,7 +687,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Mois</td>
+               <td>RTC Mese</td>
                <td>133</td>
                <td>1</td>
                <td>u8</td>
@@ -695,7 +695,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Jour</td>
+               <td>RTC Giorno</td>
                <td>134</td>
                <td>1</td>
                <td>u8</td>
@@ -703,7 +703,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Heure</td>
+               <td>RTC Ora</td>
                <td>135</td>
                <td>1</td>
                <td>u8</td>
@@ -711,7 +711,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Minute</td>
+               <td>RTC Minuto</td>
                <td>136</td>
                <td>1</td>
                <td>u8</td>
@@ -719,7 +719,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Seconde</td>
+               <td>RTC Secondo</td>
                <td>137</td>
                <td>1</td>
                <td>u8</td>
@@ -727,31 +727,31 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Sous-seconde</td>
+               <td>RTC Sottosecondo</td>
                <td>138</td>
                <td>1</td>
                <td>u8</td>
                <td>1/128 s</td>
-               <td>Sous-seconde RTC (1/128 seconde).</td>
+               <td>Sottosecondo RTC (1/128 secondo).</td>
            </tr>
            <tr>
-               <td>Fonction Always-On</td>
+               <td>Funzione Always-On</td>
                <td>139</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0 : Activé.<br> 1 : Désactivé.</td>
+               <td>0: Abilitato.<br> 1: Disabilitato.</td>
            </tr>
            <tr>
-               <td>ID de la carte</td>
+               <td>ID Scheda</td>
                <td>140</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Identification de la carte : <br> 0 : Pironman U1.<br> 1 : Pironman 4.<br> 2 : PiPower 3.<br>4 : PiPower 5.</td>
+               <td>Identificazione scheda: <br> 0: Pironman U1.<br> 1: Pironman 4.<br> 2: PiPower 3.<br>4: PiPower 5.</td>
            </tr>
            <tr>
-               <td>RÉSERVÉ</td>
+               <td>RISERVATO</td>
                <td>141</td>
                <td>1</td>
                <td>-</td>
@@ -759,7 +759,7 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>RÉSERVÉ</td>
+               <td>RISERVATO</td>
                <td>142</td>
                <td>1</td>
                <td>-</td>
@@ -767,15 +767,15 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
                <td>-</td>
            </tr>
            <tr>
-               <td>Pourcentage d'arrêt</td>
+               <td>Percentuale spegnimento</td>
                <td>143</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Seuil actuel de pourcentage de batterie pour l'arrêt.</td>
+               <td>Soglia percentuale batteria per spegnimento.</td>
            </tr>
            <tr>
-               <td>RÉSERVÉ</td>
+               <td>RISERVATO</td>
                <td>144</td>
                <td>1</td>
                <td>-</td>
@@ -787,105 +787,105 @@ Le microcontrôleur intégré collecte divers signaux de la carte et les stocke 
 
 
    <table class="custom-register-table">
-       <caption>Table des paramètres des registres</caption>
+       <caption>Tabella impostazioni registri</caption>
        <thead>
            <tr>
-               <th>Nom</th>
-               <th>Adresse</th>
-               <th>Longueur des données</th>
-               <th>Type de données</th>
-               <th>Unité</th>
-               <th>Description</th>
+               <th>Nome</th>
+               <th>Indirizzo</th>
+               <th>Lunghezza dati</th>
+               <th>Tipo dati</th>
+               <th>Unità</th>
+               <th>Descrizione</th>
            </tr>
        </thead>
        <tbody>
            <tr>
-               <td>Puissance du ventilateur</td>
+               <td>Potenza ventola</td>
                <td>0</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Définir la vitesse du ventilateur (0–100).</td>
+               <td>Imposta velocità ventola (0–100).</td>
            </tr>
            <tr>
-               <td>RTC Année</td>
+               <td>RTC Anno</td>
                <td>1</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Définir l'année RTC.</td>
+               <td>Imposta anno RTC.</td>
            </tr>
            <tr>
-               <td>RTC Mois</td>
+               <td>RTC Mese</td>
                <td>2</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Définir le mois RTC.</td>
+               <td>Imposta mese RTC.</td>
            </tr>
            <tr>
-               <td>RTC Jour</td>
+               <td>RTC Giorno</td>
                <td>3</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Définir le jour RTC.</td>
+               <td>Imposta giorno RTC.</td>
            </tr>
            <tr>
-               <td>RTC Heure</td>
+               <td>RTC Ora</td>
                <td>4</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Définir l'heure RTC.</td>
+               <td>Imposta ora RTC.</td>
            </tr>
            <tr>
-               <td>RTC Minute</td>
+               <td>RTC Minuto</td>
                <td>5</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Définir la minute RTC.</td>
+               <td>Imposta minuto RTC.</td>
            </tr>
            <tr>
-               <td>RTC Seconde</td>
+               <td>RTC Secondo</td>
                <td>6</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Définir la seconde RTC.</td>
+               <td>Imposta secondo RTC.</td>
            </tr>
            <tr>
-               <td>RTC Sous-seconde</td>
+               <td>RTC Sottosecondo</td>
                <td>7</td>
                <td>1</td>
                <td>u8</td>
                <td>1/128 s</td>
-               <td>Définir la sous-seconde RTC.</td>
+               <td>Imposta sottosecondo RTC.</td>
            </tr>
            <tr>
-               <td>Paramètre RTC</td>
+               <td>Impostazione RTC</td>
                <td>8</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Activer le paramètre RTC : <br> 1 : Activé.</td>
+               <td>Abilita impostazione RTC: <br> 1: Abilitato.</td>
            </tr>
            <tr>
-               <td>Pourcentage d'arrêt</td>
+               <td>Percentuale spegnimento</td>
                <td>9</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Définir le seuil de pourcentage de batterie pour l'arrêt (0–100).</td>
+               <td>Imposta soglia percentuale batteria per spegnimento (0–100).</td>
            </tr>
            <tr>
-               <td>Pourcentage de mise hors tension</td>
+               <td>Percentuale spegnimento forzato</td>
                <td>10</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Définir le seuil de pourcentage de batterie pour la mise hors tension (0–100).</td>
+               <td>Imposta soglia percentuale batteria per spegnimento forzato (0–100).</td>
            </tr>
        </tbody>
    </table>

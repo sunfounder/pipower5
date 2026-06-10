@@ -1,66 +1,66 @@
 .. _pipower5_tool:
 
-Outil PiPower 5
+Strumento PiPower 5
 ===============================
 
-L'outil PiPower 5 est le logiciel compagnon du PiPower 5.
+Lo strumento PiPower 5 è il software companion per PiPower 5.
 
-Il fournit :
+Fornisce:
 
-- Prise en charge de l'arrêt sécurisé
-- Gestion de la batterie et de la charge
-- Surveillance de l'alimentation
-- Accès au tableau de bord Web
-- Notifications d'événements
+- Supporto per lo spegnimento sicuro
+- Gestione della batteria e della ricarica
+- Monitoraggio dell'alimentazione
+- Accesso al pannello di controllo Web
+- Notifiche di eventi
 
-Le PiPower 5 peut envoyer des demandes d'arrêt au Raspberry Pi dans les situations suivantes :
+PiPower 5 può inviare richieste di spegnimento al Raspberry Pi nelle seguenti situazioni:
 
-- Le bouton PiPower est maintenu enfoncé pendant 2 secondes
-- Le niveau de la batterie descend en dessous du pourcentage d'arrêt configuré
+- Il pulsante PiPower viene tenuto premuto per 2 secondi
+- Il livello della batteria scende al di sotto della percentuale di spegnimento configurata
 
-Une fois l'arrêt du Raspberry Pi terminé, le PiPower 5 peut automatiquement couper l'alimentation pour aider à prévenir la corruption de la carte SD et les problèmes de perte d'alimentation inattendue.
+Dopo il completamento dello spegnimento del Raspberry Pi, PiPower 5 può scollegare automaticamente l'alimentazione per prevenire il danneggiamento della scheda SD e problemi di perdita improvvisa di alimentazione.
 
 .. start_install_pipower5
 
-Installer l'outil ``pipower5``
+Installare lo strumento ``pipower5``
 ----------------------------------------------------
 
-Installez l'outil PiPower 5 :
+Installare lo strumento PiPower 5:
 
-1. Cloner le dépôt :
+1. Clonare il repository:
 
    .. code-block:: shell
 
       git clone https://github.com/sunfounder/pipower5
 
-2. Entrer dans le répertoire :
+2. Entrare nella directory:
 
    .. code-block:: shell
 
       cd pipower5
 
-3. Exécuter l'installateur :
+3. Eseguire l'installatore:
 
    .. code-block:: shell
 
       sudo python3 install.py
 
-4. Redémarrer le Raspberry Pi lorsqu'il vous est demandé.
+4. Riavviare il Raspberry Pi quando richiesto.
 
 .. end_install_pipower5
 
-Référence des commandes
+Riferimento dei comandi
 ---------------------------------------
 
-L'outil ``pipower5`` donne accès aux informations d'état et aux options de configuration du PiPower 5.
+Lo strumento ``pipower5`` fornisce accesso alle informazioni di stato e alle opzioni di configurazione di PiPower 5.
 
-Par exemple, la commande suivante affiche l'état actuel du PiPower 5 :
+Ad esempio, il seguente comando visualizza lo stato corrente di PiPower 5:
 
 .. code-block:: shell
 
    pipower5 -a
 
-Exemple de sortie :
+Esempio di output:
 
 .. code-block::
 
@@ -88,9 +88,9 @@ Exemple de sortie :
       default on: on
       shutdown percentage: 10 %
 
-Vous pouvez personnaliser ces paramètres selon vos besoins.
+È possibile personalizzare queste impostazioni in base alle proprie esigenze.
 
-Utilisez ``pipower5`` ou ``pipower5 -h`` pour les instructions.
+Utilizzare ``pipower5`` o ``pipower5 -h`` per le istruzioni.
 
 .. code-block:: text
 
@@ -183,44 +183,44 @@ Utilisez ``pipower5`` ou ``pipower5 -h`` pour les instructions.
 
 .. note::
 
-   Chaque fois que vous modifiez l'état de ``pipower5.service``, vous devez utiliser la commande suivante pour que les modifications de configuration prennent effet.
+   Ogni volta che si modifica lo stato di ``pipower5.service``, è necessario utilizzare il seguente comando per rendere effettive le modifiche di configurazione.
 
    .. code-block:: shell
 
       sudo systemctl restart pipower5.service
 
-   Vérifiez l'état du programme pipower5 à l'aide de l'outil systemctl.
+   Verificare lo stato del programma pipower5 utilizzando lo strumento systemctl.
 
    .. code-block:: shell
 
       sudo systemctl status pipower5.service
 
-   Alternativement, inspectez les fichiers journaux générés par le programme.
+   In alternativa, ispezionare i file di log generati dal programma.
 
    .. code-block:: shell
 
       cat /opt/pipower5/log
 
-Tableau de bord Web
+Pannello di controllo Web
 ----------------------------------------------------
 
-L'outil PiPower 5 inclut un tableau de bord Web intégré pour la surveillance et la configuration.
+Lo strumento PiPower 5 include un pannello di controllo Web integrato per il monitoraggio e la configurazione.
 
-Accédez au tableau de bord depuis votre navigateur :
+Accedere al pannello di controllo dal browser:
 
 .. code-block:: text
 
-   http://<adresse-ip-raspberry-pi>:34001
+   http://<indirizzo-ip-raspberry-pi>:34001
 
-Les fonctionnalités du tableau de bord incluent :
+Le funzionalità del pannello includono:
 
-- Surveillance du pourcentage de la batterie
-- Surveillance de l'état de charge
-- Surveillance de la tension d'entrée et de sortie
-- Surveillance du courant
-- Configuration du pourcentage d'arrêt
-- Gestion des notifications
-- Informations sur l'appareil Raspberry Pi
+- Monitoraggio della percentuale della batteria
+- Monitoraggio dello stato di carica
+- Monitoraggio della tensione di ingresso e uscita
+- Monitoraggio della corrente
+- Configurazione della percentuale di spegnimento
+- Gestione delle notifiche
+- Informazioni sul dispositivo Raspberry Pi
 
 .. image:: img/web_dashboard.png
    :width: 100%
@@ -230,60 +230,60 @@ Les fonctionnalités du tableau de bord incluent :
    :width: 100%
    :align: center
 
-Vous pouvez également configurer le pourcentage d'arrêt directement depuis le tableau de bord :
+È anche possibile configurare la percentuale di spegnimento direttamente dal pannello di controllo:
 
 .. image:: img/web_dashboard_3.png
    :width: 100%
    :align: center
 
-Si vous n'avez pas besoin du tableau de bord, supprimez-le avec :
+Se non si necessita del pannello di controllo, rimuoverlo con:
 
 .. code-block:: shell
 
    pipower5 --remove-dashboard
 
-Arrêt sécurisé
+Spegnimento sicuro
 ----------------------------------------------------
 
-Le PiPower 5 prend en charge la protection par arrêt sécurisé automatique pour les systèmes Raspberry Pi.
+PiPower 5 supporta la protezione automatica con spegnimento sicuro per i sistemi Raspberry Pi.
 
-Flux de travail d'arrêt :
+Flusso di lavoro di spegnimento:
 
 .. code-block:: text
 
-   Arrêt déclenché
-   -> Le Raspberry Pi effectue un arrêt sécurisé
-   -> Le PiPower 5 détecte la fin de l'arrêt
-   -> Le PiPower 5 coupe automatiquement l'alimentation
+   Spegnimento attivato
+   -> Il Raspberry Pi esegue uno spegnimento sicuro
+   -> PiPower 5 rileva il completamento dello spegnimento
+   -> PiPower 5 scollega automaticamente l'alimentazione
 
-Cela aide à prévenir :
+Questo aiuta a prevenire:
 
-- La corruption de la carte SD
-- Les dommages au système de fichiers
-- Les problèmes de perte d'alimentation inattendue
+- Il danneggiamento della scheda SD
+- Danni al file system
+- Problemi di perdita improvvisa di alimentazione
 
 
-Coupure d'alimentation après l'arrêt du Raspberry Pi
-++++++++++++++++++++++++++++++++++++++++++++++++++++
+Spegnimento dopo l'arresto del Raspberry Pi
++++++++++++++++++++++++++++++++++++++++++++
 
 .. start_power_off_after_shutdown
 
-Pour permettre au PiPower 5 de couper automatiquement l'alimentation après l'arrêt du Raspberry Pi, une configuration supplémentaire est requise.
+Per consentire a PiPower 5 di scollegare automaticamente l'alimentazione dopo lo spegnimento del Raspberry Pi, è necessaria una configurazione aggiuntiva.
 
-1. Si vous utilisez un **Raspberry Pi 4 ou 5** :
+1. Se si utilizza un **Raspberry Pi 4 o 5**:
 
-   * Assurez-vous que le cavalier ``SDSIG`` du PiPower 5 est connecté à ``PI3V3``.
+   * Assicurarsi che il ponticello ``SDSIG`` su PiPower 5 sia collegato a ``PI3V3``.
 
      .. image:: img/safe_shutdown_3v3.png
         :width: 400
 
-   * Ouvrez la configuration du Raspberry Pi :
+   * Aprire la configurazione del Raspberry Pi:
 
      .. code-block:: shell
 
         sudo raspi-config
 
-   * Accédez à :
+   * Accedere a:
 
      .. code-block:: text
 
@@ -291,70 +291,70 @@ Pour permettre au PiPower 5 de couper automatiquement l'alimentation après l'ar
         -> A11 Shutdown Behaviour
         -> B1 Full power off Switch off Pi ...
 
-   * Redémarrez le Raspberry Pi lorsqu'il vous est demandé.
+   * Riavviare il Raspberry Pi quando richiesto.
 
-2. Si vous utilisez un **Raspberry Pi 3** ou antérieur :
+2. Se si utilizza un **Raspberry Pi 3** o precedente:
 
-   * Réglez le cavalier ``SDSIG`` du PiPower 5 sur ``GPIO26``.
+   * Impostare il ponticello ``SDSIG`` su PiPower 5 su ``GPIO26``.
 
      .. image:: img/safe_shutdown_io26.png
         :width: 400
 
-   * Ouvrez ``/boot/firmware/config.txt`` :
+   * Aprire ``/boot/firmware/config.txt``:
 
      .. code-block:: shell
 
         sudo nano /boot/firmware/config.txt
 
-   * Ajoutez les lignes suivantes :
+   * Aggiungere le seguenti righe:
 
      .. code-block:: shell
 
         dtoverlay=gpio-poweroff,gpio_pin=26,active_low=1
         gpio=26=op,dh
 
-   * Appuyez sur ``Ctrl+X``, puis ``Y``, et appuyez sur ``Entrée`` pour enregistrer le fichier et quitter.
+   * Premere ``Ctrl+X``, poi ``Y``, e premere ``Invio`` per salvare il file e uscire.
 
-   * Redémarrez le Raspberry Pi.
+   * Riavviare il Raspberry Pi.
 
      .. code-block:: shell
 
         sudo reboot
 
-Après la configuration, le PiPower 5 peut détecter automatiquement l'arrêt du Raspberry Pi et couper l'alimentation en toute sécurité.
+Dopo la configurazione, PiPower 5 può rilevare automaticamente lo spegnimento del Raspberry Pi e scollegare l'alimentazione in modo sicuro.
 
-Les méthodes d'arrêt sécurisé prises en charge incluent :
+I metodi di spegnimento sicuro supportati includono:
 
-- Maintenir le bouton PiPower enfoncé pendant 2 secondes
-- Arrêter depuis le menu du bureau Raspberry Pi
-- Exécuter ``sudo shutdown now``
-- Arrêt automatique lorsque le niveau de la batterie descend en dessous du pourcentage d'arrêt configuré
+- Tenere premuto il pulsante PiPower per 2 secondi
+- Spegnere dal menu del desktop Raspberry Pi
+- Eseguire ``sudo shutdown now``
+- Spegnimento automatico quando il livello della batteria scende al di sotto della percentuale di spegnimento configurata
 
 .. end_power_off_after_shutdown
 
-Configurer le pourcentage d'arrêt
-++++++++++++++++++++++++++++++++++++++
+Configurare la percentuale di spegnimento
+++++++++++++++++++++++++++++++++++++++++++
 
-Vous pouvez configurer le pourcentage de batterie qui déclenche l'arrêt automatique.
+È possibile configurare la percentuale della batteria che attiva lo spegnimento automatico.
 
-Exemple :
+Esempio:
 
 .. code-block:: shell
 
    pipower5 -sp 30
 
-Cela définit le seuil d'arrêt à 30%.
+Questo imposta la soglia di spegnimento al 30%.
 
-Utilisez ensuite la commande suivante pour que les modifications de configuration prennent effet.
+Quindi utilizzare il seguente comando per rendere effettive le modifiche di configurazione.
 
 .. code-block:: shell
 
    sudo systemctl restart pipower5.service
 
-Lorsque le niveau de la batterie descend en dessous de 30%, le PiPower 5 demandera au Raspberry Pi de s'arrêter et coupera automatiquement l'alimentation.
+Quando il livello della batteria scende al di sotto del 30%, PiPower 5 chiederà al Raspberry Pi di spegnersi e scollegherà automaticamente l'alimentazione.
 
 
-Vous pouvez également lire le pourcentage d'arrêt actuel :
+È anche possibile leggere la percentuale di spegnimento corrente:
 
 .. code-block:: shell
 
@@ -362,67 +362,67 @@ Vous pouvez également lire le pourcentage d'arrêt actuel :
 
 .. tip::
 
-   Pour les systèmes Raspberry Pi 5 à forte consommation d'énergie (>3A), il est recommandé de définir le pourcentage d'arrêt à ``100%``.
+   Per i sistemi Raspberry Pi 5 con elevato consumo energetico (>3A), si consiglia di impostare la percentuale di spegnimento al ``100%``.
 
-   Cela garantit que le Raspberry Pi s'arrête immédiatement lorsque l'alimentation externe est déconnectée, aidant à protéger le système et les périphériques de stockage.
+   Questo garantisce che il Raspberry Pi si spenga immediatamente quando l'alimentazione esterna viene scollegata, aiutando a proteggere il sistema e i dispositivi di archiviazione.
 
 
-Surveillance de l'alimentation
+Monitoraggio dell'alimentazione
 ----------------------------------------------------
 
-Le PiPower 5 fournit une surveillance en temps réel pour :
+PiPower 5 fornisce monitoraggio in tempo reale per:
 
-- Pourcentage de la batterie
-- État de charge
-- Tension d'entrée
-- Tension de sortie
-- Courant d'entrée
-- Courant de sortie
-- Tension de la batterie
-- Courant de la batterie
+- Percentuale della batteria
+- Stato di carica
+- Tensione di ingresso
+- Tensione di uscita
+- Corrente di ingresso
+- Corrente di uscita
+- Tensione della batteria
+- Corrente della batteria
 
-Commandes utiles :
+Comandi utili:
 
-Afficher le pourcentage de la batterie :
+Visualizzare la percentuale della batteria:
 
 .. code-block:: shell
 
    pipower5 -bp
 
-Afficher l'état de charge :
+Visualizzare lo stato di carica:
 
 .. code-block:: shell
 
    pipower5 -ichg
 
-Afficher la tension d'entrée :
+Visualizzare la tensione di ingresso:
 
 .. code-block:: shell
 
    pipower5 -iv
 
-Afficher toutes les informations d'état :
+Visualizzare tutte le informazioni di stato:
 
 .. code-block:: shell
 
    pipower5 -a
 
-Pour la liste complète des commandes :
+Per l'elenco completo dei comandi:
 
 .. code-block:: shell
 
    pipower5 --help
 
 
-Notifications
+Notifiche
 ----------------------------------------------------
 
-Le PiPower5 prend en charge les notifications pilotées par événements via :
+PiPower5 supporta notifiche guidate dagli eventi tramite:
 
-- Alertes par buzzer
-- Notifications par email
+- Avvisi acustici (buzzer)
+- Notifiche email
 
-Les événements pris en charge incluent :
+Gli eventi supportati includono:
 
 - ``battery_activated``
 - ``low_battery``
@@ -434,143 +434,143 @@ Les événements pris en charge incluent :
 
 .. note::
 
-   Chaque fois que vous modifiez l'état de ``pipower5.service``, vous devez utiliser la commande suivante pour que les modifications de configuration prennent effet.
+   Ogni volta che si modifica lo stato di ``pipower5.service``, è necessario utilizzare il seguente comando per rendere effettive le modifiche di configurazione.
 
    .. code-block:: shell
 
       sudo systemctl restart pipower5.service
 
-Descriptions des événements
+Descrizioni degli eventi
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
 1. ``battery_activated``
 
-   Déclenché lorsque la batterie commence à fournir de l'énergie. Cela se produit généralement si la source d'alimentation externe est déconnectée ou incapable de fournir une puissance suffisante.
+   Attivato quando la batteria inizia a fornire alimentazione. Questo si verifica tipicamente se la fonte di alimentazione esterna è scollegata o non è in grado di fornire potenza sufficiente.
 
-   * **Condition de réinitialisation** : Se réinitialise automatiquement après la déconnexion de l'alimentation externe.
+   * **Condizione di ripristino**: Si ripristina automaticamente dopo la disconnessione dell'alimentazione esterna.
 
 2. ``low_battery``
 
-   Activé lorsque le niveau de charge de la batterie descend en dessous du **seuil d'arrêt configuré**.
+   Attivato quando il livello di carica della batteria scende al di sotto della **soglia di spegnimento configurata**.
 
-   * **Répétition** : Si la batterie reste en dessous de ce seuil, l'événement est déclenché toutes les 10 minutes.
-   * **Condition de réinitialisation** : Se réinitialise lorsque la charge de la batterie remonte au-dessus du **seuil d'arrêt + 5%**.
+   * **Ripetizione**: Se la batteria rimane al di sotto di questa soglia, l'evento viene attivato ogni 10 minuti.
+   * **Condizione di ripristino**: Si ripristina quando la carica della batteria risale sopra la **soglia di spegnimento + 5%**.
 
 3. ``power_disconnected``
 
-   Déclenché lorsque la source d'alimentation externe est déconnectée.
+   Attivato quando la fonte di alimentazione esterna viene scollegata.
 
-   * **Condition de réinitialisation** : Se réinitialise lorsque l'alimentation externe est rétablie.
+   * **Condizione di ripristino**: Si ripristina quando l'alimentazione esterna viene ripristinata.
 
 4. ``power_restored``
 
-   Déclenché lorsque la source d'alimentation externe est rétablie.
+   Attivato quando la fonte di alimentazione esterna viene ripristinata.
 
-   * **Condition de réinitialisation** : Se réinitialise si l'alimentation externe est à nouveau déconnectée.
+   * **Condizione di ripristino**: Si ripristina se l'alimentazione esterna viene nuovamente scollegata.
 
 5. ``power_insufficient``
 
-   Se produit lorsque l'alimentation externe est insuffisante, nécessitant que la batterie fournisse une puissance supplémentaire.
+   Si verifica quando l'alimentazione esterna è insufficiente, richiedendo alla batteria di fornire potenza supplementare.
 
-   * **Action recommandée** : Vérifiez la puissance nominale de la source d'alimentation ou vérifiez les paramètres de puissance de charge configurés.
-   * **Condition de réinitialisation** : Se réinitialise lorsque la source d'alimentation externe est déconnectée.
+   * **Azione consigliata**: Verificare la potenza nominale della fonte di alimentazione o controllare le impostazioni di potenza di carica configurate.
+   * **Condizione di ripristino**: Si ripristina quando la fonte di alimentazione esterna viene scollegata.
 
 6. ``battery_critical_shutdown``
 
-   Déclenché juste avant l'arrêt du système en raison d'une **capacité de batterie extrêmement faible**.
+   Attivato appena prima dello spegnimento del sistema a causa della **capacità della batteria criticamente bassa**.
 
 7. ``battery_voltage_critical_shutdown``
 
-   Déclenché lorsque la **tension de la batterie** descend en dessous du seuil critique, entraînant l'arrêt.
+   Attivato quando la **tensione della batteria** scende al di sotto della soglia critica, portando allo spegnimento.
 
-   * **Remarque** : Cet événement est rarement déclenché en utilisation normale. Généralement, l'événement ``low_battery`` initie une séquence d'arrêt avant que la tension ne descende aussi bas. Cela sert de **mécanisme d'arrêt de sécurité**.
+   * **Nota**: Questo evento è raramente attivato nell'uso normale. In genere, l'evento ``low_battery`` avvia una sequenza di spegnimento prima che la tensione scenda così tanto. Questo funge da **meccanismo di spegnimento di sicurezza**.
 
-Avec ces événements, le PiPower5 fournit à la fois des avertissements proactifs (par ex., batterie faible, puissance insuffisante) et des sauvegardes critiques (par ex., déclencheurs d'arrêt), assurant un fonctionnement stable et une protection des données.
+Con questi eventi, PiPower5 fornisce sia avvisi proattivi (es. batteria scarica, potenza insufficiente) che salvaguardie critiche (es. attivatori di spegnimento), garantendo un funzionamento stabile e la protezione dei dati.
 
 
 
-Alertes par buzzer
+Avvisi acustici (Buzzer)
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
-Le PiPower5 prend en charge les notifications par buzzer pour différents événements système.
+PiPower5 supporta notifiche acustiche per diversi eventi di sistema.
 
-Vous pouvez configurer les alertes par buzzer via le **tableau de bord Web** ou l'**outil en ligne de commande**.
-Lorsqu'un événement configuré se produit, le PiPower5 joue le son de buzzer correspondant.
+È possibile configurare gli avvisi acustici tramite il **pannello di controllo Web** o lo **strumento a riga di comando**.
+Quando si verifica un evento configurato, PiPower5 riproduce il suono acustico corrispondente.
 
-Les fonctionnalités incluent :
+Le funzionalità includono:
 
-- Notifications par buzzer basées sur les événements
-- Volume du buzzer réglable (1–10)
-- Aperçu du son des événements
-- Prise en charge des effets sonores personnalisés
+- Notifiche acustiche basate sugli eventi
+- Volume del buzzer regolabile (1–10)
+- Anteprima del suono degli eventi
+- Supporto per effetti sonori personalizzati
 
-Les utilisateurs avancés peuvent également créer des effets sonores de buzzer personnalisés.
+Gli utenti avanzati possono anche creare effetti sonori acustici personalizzati.
 
-1. Ouvrez le fichier de configuration :
+1. Aprire il file di configurazione:
 
    .. code-block:: shell
 
       /opt/pipower5/venv/lib/python3.11/site-packages/pipower5/config.json
 
-2. Localisez la section ``pipower5_buzz_sequence``.
+2. Individuare la sezione ``pipower5_buzz_sequence``.
 
-3. Chaque effet sonore est défini en utilisant le format suivant :
+3. Ogni effetto sonoro è definito utilizzando il seguente formato:
 
    .. code-block:: text
 
       [action, duration]
 
-   Où :
+   Dove:
 
-   - ``action`` peut être :
+   - ``action`` può essere:
 
-     - Une note de musique, telle que ``"A4"``, ``"D3"`` ou ``"C#4"``
-     - Une valeur de fréquence (entier)
-     - ``"pause"`` pour le silence
+     - Una nota musicale, come ``"A4"``, ``"D3"`` o ``"C#4"``
+     - Un valore di frequenza (intero)
+     - ``"pause"`` per il silenzio
 
-   - ``duration`` est le temps de lecture en millisecondes (ms)
+   - ``duration`` è il tempo di riproduzione in millisecondi (ms)
 
 
-Alertes par email
+Avvisi email
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
-Le PiPower5 prend en charge les notifications par email pour les événements système importants, tels que :
+PiPower5 supporta notifiche email per eventi di sistema importanti, come:
 
-- Batterie faible
-- Alimentation déconnectée
-- Alimentation rétablie
-- Événements d'arrêt critiques
+- Batteria scarica
+- Alimentazione scollegata
+- Alimentazione ripristinata
+- Eventi di spegnimento critico
 
-Les notifications par email peuvent être configurées via le **tableau de bord Web** ou l'**outil en ligne de commande**.
+Le notifiche email possono essere configurate tramite il **pannello di controllo Web** o lo **strumento a riga di comando**.
 
-Pour utiliser les alertes par email, un serveur SMTP est requis. La plupart des fournisseurs de messagerie prennent en charge les services SMTP.
+Per utilizzare gli avvisi email, è necessario un server SMTP. La maggior parte dei provider di posta elettronica supporta i servizi SMTP.
 
-- Pour Gmail, créez simplement un **mot de passe d'application**
-- Pour les autres fournisseurs, activez l'accès SMTP et générez un mot de passe SMTP dédié si nécessaire
+- Per Gmail, è sufficiente creare una **password per app**
+- Per altri provider, abilitare l'accesso SMTP e generare una password SMTP dedicata se necessario
 
-Avant la configuration, préparez les informations suivantes :
+Prima della configurazione, preparare le seguenti informazioni:
 
-- Adresse du serveur SMTP
-  (Exemple : ``smtp.gmail.com``)
+- Indirizzo del server SMTP
+  (Esempio: ``smtp.gmail.com``)
 
-- Port SMTP
-  (Exemple : ``465`` ou ``25``)
+- Porta SMTP
+  (Esempio: ``465`` o ``25``)
 
-- Type de chiffrement
+- Tipo di crittografia
   (``None`` / ``SSL`` / ``TLS``)
 
-- Compte SMTP
-  (Généralement votre adresse email)
+- Account SMTP
+  (Solitamente il proprio indirizzo email)
 
-- Mot de passe SMTP
-  (Mot de passe d'application ou mot de passe SMTP)
+- Password SMTP
+  (Password per app o password SMTP)
 
-Après avoir saisi les informations SMTP, configurez l'adresse email du destinataire.
+Dopo aver inserito le informazioni SMTP, configurare l'indirizzo email del destinatario.
 
 .. note::
 
-   Le PiPower5 utilise le serveur SMTP pour se connecter à votre compte email et envoyer des notifications.
+   PiPower5 utilizza il server SMTP per accedere al proprio account email e inviare notifiche.
 
-   Vous pouvez utiliser la même adresse email comme expéditeur et destinataire.
+   È possibile utilizzare lo stesso indirizzo email sia come mittente che come destinatario.
 
-Après la configuration, utilisez la commande de test pour vérifier la connexion SMTP et la livraison des emails.
+Dopo la configurazione, utilizzare il comando di test per verificare la connessione SMTP e la consegna delle email.

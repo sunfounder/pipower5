@@ -1,19 +1,19 @@
 MicroPython
 ==========================================================
 
-Nous fournissons une bibliothèque qui vous permet de surveiller les tensions d'entrée et de sortie, la tension et le pourcentage de la batterie, la source d'alimentation, l'état de charge et d'autres données internes.
+Forniamo una libreria che consente di monitorare le tensioni di ingresso e uscita, la tensione e la percentuale della batteria, la fonte di alimentazione, lo stato di carica e altri dati interni.
 
-Si vous utilisez le PiPower 5 pour alimenter votre carte Raspberry Pi Pico ou ESP32, vous pouvez connecter la carte au PiPower 5 via le port de sortie Type-A ou deux câbles de liaison.
+Se si utilizza il PiPower 5 per alimentare la scheda Raspberry Pi Pico o ESP32, è possibile collegare la scheda al PiPower 5 tramite la porta di uscita Type-A o due cavi jumper.
 
-Pour connecter l'interface I2C du PiPower 5, utilisez un cavalier.
+Per collegare l'interfaccia I2C del PiPower 5, utilizzare un ponticello.
 
 .. If no operations are needed before shutting down, connect the SDSIG jumper cap directly to the GND pin. If operations are required before shutdown, remove the jumper cap and connect the intermediate wire to an I/O pin on the Raspberry Pi Pico or ESP32 board. This setup notifies the PiPower 5 that the shutdown process is complete and it can safely power off.
 
-#. Téléchargez la bibliothèque depuis GitHub. Vous pouvez la télécharger rapidement en utilisant le lien ci-dessous ou visitez : https://github.com/sunfounder/micropython_spc.
+#. Scaricare la libreria da GitHub. È possibile scaricarla rapidamente utilizzando il link sottostante o visitare: https://github.com/sunfounder/micropython_spc.
 
    * :download:`micropython_spc <https://github.com/sunfounder/micropython_spc/archive/refs/heads/main.zip>`
 
-#. Après avoir téléchargé et décompressé, téléversez le dossier ``spc`` sur votre carte Raspberry Pi Pico ou ESP32. Thonny est recommandé pour cette opération.
+#. Dopo il download e l'estrazione, caricare la cartella ``spc`` sulla scheda Raspberry Pi Pico o ESP32. Si consiglia Thonny per questa operazione.
 
    .. image:: img/micropython_upload.png
        :width: 100%
@@ -23,17 +23,17 @@ Pour connecter l'interface I2C du PiPower 5, utilisez un cavalier.
 
       <br/>
 
-#. Une fois la bibliothèque téléversée, vous pouvez la tester en utilisant les exemples fournis dans le dossier ``micropython_spc-main/examples/pipower5`` :
+#. Una volta caricata la libreria, è possibile testarla utilizzando gli esempi forniti nella cartella ``micropython_spc-main/examples/pipower5``:
 
-   * ``pipower_5_read_all.py`` : Utilisez cet exemple si vous avez besoin de lire toutes les données. Il montre comment lire toutes les données disponibles en une fois et les traiter individuellement.
+   * ``pipower_5_read_all.py`` : Utilizzare questo esempio se si desidera leggere tutti i dati. Mostra come leggere tutti i dati disponibili in una volta ed elaborarli individualmente.
 
-   * ``pipower_5_read_individual.py`` : Cet exemple fournit des instructions pour lire des données spécifiques individuellement. Utilisez-le si vous n'avez besoin d'accéder qu'à certaines données.
+   * ``pipower_5_read_individual.py`` : Questo esempio fornisce istruzioni per leggere singolarmente dati specifici. Utilizzarlo se si desidera accedere solo a determinati dati.
 
-   * ``pipower_5_set_shutdown_percentage.py`` : Cet exemple explique comment définir le pourcentage de batterie d'arrêt. Lorsque la batterie n'est pas en charge et que son niveau descend en dessous du pourcentage spécifié, le PiPower 5 envoie un signal d'arrêt à l'hôte. Il ne se met hors tension qu'après que l'hôte a terminé son arrêt et renvoyé un signal de mise hors tension.
+   * ``pipower_5_set_shutdown_percentage.py`` : Questo esempio spiega come impostare la percentuale di batteria per lo spegnimento. Quando la batteria non è in carica e il suo livello scende al di sotto della percentuale specificata, PiPower 5 invia un segnale di spegnimento all'host. Si spegne solo dopo che l'host ha completato lo spegnimento e inviato un segnale di spegnimento.
 
-     * Pour les SBC (ex. Raspberry Pi) : Aucune configuration supplémentaire n'est requise.
-     * Pour les microcontrôleurs : Retirez le cavalier **SDSIG** et connectez le fil intermédiaire à une broche. Après avoir reçu le signal d'arrêt et effectué un arrêt sécurisé, mettez cette broche à l'état haut pour indiquer au PiPower 5 de se mettre hors tension.
+     * Per SBC (es. Raspberry Pi): Non è richiesta alcuna configurazione aggiuntiva.
+     * Per microcontrollori: Rimuovere il ponticello **SDSIG** e collegare il filo intermedio a un pin. Dopo aver ricevuto il segnale di spegnimento ed eseguito uno spegnimento sicuro, portare questo pin a livello alto per indicare a PiPower 5 di spegnersi.
 
-   * ``pipower_5_shutdown_when_request.py`` : Cet exemple montre comment gérer les opérations après avoir reçu un signal d'arrêt. Vous devez retirer le cavalier **SDSIG** et connecter le fil intermédiaire à une broche.
+   * ``pipower_5_shutdown_when_request.py`` : Questo esempio mostra come gestire le operazioni dopo aver ricevuto un segnale di spegnimento. È necessario rimuovere il ponticello **SDSIG** e collegare il filo intermedio a un pin.
 
-Documentation de l'API de la bibliothèque MicroPython : https://github.com/sunfounder/micropython_spc?tab=readme-ov-file#api
+Documentazione API della libreria MicroPython: https://github.com/sunfounder/micropython_spc?tab=readme-ov-file#api

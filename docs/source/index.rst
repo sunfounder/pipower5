@@ -1,25 +1,25 @@
 .. note::
 
-    Bonjour, bienvenue dans la communauté SunFounder des passionnés de Raspberry Pi, Arduino et ESP32 sur Facebook ! Explorez plus en profondeur Raspberry Pi, Arduino et ESP32 avec d'autres passionnés.
+    Ciao, benvenuto nella community SunFounder degli appassionati di Raspberry Pi, Arduino e ESP32 su Facebook! Approfondisci Raspberry Pi, Arduino e ESP32 con altri appassionati.
 
-    **Pourquoi nous rejoindre ?**
+    **Perché unirsi?**
 
-    - **Assistance d'experts** : Résolvez les problèmes post-achat et les défis techniques avec l'aide de notre communauté et de notre équipe.
-    - **Apprendre et partager** : Échangez des astuces et des tutoriels pour améliorer vos compétences.
-    - **Aperçus exclusifs** : Accédez en avant-première aux annonces de nouveaux produits et aux aperçus.
-    - **Réductions spéciales** : Profitez de remises exclusives sur nos produits les plus récents.
-    - **Promotions festives et cadeaux** : Participez à des concours et à des promotions saisonnières.
+    - **Supporto esperto**: Risolvi i problemi post-vendita e le sfide tecniche con l'aiuto della nostra community e del nostro team.
+    - **Impara e condividi**: Scambia consigli e tutorial per migliorare le tue competenze.
+    - **Anteprime esclusive**: Accedi in anteprima agli annunci di nuovi prodotti e alle anticipazioni.
+    - **Sconti speciali**: Goditi sconti esclusivi sui nostri prodotti più recenti.
+    - **Promozioni festive e omaggi**: Partecipa a concorsi e promozioni stagionali.
 
-    👉 Prêt à explorer et à créer avec nous ? Cliquez [|link_sf_facebook|] et rejoignez-nous dès aujourd'hui !
+    👉 Pronto a esplorare e creare con noi? Clicca [|link_sf_facebook|] e unisciti oggi!
 
-SunFounder PiPower5 - Protégez votre appareil et vos données
+SunFounder PiPower5 - Proteggi il tuo dispositivo e i tuoi dati
 ================================================================================
 
 .. * |link_PiPower_5_buy|
 
 .. Thank you for choosing our |link_PiPower_5|.
 
-Merci d'avoir choisi notre PiPower5.
+Grazie per aver scelto il nostro PiPower5.
 
 
 .. .. note::
@@ -37,41 +37,41 @@ Merci d'avoir choisi notre PiPower5.
     :width: 400
     :align: center
 
-Le PiPower 5 est une solution UPS polyvalente conçue pour une intégration transparente avec les appareils Raspberry Pi. Il dispose d'une gestion robuste du chemin d'alimentation, de capacités de charge et décharge de deux batteries au lithium, et de protections essentielles contre l'inversion de polarité, la surcharge et la décharge excessive.
+PiPower 5 è una soluzione UPS versatile progettata per un'integrazione perfetta con i dispositivi Raspberry Pi. Dispone di una gestione robusta del percorso di alimentazione, capacità di carica e scarica di due batterie al litio e protezioni essenziali contro l'inversione di polarità, il sovraccarico e la scarica eccessiva.
 
-Avec une sortie allant jusqu'à 5V/5A, le PiPower 5 assure des performances stables pour une large gamme d'appareils. Sa configuration HAT+ garantit la compatibilité avec le Raspberry Pi 5, tandis que les sorties supplémentaires, y compris un port USB-A et un connecteur 4x2P, offrent une prise en charge pour divers ordinateurs monocarte (SBC) et plateformes de microcontrôleurs, telles qu'Arduino, Pico et ESP32.
+Con un'uscita fino a 5V/5A, PiPower 5 garantisce prestazioni stabili per un'ampia gamma di dispositivi. La sua configurazione HAT+ garantisce la compatibilità con Raspberry Pi 5, mentre le uscite aggiuntive, tra cui una porta USB-A e un connettore 4x2P, forniscono supporto per vari computer a scheda singola (SBC) e piattaforme di microcontrollori, come Arduino, Pico e ESP32.
 
-Un microcontrôleur intégré gère efficacement les opérations d'alimentation et permet la surveillance en temps réel des paramètres clés via la communication I2C. Ces paramètres incluent la tension d'entrée, la tension de sortie, la tension de la batterie, la capacité de la batterie, l'état de connexion de l'alimentation externe, l'état de charge et la source d'alimentation actuelle (batterie ou USB).
+Un microcontrollore integrato gestisce in modo efficiente le operazioni di alimentazione e consente il monitoraggio in tempo reale dei parametri chiave tramite comunicazione I2C. Questi parametri includono la tensione di ingresso, la tensione di uscita, la tensione della batteria, la capacità della batteria, lo stato di connessione dell'alimentazione esterna, lo stato di carica e la fonte di alimentazione corrente (batteria o USB).
 
-Alliant une gestion avancée de la batterie à une large compatibilité, le PiPower 5 est un outil essentiel pour les passionnés de technologie et les professionnels cherchant à optimiser leurs configurations matérielles.
+Combinando una gestione avanzata della batteria con un'ampia compatibilità, PiPower 5 è uno strumento essenziale per gli appassionati di tecnologia e i professionisti che desiderano ottimizzare le proprie configurazioni hardware.
 
-**Caractéristiques**
+**Caratteristiche**
 
-* **Entrée** : 5-15V, 45W, USB Type-C PD, DC5.5-2.1
-* **Sortie** : 5V/5A via GPIO Raspberry Pi, USB Type-A et connecteurs à broches 2x4P 2.54mm
-* **Puissance de charge** : Jusqu'à 20W
-* **Spécifications de la batterie** : 7.4V 2 cellules 18650 Li-ion, connecteur XH2.54 3P
-* **Paramètres configurables via cavaliers** :
+* **Ingresso**: 5-15V, 45W, USB Type-C PD, DC5.5-2.1
+* **Uscita**: 5V/5A tramite GPIO Raspberry Pi, USB Type-A e connettori a pin 2x4P 2.54mm
+* **Potenza di carica**: Fino a 20W
+* **Specifiche batteria**: 7.4V 2 celle 18650 Li-ion, connettore XH2.54 3P
+* **Impostazioni configurabili tramite ponticelli**:
 
-  * Cavalier Default On : Configure si l'appareil s'allume automatiquement lorsqu'il est connecté à l'alimentation.
-  * Cavalier Shutdown Signal : Active la détection de l'état d'arrêt de l'appareil.
-  * Connecteur pour bouton d'alimentation externe : Connectez un bouton d'alimentation externe pour un contrôle manuel de l'alimentation.
+  * Ponticello Default On: Configura se il dispositivo si accende automaticamente quando è collegato all'alimentazione.
+  * Ponticello Shutdown Signal: Abilita il rilevamento dello stato di spegnimento del dispositivo.
+  * Connettore per pulsante di accensione esterno: Collega un pulsante di accensione esterno per il controllo manuale dell'alimentazione.
 
-* **Indicateurs et boutons intégrés** :
+* **Indicatori e pulsanti integrati**:
 
-  * Indicateur d'état de la batterie
-  * Indicateur de source d'entrée
-  * Bouton d'alimentation
-  * Indicateur de connexion inversée de la batterie
-  * Indicateur de puissance de sortie
+  * Indicatore di stato della batteria
+  * Indicatore della fonte di ingresso
+  * Pulsante di accensione
+  * Indicatore di connessione inversa della batteria
+  * Indicatore di potenza in uscita
 
-* **Microcontrôleur intégré** : ARM Cortex-M23 32 bits, prenant en charge la communication I2C
+* **Microcontrollore integrato**: ARM Cortex-M23 a 32 bit, con supporto per comunicazione I2C
 
-* **Interfaces de communication I2C** :
+* **Interfacce di comunicazione I2C**:
 
   * GPIO Raspberry Pi
-  * SH1.0 4P (compatible avec Qwiic et STEMMA QT)
-  * Connecteur à broches 1x4P 2.54mm
+  * SH1.0 4P (compatibile con Qwiic e STEMMA QT)
+  * Connettore a pin 1x4P 2.54mm
 
 
 .. **Table of Contents**
@@ -79,16 +79,16 @@ Alliant une gestion avancée de la batterie à une large compatibilité, le PiPo
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Pour commencer
+   :caption: Per iniziare
 
-   À propos du PiPower 5 <self>
+   Informazioni su PiPower 5 <self>
    assembly
    quick_guide
 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Aperçu du matériel
+   :caption: Panoramica hardware
 
    pipower_hat
    battery
@@ -96,7 +96,7 @@ Alliant une gestion avancée de la batterie à une large compatibilité, le PiPo
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Configuration logicielle
+   :caption: Configurazione software
 
    pipower5_software
    update_firmware
@@ -106,14 +106,14 @@ Alliant une gestion avancée de la batterie à une large compatibilité, le PiPo
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Annexe
+   :caption: Appendice
 
    compatible_sbc
    troubleshooting
    faq
 
 
-**Avis de droit d'auteur**
+**Avviso di copyright**
 
-Tout le contenu, y compris mais sans s'y limiter, les textes, images et code de ce manuel sont la propriété de SunFounder Company. Vous ne devez l'utiliser qu'à des fins d'étude personnelle, de recherche, de loisir ou à d'autres fins non commerciales ou non lucratives, conformément aux réglementations et lois sur le droit d'auteur en vigueur, sans porter atteinte aux droits légaux de l'auteur et des ayants droit. Pour toute personne ou organisation utilisant ce contenu à des fins commerciales sans autorisation, la Société se réserve le droit d'intenter une action en justice.
+Tutti i contenuti, inclusi a titolo esemplificativo ma non esaustivo testi, immagini e codice in questo manuale, sono di proprietà di SunFounder Company. È consentito utilizzarli solo per studio personale, ricerca, svago o altri scopi non commerciali o senza scopo di lucro, in conformità con le normative e le leggi sul copyright vigenti, senza violare i diritti legali dell'autore e degli aventi diritto. Per qualsiasi individuo o organizzazione che utilizzi questi contenuti a scopo di lucro commerciale senza autorizzazione, la Società si riserva il diritto di intraprendere azioni legali.
 

@@ -1,56 +1,56 @@
 # SunFounder PiPower 5
-Ce dépôt est pour le PiPower 5. Vous pouvez l'acheter sur [notre site Web](https://www.sunfounder.com/), ou rechercher sunfounder sur Amazon.
+Questo repository è per PiPower 5. È possibile acquistarlo sul [nostro sito web](https://www.sunfounder.com/), o cercare sunfounder su Amazon.
 
 Quick Links:
 
- * [À propos de ce kit](#about_this_kit)
- * [Mise à jour](#update)
- * [Dépannage](#trouble)
- * [À propos de SunFounder](#about_sunfounder)
- * [Licence](#license)
- * [Contactez-nous](#contact_us)
+ * [Informazioni su questo kit](#about_this_kit)
+ * [Aggiornamento](#update)
+ * [Risoluzione dei problemi](#trouble)
+ * [Informazioni su SunFounder](#about_sunfounder)
+ * [Licenza](#license)
+ * [Contattaci](#contact_us)
 
 <a id="about_this_kit"></a>
-## À propos de ce kit :
+## Informazioni su questo kit:
 
-Document : https://docs.sunfounder.com/projects/pipower5/en/latest/
+Documento: https://docs.sunfounder.com/projects/pipower5/en/latest/
 
-Le PiPower 5 est une solution UPS polyvalente conçue pour une intégration transparente avec les appareils Raspberry Pi. Il dispose d'une gestion robuste du chemin d'alimentation, de capacités de charge et décharge de deux batteries au lithium, et de protections essentielles contre l'inversion de polarité, la surcharge et la décharge excessive.
+PiPower 5 è una soluzione UPS versatile progettata per un'integrazione perfetta con i dispositivi Raspberry Pi. Dispone di una gestione robusta del percorso di alimentazione, capacità di carica e scarica di due batterie al litio e protezioni essenziali contro l'inversione di polarità, il sovraccarico e la scarica eccessiva.
 
 <a id="update"></a>
-## Mise à jour :
+## Aggiornamento:
 
 <a id="trouble"></a>
-## Dépannage :
+## Risoluzione dei problemi:
 
 <a id="about_sunfounder"></a>
-## À propos de SunFounder
-SunFounder est une entreprise axée sur l'éducation STEAM avec des produits tels que des robots open source, des cartes de développement, des kits STEAM, des modules, des outils et d'autres appareils intelligents distribués dans le monde entier. Chez SunFounder, nous nous efforçons d'aider les élèves du primaire et du secondaire ainsi que les passionnés, grâce à l'éducation STEAM, à renforcer leurs compétences pratiques et leurs capacités de résolution de problèmes. De cette façon, nous espérons diffuser les connaissances et offrir une formation technique de manière ludique, favorisant ainsi votre intérêt pour la programmation et la création, et vous exposant à un monde fascinant de science et d'ingénierie. Pour embrasser l'avenir de l'intelligence artificielle, il est urgent et significatif d'apprendre des connaissances STEAM abondantes.
+## Informazioni su SunFounder
+SunFounder è un'azienda focalizzata sull'educazione STEAM con prodotti come robot open source, schede di sviluppo, kit STEAM, moduli, strumenti e altri dispositivi intelligenti distribuiti a livello globale. In SunFounder, ci impegniamo ad aiutare gli studenti delle scuole elementari e medie, così come gli appassionati, attraverso l'educazione STEAM, a rafforzare le loro capacità pratiche e di risoluzione dei problemi. In questo modo, speriamo di diffondere conoscenza e fornire formazione tecnica in modo divertente, favorendo il tuo interesse per la programmazione e la creazione, ed esponendoti a un affascinante mondo di scienza e ingegneria. Per abbracciare il futuro dell'intelligenza artificiale, è urgente e significativo apprendere abbondanti conoscenze STEAM.
 
 <a id="license"></a>
-## Licence
-Ceci est la documentation du PiPower 5.
+## Licenza
+Questa è la documentazione per PiPower 5.
 
-Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier selon les termes de la Licence Publique Générale GNU telle que publiée par la Free Software Foundation ; soit la version 2 de la Licence, ou (à votre choix) toute version ultérieure.
+Questo programma è software libero; è possibile ridistribuirlo e/o modificarlo secondo i termini della Licenza Pubblica Generica GNU come pubblicata dalla Free Software Foundation; versione 2 della Licenza, o (a propria scelta) qualsiasi versione successiva.
 
-Ce programme est distribué dans l'espoir qu'il sera utile, mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de QUALITÉ MARCHANDE ou d'ADÉQUATION À UN USAGE PARTICULIER. Voir la Licence Publique Générale GNU pour plus de détails.
+Questo programma è distribuito nella speranza che possa essere utile, ma SENZA ALCUNA GARANZIA; senza nemmeno la garanzia implicita di COMMERCIABILITÀ o IDONEITÀ PER UNO SCOPO PARTICOLARE. Vedere la Licenza Pubblica Generica GNU per maggiori dettagli.
 
-Vous devriez avoir reçu une copie de la Licence Publique Générale GNU avec ce programme ; si ce n'est pas le cas, écrivez à la Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+Si dovrebbe aver ricevuto una copia della Licenza Pubblica Generica GNU insieme a questo programma; in caso contrario, scrivere alla Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-Ce dépôt est fourni SANS ABSOLUMENT AUCUNE GARANTIE ; pour plus de détails, exécutez ./show w. Ceci est un logiciel libre, et vous êtes invités à le redistribuer sous certaines conditions ; exécutez ./show c pour plus de détails.
+Questo repository viene fornito SENZA ASSOLUTAMENTE ALCUNA GARANZIA; per i dettagli eseguire ./show w. Questo è software libero, e siete invitati a ridistribuirlo a determinate condizioni; eseguire ./show c per i dettagli.
 
-SunFounder, Inc., décline par la présente tout intérêt de droit d'auteur dans le programme « PiPower 5 » (qui fait des passes aux compilateurs).
+SunFounder, Inc., declina con la presente ogni interesse di copyright nel programma «PiPower 5» (che fa passaggi ai compilatori).
 
-Mike Huang, 21 août 2015
+Mike Huang, 21 agosto 2015
 
-Mike Huang, Directeur Général
+Mike Huang, Amministratore Delegato
 
-Email : service@sunfounder.com
+Email: service@sunfounder.com
 
 <a id="contact_us"></a>
-## Contactez-nous :
-site Web :
+## Contattaci:
+sito web:
     www.sunfounder.com
 
-E-mail :
+E-mail:
     service@sunfounder.com
