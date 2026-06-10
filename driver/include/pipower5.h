@@ -15,6 +15,7 @@
 
 #include <linux/device.h>
 #include <linux/i2c.h>
+#include <linux/input.h>
 #include <linux/mutex.h>
 #include <linux/timer.h>
 #include <linux/workqueue.h>
@@ -118,7 +119,9 @@ struct pipower5_device {
   u8 shutdown_percentage;
   u16 battery_internal_resistor;
   u8 power_button_state;
+  u8 last_power_button_state;
   u8 charge_current_max;
+  struct input_dev *input_dev;
   u8 buzzer_volume;
 
   /* Buzzer playback sequence */
