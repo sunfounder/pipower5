@@ -72,6 +72,7 @@
 
 /* Polling interval in milliseconds */
 #define PIPOWER5_POLL_INTERVAL 1000
+#define PIPOWER5_BUTTON_POLL_INTERVAL 20  /* 50 Hz for responsive button */
 
 /* Constants */
 #define PIPOWER5_BATTERY_MAX_VOLTAGE 8400 /* mV */
@@ -97,6 +98,8 @@ struct pipower5_device {
   /* Polling and workqueue */
   struct workqueue_struct *wq;
   struct delayed_work poll_work;
+  struct delayed_work button_poll_work;
+  bool events_initialized;
 
   /* Cached values */
   u16 input_voltage;
@@ -122,6 +125,11 @@ struct pipower5_device {
   u8 last_power_button_state;
   u8 charge_current_max;
   struct input_dev *input_dev;
+
+  /* State tracking for event detection */
+  u8 last_is_input_plugged_in;
+  u8 last_power_source;
+  u8 last_is_charging;
   u8 buzzer_volume;
 
   /* Buzzer playback sequence */

@@ -81,6 +81,24 @@ static struct i2c_driver pipower5_driver = {
 
 
 
+/* Fast button poll — reads only the power button register at 50 Hz */
+static void pipower5_button_poll_work(struct work_struct *work) {
+  struct delayed_work *dwork = to_delayed_work(work);
+  struct pipower5_device *pi_dev =
+      container_of(dwork, struct pipower5_device, button_poll_work);
+  int ret;
+
+  ret = __pipower5_read_byte(pi_dev, REG_READ_POWER_BUTTON_STATE);
+  if (ret >= 0) {
+    pi_dev->power_button_state = (u8)ret;
+    __pipower5_write_byte(pi_dev, REG_WRITE_POWER_BTN_STATE, 0);
+    pipower5_button_check(pi_dev);
+  }
+
+  queue_delayed_work(pi_dev->wq, &pi_dev->button_poll_work,
+                     msecs_to_jiffies(PIPOWER5_BUTTON_POLL_INTERVAL));
+}
+
 static void pipower5_poll_work(struct work_struct *work) {
   struct delayed_work *dwork = to_delayed_work(work);
   struct pipower5_device *pi_dev =
@@ -97,8 +115,42 @@ static void pipower5_poll_work(struct work_struct *work) {
       power_supply_changed(pi_dev->power_supply);
     }
 
-    /* Check for power button state change */
-    pipower5_button_check(pi_dev);
+    /* ── Event detection (first poll is skipped to avoid false events) ── */
+    if (pi_dev->events_initialized) {
+      /* POWER_DISCONNECTED / POWER_RESTORED */
+      if (pi_dev->is_input_plugged_in != pi_dev->last_is_input_plugged_in) {
+        if (pi_dev->is_input_plugged_in)
+          pipower5_log_event(pi_dev, "POWER_RESTORED");
+        else
+          pipower5_log_event(pi_dev, "POWER_DISCONNECTED");
+      }
+
+      /* BATTERY_ACTIVATED: switched to battery power */
+      if (pi_dev->power_source != pi_dev->last_power_source &&
+          pi_dev->power_source == 1) {
+        pipower5_log_event(pi_dev, "BATTERY_ACTIVATED");
+      }
+
+      /* POWER_INSUFFICIENT: input plugged in but battery still discharging */
+      if (pi_dev->is_input_plugged_in && !pi_dev->is_charging &&
+          pi_dev->battery_current > 20) {
+        pipower5_log_event(pi_dev, "POWER_INSUFFICIENT bat=%d%% cur=%dmA",
+                           pi_dev->battery_percentage, pi_dev->battery_current);
+      }
+
+      /* LOW_BATTERY: percentage below shutdown threshold */
+      if (pi_dev->battery_percentage < pi_dev->shutdown_percentage) {
+        pipower5_log_event(pi_dev, "LOW_BATTERY bat=%d%% threshold=%d%%",
+                           pi_dev->battery_percentage,
+                           pi_dev->shutdown_percentage);
+      }
+    }
+
+    /* Save state for next poll */
+    pi_dev->last_is_input_plugged_in = pi_dev->is_input_plugged_in;
+    pi_dev->last_power_source = pi_dev->power_source;
+    pi_dev->last_is_charging = pi_dev->is_charging;
+    pi_dev->events_initialized = true;
 
     /* Check for shutdown request */
     if (pi_dev->shutdown_request != SHUTDOWN_REQUEST_NONE) {
@@ -159,10 +211,13 @@ static int pipower5_probe(struct i2c_client *client) {
 
   /* Initialize delayed work */
   INIT_DELAYED_WORK(&pi_dev->poll_work, pipower5_poll_work);
+  INIT_DELAYED_WORK(&pi_dev->button_poll_work, pipower5_button_poll_work);
 
   /* Start polling */
   queue_delayed_work(pi_dev->wq, &pi_dev->poll_work,
                      msecs_to_jiffies(PIPOWER5_POLL_INTERVAL));
+  queue_delayed_work(pi_dev->wq, &pi_dev->button_poll_work,
+                     msecs_to_jiffies(PIPOWER5_BUTTON_POLL_INTERVAL));
 
   i2c_set_clientdata(client, pi_dev);
 
@@ -225,6 +280,7 @@ static void pipower5_remove(struct i2c_client *client) {
   /* Cancel work */
   cancel_delayed_work_sync(&pi_dev->buzzer_work);
   cancel_delayed_work_sync(&pi_dev->poll_work);
+  cancel_delayed_work_sync(&pi_dev->button_poll_work);
   destroy_workqueue(pi_dev->wq);
 
   /* Remove upower interface */
