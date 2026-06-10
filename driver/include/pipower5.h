@@ -155,6 +155,11 @@ void pipower5_buzzer_init(struct pipower5_device *pi_dev);
 int pipower5_create_upower(struct pipower5_device *pi_dev);
 void pipower5_remove_upower(struct pipower5_device *pi_dev);
 
+/* Function prototypes for button operations */
+int pipower5_button_init(struct pipower5_device *pi_dev);
+void pipower5_button_cleanup(struct pipower5_device *pi_dev);
+void pipower5_button_check(struct pipower5_device *pi_dev);
+
 /* Function prototypes for shutdown operations */
 void pipower5_log_event(struct pipower5_device *pi_dev, const char *fmt, ...);
 void pipower5_handle_shutdown(struct pipower5_device *pi_dev);
