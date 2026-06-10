@@ -46,7 +46,7 @@ def main():
     pipower5 = PiPower5()
     parser = argparse.ArgumentParser(prog='pipower5', description='PiPower 5')
     parser.add_argument("command",
-                        choices=["doctor", "uninstall", "info", "status"],
+                        choices=["doctor", "uninstall", "info", "status", "send-email"],
                         nargs="?",
                         help="Command")
     parser.add_argument("--fix", action="store_true", help="Attempt auto-repair (with doctor)")
@@ -77,17 +77,17 @@ def main():
     parser.add_argument('-a', '--all', action='store_true', help='Show all status')
     parser.add_argument('-fv', '--firmware', action='store_true', help='PiPower5 MCU firmware version')
     parser.add_argument('-dv', '--driver-version', action='store_true', help='PiPower5 kernel driver version')
-    parser.add_argument('-pfs', '--power-failure-simulation', nargs='?', default='', help='Power failure simulation')
-    parser.add_argument("-seo", '--send-email-on', nargs='?', default='', help=f"Send email on: {AVAILABLE_EVENTS}")
-    parser.add_argument("-set", '--send-email-to', nargs='?', default='', help="Email address to send email to")
+    parser.add_argument('-pfs', '--power-failure-simulation', nargs='?', default='', help='Power failure simulation (seconds)')
+    parser.add_argument("-seo", '--send-email-on', nargs='?', default='', help=f"Send email on events (comma-separated)")
+    parser.add_argument("-set", '--send-email-to', nargs='?', default='', help="Email recipient address")
     parser.add_argument("-ss", '--smtp-server', nargs='?', default='', help="SMTP server")
     parser.add_argument("-smp", '--smtp-port', nargs='?', default='', help="SMTP port")
     parser.add_argument("-se", '--smtp-email', nargs='?', default='', help="SMTP email")
     parser.add_argument("-spw", '--smtp-password', nargs='?', default='', help="SMTP password")
-    parser.add_argument("-ssc", '--smtp-security', nargs='?', default='', help="SMTP security, 'none', 'ssl' or 'tls'")
-    parser.add_argument("-bzo", '--buzz-on', nargs='?', default='', help=f"Buzz on: {AVAILABLE_EVENTS}")
-    parser.add_argument("-bzv", '--buzzer-volume', nargs='?', default='', help="Buzz volume")
-    parser.add_argument("-bzt", '--buzzer-test', nargs='?', default='', help="Test buzzer on selected event.")
+    parser.add_argument("-ssc", '--smtp-security', nargs='?', default='', help="SMTP security: none, ssl, tls")
+    parser.add_argument("-bzo", '--buzz-on', nargs='?', default='', help='Buzzer event bitmask (e.g. 0x7F), leave empty to read')
+    parser.add_argument("-bzv", '--buzzer-volume', nargs='?', default='', help='Buzzer volume (0-10), leave empty to read')
+    parser.add_argument("-bzt", '--buzzer-test', nargs='?', default='', help='Test buzzer: event name or frequency')
 
     parser.add_argument("-u", "--temperature-unit", choices=["C", "F"], nargs='?', default='', help="Temperature unit")
 
@@ -169,6 +169,25 @@ def main():
 
     if args.command in ("info", "status"):
         args.all = True  # alias for -a
+
+    if args.command == "send-email":
+        from .device import DEVICE_PATH
+        event = args.event
+        if not event:
+            print("Usage: pipower5 send-email <event>")
+            print("Events: low_battery power_disconnected power_restored battery_activated power_insufficient")
+            quit()
+        import subprocess, sys
+        script = "/usr/local/bin/pipower5-send-mail"
+        try:
+            subprocess.run([sys.executable, script, event], check=True)
+            print(f"Email sent for: {event}")
+        except FileNotFoundError:
+            print(f"Script not installed: {script}")
+            print("Install with: sudo cp rules/pipower5-send-mail /usr/local/bin/")
+        except Exception as e:
+            print(f"Failed: {e}")
+        quit()
 
     if args.command == "uninstall":
         from .device import uninstall
@@ -290,148 +309,85 @@ Versions:
     if args.driver_version:
         print(f"PiPower5 kernel driver version: {pipower5.read_driver_version()}")
 
-    # send email on
+    # power failure simulation
+    if args.power_failure_simulation != '':
+        print("Power failure simulation requires kernel driver ADV_CMD support (not yet implemented).")
+        print("Use 'pipower5 --all' to monitor battery drain manually.")
+    # send email config
     if args.send_email_on != '':
         if args.send_email_on == None:
-            send_email_on = [f' - {event}' for event in current_config['system']['send_email_on']]
-            send_email_on = '\n'.join(send_email_on)
-            print("Send email on:")
-            print(send_email_on)
+            print(f"Send email on: {current_config['system']['send_email_on']}")
         else:
-            send_email_on = args.send_email_on.split(',')
-            for event in send_email_on:
-                if event not in AVAILABLE_EVENTS:
-                    print(f"Invalid event for Send email on: '{event}', it should be {', '.join(AVAILABLE_EVENTS)}")
-                    quit()
-            send_email_on = list(set(send_email_on))
-            new_sys_config['send_email_on'] = send_email_on
-            print(f"Set Send email on: {send_email_on}")
-    # send email to
+            import json as _json
+            email_cfg = _json.loads(_json.dumps(current_config['system']))
+            email_cfg['send_email_on'] = args.send_email_on.split(',')
+            new_sys_config['send_email_on'] = email_cfg['send_email_on']
+            print(f"Set Send email on: {new_sys_config['send_email_on']}")
     if args.send_email_to != '':
         if args.send_email_to == None:
             print(f"Send email to: {current_config['system']['send_email_to']}")
         else:
             new_sys_config['send_email_to'] = args.send_email_to
             print(f"Set Send email to: {args.send_email_to}")
-    # SMTP server
     if args.smtp_server != '':
         if args.smtp_server == None:
             print(f"SMTP server: {current_config['system']['smtp_server']}")
         else:
             new_sys_config['smtp_server'] = args.smtp_server
-            print(f"Set SMTP server: {args.smtp_server}")
-    # SMTP port
     if args.smtp_port != '':
         if args.smtp_port == None:
             print(f"SMTP port: {current_config['system']['smtp_port']}")
         else:
             new_sys_config['smtp_port'] = args.smtp_port
-            print(f"Set SMTP port: {args.smtp_port}")
-    # SMTP user
     if args.smtp_email != '':
         if args.smtp_email == None:
-            print(f"SMTP user: {current_config['system']['smtp_email']}")
+            print(f"SMTP email: {current_config['system']['smtp_email']}")
         else:
             new_sys_config['smtp_email'] = args.smtp_email
-            print(f"Set SMTP user: {args.smtp_email}")
-    # SMTP password
     if args.smtp_password != '':
         if args.smtp_password == None:
-            print(f"SMTP password: {current_config['system']['smtp_password']}")
+            print("SMTP password: ***")
         else:
             new_sys_config['smtp_password'] = args.smtp_password
-            print(f"Set SMTP password: {args.smtp_password}")
-    # SMTP security
     if args.smtp_security != '':
         if args.smtp_security == None:
             print(f"SMTP security: {current_config['system']['smtp_security']}")
         else:
-            security = args.smtp_security.lower()
-            if security not in ['none', 'tls', 'ssl']:
-                print(f"Invalid value for SMTP security, it should be in 'none', 'tls' or 'ssl'")
+            sec = args.smtp_security.lower()
+            if sec not in ['none', 'tls', 'ssl']:
+                print("Invalid SMTP security, use: none, tls, ssl")
                 quit()
-            new_sys_config['smtp_security'] = security
-            print(f"Set SMTP security: {security}")
-
-    if args.power_failure_simulation != '':
-        test_time = 60 # seconds
-        if args.power_failure_simulation != None:
-            test_time = int(args.power_failure_simulation)
-            if test_time < 10:
-                print(f"Power failure simulation time should be at least 10 seconds")
-                quit()
-            elif test_time > 600:
-                print(f"Power failure simulation time should be at most 600 seconds(10 minutes)")
-                quit()
-
-        print(f"Power failure simulation for {test_time} seconds")
-        report = pipower5.power_failure_simulation(test_time)
-        if report == None:
-            print(f'Power failure simulation failed')
-            quit()
-        print(f'report:')
-        print(f'  battery mah used : {report["bat_mah_used"]:.3f} mAh')
-        print(f'  battery percent used : {report["bat_percent_used"]:.3f} %')
-        print(f'  average battery voltage : {report["bat_voltage_avg"]:.3f} V')
-        print(f'  average battery current : {report["bat_current_avg"]:.3f} A')
-        print(f'  average battery power : {report["bat_power_avg"]:.3f} W')
-        print(f'  average output voltage : {report["output_voltage_avg"]:.3f} V')
-        print(f'  average output current : {report["output_current_avg"]:.3f} A')
-        print(f'  average output power : {report["output_power_avg"]:.3f} W')
-        print(f'  ---')
-        print(f'  max battery voltage : {report["bat_voltage_max"]:.3f} V')
-        print(f'  max battery current : {report["bat_current_max"]:.3f}A')
-        print(f'  max battery power : {report["bat_power_max"]:.2f} W')
-        print(f'  max output voltage : {report["output_voltage_max"]:.3f} V')
-        print(f'  max output current : {report["output_current_max"]:.3f} A')
-        print(f'  max output power : {report["output_power_max"]:.3f} W')
-        print(f'  ---')
-        print(f'  battery precentage : {report["battery_percentage"]} %')
-        print(f'  shutdown percentage : {report["shutdown_percentage"]} %')
-        print(f'  available time: {report["available_time_str"]}')
-        print(f'  available time: {report["available_time"]} s')
-        print(f'  available_bat_capacity: {int(report["available_bat_capacity"])} mAh')
-
+            new_sys_config['smtp_security'] = sec
     # buzzer
     if args.buzz_on != '':
         if args.buzz_on == None:
-            buzz_on = [f' - {event}' for event in current_config['system']['pipower5_buzz_on']]
-            buzz_on = '\n'.join(buzz_on)
-            print("Buzz on:")
-            print(buzz_on)
+            try:
+                with open(f"{DEVICE_PATH}/buzz_on", "r") as f:
+                    print(f"Buzz on: {f.read().strip()}")
+            except Exception:
+                print("Buzz on: (cannot read sysfs)")
         else:
-            buzz_on = args.buzz_on.split(',')
-            for event in buzz_on:
-                if event not in AVAILABLE_EVENTS:
-                    print(f"Invalid event for Buzz on: '{event}', it should be {', '.join(AVAILABLE_EVENTS)}")
-                    quit()
-            buzz_on = list(set(buzz_on))
-            new_sys_config['pipower5_buzz_on'] = buzz_on
-            print(f"Set Buzz on: {buzz_on}")
+            pipower5._write_sysfs("buzz_on", args.buzz_on)
+            print(f"Set buzz_on: {args.buzz_on} (persist via /etc/modprobe.d/pipower5.conf)")
     if args.buzzer_volume != '':
         if args.buzzer_volume == None:
-            print(f"Buzz volume: {pipower5.get_buzzer_volume()}")
+            print(f"Buzzer volume: {pipower5.read_buzzer_volume()}")
         else:
-            volume = int(args.buzzer_volume)
-            if volume < 0 or volume > 10:
-                print(f"Invalid value for Buzz volume, it should be in 0-10")
-                quit()
-            new_sys_config['pipower5_buzzer_volume'] = volume
-            pipower5.set_buzzer_volume(volume)
-            print(f"Set Buzz volume: {volume}")
-    # test buzz on
+            vol = int(args.buzzer_volume)
+            pipower5.set_buzzer_volume(vol)
+            print(f"Set buzzer volume: {vol}")
     if args.buzzer_test != '':
         if args.buzzer_test == None:
-            print(f"Invalid event for Test buzz on: '{args.buzzer_test}', it should be {', '.join(AVAILABLE_EVENTS)}")
-            quit()
+            print("Usage: --buzzer-test <frequency> (e.g. 440) or --buzzer-test <event_name>")
         else:
-            event = args.buzzer_test
-            if event in AVAILABLE_EVENTS:
-                sequence = current_config['system']['pipower5_buzz_sequence'][event]
-                pipower5.buzz_sequence(sequence)
-            else:
-                print(f"Invalid event for Test buzz on: '{event}', it should be {', '.join(AVAILABLE_EVENTS)}")
-                quit()
+            from .device import DEVICE_PATH as _DP
+            val = args.buzzer_test
+            try:
+                freq = int(val)
+                pipower5._write_sysfs("buzzer_play", str(freq))
+                print(f"Playing {freq}Hz for 5s...")
+            except ValueError:
+                print(f"Event '{val}' - buzzer auto-triggers on kernel events. Use frequency value to test manually.")
 
     if len(new_sys_config) > 0 or len(new_peripheral_config) > 0:
         new_config = {

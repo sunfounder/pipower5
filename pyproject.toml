@@ -18,7 +18,6 @@ classifiers = [
 dynamic = ["version"]
 
 dependencies = [
-  'smbus2',
 ]
 
 [project.scripts]
