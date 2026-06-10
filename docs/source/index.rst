@@ -1,25 +1,25 @@
 .. note::
 
-    Hello, welcome to the SunFounder Raspberry Pi & Arduino & ESP32 Enthusiasts Community on Facebook! Dive deeper into Raspberry Pi, Arduino, and ESP32 with fellow enthusiasts.
+    Facebook上のSunFounder Raspberry Pi & Arduino & ESP32エンスージアストコミュニティへようこそ！仲間のエンスージアストと共に、Raspberry Pi、Arduino、ESP32についてより深く学びましょう。
 
-    **Why Join?**
+    **参加する理由**
 
-    - **Expert Support**: Solve post-sale issues and technical challenges with help from our community and team.
-    - **Learn & Share**: Exchange tips and tutorials to enhance your skills.
-    - **Exclusive Previews**: Get early access to new product announcements and sneak peeks.
-    - **Special Discounts**: Enjoy exclusive discounts on our newest products.
-    - **Festive Promotions and Giveaways**: Take part in giveaways and holiday promotions.
+    - **エキスパートサポート**: コミュニティとチームの助けを借りて、販売後の問題や技術的な課題を解決します。
+    - **学びと共有**: ヒントやチュートリアルを交換してスキルを向上させましょう。
+    - **独占プレビュー**: 新製品の発表や先行紹介にいち早くアクセスできます。
+    - **特別割引**: 最新製品の独占割引をお楽しみください。
+    - **お祭りプロモーションとプレゼント**: プレゼント企画やホリデープロモーションに参加しましょう。
 
-    👉 Ready to explore and create with us? Click [|link_sf_facebook|] and join today!
+    👉 私たちと一緒に探求し創造する準備はできましたか？[|link_sf_facebook|]をクリックして今すぐ参加しましょう！
 
-SunFounder PiPower5 - Protect Your Device & Data
+SunFounder PiPower5 - デバイスとデータを保護
 ================================================================================
 
 .. * |link_PiPower_5_buy|
 
 .. Thank you for choosing our |link_PiPower_5|.
 
-Thank you for choosing our PiPower5.
+PiPower5 をお選びいただきありがとうございます。
 
 
 .. .. note::
@@ -28,7 +28,7 @@ Thank you for choosing our PiPower5.
 ..         * |link_german_tutorials|
 ..         * |link_jp_tutorials|
 ..         * |link_en_tutorials|
-    
+
 ..     Please click on the respective links to access the document in your preferred language.
 
 .. todo: new pic
@@ -37,41 +37,41 @@ Thank you for choosing our PiPower5.
     :width: 400
     :align: center
 
-PiPower 5 is a versatile UPS solution designed for seamless integration with Raspberry Pi devices. It features robust power path management, dual lithium battery charging and discharging capabilities, and essential protections against reverse polarity, overcharging, and over-discharging.
+PiPower 5 は、Raspberry Pi デバイスとのシームレスな統合のために設計された多用途 UPS ソリューションです。堅牢な電源パス管理、デュアルリチウムバッテリーの充放電機能、逆極性・過充電・過放電に対する必須保護機能を備えています。
 
-With an output of up to 5V/5A, PiPower 5 ensures stable performance for a wide range of devices. Its HAT+ configuration guarantees compatibility with Raspberry Pi 5, while additional outputs, including a USB-A port and a 4x2P header, provide support for various single-board computers (SBCs) and microcontroller platforms, such as Arduino, Pico, and ESP32.
+最大 5V/5A の出力により、PiPower 5 は幅広いデバイスで安定したパフォーマンスを保証します。HAT+ 構成は Raspberry Pi 5 との互換性を保証し、USB-A ポートと 4x2P ヘッダーを含む追加出力は、Arduino、Pico、ESP32 などのさまざまなシングルボードコンピューター (SBC) およびマイクロコントローラープラットフォームをサポートします。
 
-An onboard microcontroller efficiently manages power operations and enables real-time monitoring of key parameters via I2C communication. These parameters include input voltage, output voltage, battery voltage, battery capacity, external power connection status, charging status, and the current power source (battery or USB).
+内蔵マイクロコントローラーが電源操作を効率的に管理し、I2C 通信を介して主要パラメーターのリアルタイム監視を可能にします。これらのパラメーターには、入力電圧、出力電圧、バッテリー電圧、バッテリー容量、外部電源接続状態、充電状態、現在の電源ソース (バッテリーまたはUSB) が含まれます。
 
-Combining advanced battery management with broad compatibility, PiPower 5 is an essential tool for tech enthusiasts and professionals looking to optimize their hardware setups.
+高度なバッテリー管理と幅広い互換性を組み合わせた PiPower 5 は、ハードウェアセットアップの最適化を目指す技術愛好家や専門家にとって不可欠なツールです。
 
-**Features**
+**機能**
 
-* **Input**: 5-15V, 45W, USB Type-C PD, DC5.5-2.1
-* **Output**: 5V/5A via Raspberry Pi GPIO, USB Type-A, and 2x4P 2.54mm pin headers
-* **Charging Power**: Up to 20W
-* **Battery Specs**: 7.4V 2 Cell 18650 Li-ion, XH2.54 3P connector
-* **Configurable Settings via Jumpers**:
+* **入力**: 5-15V、45W、USB Type-C PD、DC5.5-2.1
+* **出力**: Raspberry Pi GPIO 経由で 5V/5A、USB Type-A、2x4P 2.54mm ピンヘッダー
+* **充電電力**: 最大 20W
+* **バッテリー仕様**: 7.4V 2セル 18650 Li-ion、XH2.54 3P コネクタ
+* **ジャンパーによる設定可能な設定**:
 
-  * Default On Jumper: Configure whether the device powers on automatically when connected to power.
-  * Shutdown Signal Jumper: Enable detection of the device's shutdown status.
-  * External Power Button Pin Header: Connect an external power button for manual power control.
+  * デフォルトONジャンパー: 電源接続時にデバイスを自動起動するかどうかを設定。
+  * シャットダウン信号ジャンパー: デバイスのシャットダウン状態の検出を有効化。
+  * 外部電源ボタンピンヘッダー: 手動電源制御用の外部電源ボタンを接続。
 
-* **Onboard Indicators and Buttons**:
-  
-  * Battery status indicator
-  * Input source indicator
-  * Power button
-  * Battery reverse connection indicator
-  * Output power indicator
+* **内蔵インジケーターとボタン**:
 
-* **Onboard Microcontroller**: 32-bit ARM Cortex-M23, supporting I2C communication
+  * バッテリー状態インジケーター
+  * 入力ソースインジケーター
+  * 電源ボタン
+  * バッテリー逆接続インジケーター
+  * 出力電源インジケーター
 
-* **I2C communication interfaces**: 
-  
+* **内蔵マイクロコントローラー**: 32-bit ARM Cortex-M23、I2C通信対応
+
+* **I2C通信インターフェース**:
+
   * Raspberry Pi GPIO
-  * SH1.0 4P (compatible with Qwiic and STEMMA QT)
-  * 1x4P 2.54mm pin header
+  * SH1.0 4P (Qwiic および STEMMA QT 互換)
+  * 1x4P 2.54mm ピンヘッダー
 
 
 .. **Table of Contents**
@@ -79,7 +79,7 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Getting Started
+   :caption: はじめに
 
    About PiPower 5 <self>
    assembly
@@ -88,7 +88,7 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Hardware Overview
+   :caption: ハードウェア概要
 
    pipower_hat
    battery
@@ -96,7 +96,7 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Software Configuration
+   :caption: ソフトウェア設定
 
    pipower5_software
    update_firmware
@@ -106,14 +106,13 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Appendix
+   :caption: 付録
 
    compatible_sbc
    troubleshooting
    faq
 
 
-**Copyright Notice**
+**著作権表示**
 
-All contents including but not limited to texts, images, and code in this manual are owned by the SunFounder Company. You should only use it for personal study,investigation, enjoyment, or other non-commercial or nonprofit purposes, under therelated regulations and copyrights laws, without infringing the legal rights of the author and relevant right holders. For any individual or organization that uses these for commercial profit without permission, the Company reserves the right to take legal action.
-
+本書のテキスト、画像、コードを含むがこれらに限定されないすべての内容は、SunFounder Company が所有しています。著作者および関連する権利所有者の法的権利を侵害することなく、関連法規および著作権法の下で、個人的な学習、調査、娯楽、またはその他の非商業的・非営利目的にのみ使用することができます。許可なくこれらを商業的利益のために使用する個人または組織に対して、当社は法的措置を取る権利を留保します。

@@ -1,68 +1,68 @@
 .. _pipower5_tool:
 
-PiPower 5 Tool
+PiPower 5 ツール
 ===============================
 
-The PiPower 5 Tool is the companion software for PiPower 5.
+PiPower 5 ツールは、PiPower 5 のコンパニオンソフトウェアです。
 
-It provides:
+以下の機能を提供します:
 
-- Safe shutdown support
-- Battery and charging management
-- Power monitoring
-- Web Dashboard access
-- Event notifications
+- 安全なシャットダウンサポート
+- バッテリーおよび充電管理
+- 電力監視
+- Web ダッシュボードへのアクセス
+- イベント通知
 
-PiPower 5 can send shutdown requests to the Raspberry Pi in the following situations:
+PiPower 5 は以下の状況で Raspberry Pi にシャットダウン要求を送信できます:
 
-- The PiPower button is held for 2 seconds
-- Battery level falls below the configured shutdown percentage
+- PiPower ボタンを 2 秒間長押ししたとき
+- バッテリーレベルが設定されたシャットダウン残量を下回ったとき
 
-After the Raspberry Pi completes shutdown, PiPower 5 can automatically disconnect power to help prevent SD card corruption and unexpected power loss issues.
+Raspberry Pi のシャットダウン完了後、PiPower 5 は自動的に電源を切断し、SD カードの破損や予期しない電源喪失の問題を防ぐことができます。
 
 .. start_install_pipower5
 
-Install ``pipower5`` Tool
+``pipower5`` ツールのインストール
 ----------------------------------------------------
 
-Install the PiPower 5 Tool:
+PiPower 5 ツールをインストールします:
 
-1. Clone the repository:
+1. リポジトリをクローン:
 
    .. code-block:: shell
 
       git clone https://github.com/sunfounder/pipower5
 
-2. Enter the directory:
+2. ディレクトリに移動:
 
    .. code-block:: shell
 
       cd pipower5
 
-3. Run the installer:
+3. インストーラーを実行:
 
    .. code-block:: shell
 
       sudo python3 install.py
 
-4. Reboot the Raspberry Pi when prompted.
+4. プロンプトが表示されたら Raspberry Pi を再起動します。
 
 .. end_install_pipower5
 
-Command Reference
+コマンドリファレンス
 ---------------------------------------
 
-The ``pipower5`` tool provides access to PiPower 5 status information and configuration options.
+``pipower5`` ツールは PiPower 5 のステータス情報と設定オプションへのアクセスを提供します。
 
-For example, the following command displays the current PiPower 5 status:
+たとえば、以下のコマンドは現在の PiPower 5 ステータスを表示します:
 
 .. code-block:: shell
 
    pipower5 -a
 
-Example output:
+出力例:
 
-.. code-block:: 
+.. code-block::
 
    Input:
       voltage: 0 mV
@@ -88,9 +88,9 @@ Example output:
       default on: on
       shutdown percentage: 10 %
 
-You can customize these settings to fit your needs.
+これらの設定はニーズに合わせてカスタマイズできます。
 
-Use ``pipower5`` or ``pipower5 -h`` for instructions.
+``pipower5`` または ``pipower5 -h`` で手順を表示します。
 
 .. code-block:: text
 
@@ -183,44 +183,44 @@ Use ``pipower5`` or ``pipower5 -h`` for instructions.
 
 .. note::
 
-   Each time you modify the status of ``pipower5.service``, you need to use the following command to make the configuration changes take effect.
+   ``pipower5.service`` の状態を変更するたびに、以下のコマンドを使用して設定変更を反映させる必要があります。
 
    .. code-block:: shell
 
       sudo systemctl restart pipower5.service
 
-   Verify the pipower5 program status using the systemctl tool.
+   systemctl ツールを使用して pipower5 プログラムの状態を確認します。
 
    .. code-block:: shell
 
       sudo systemctl status pipower5.service
 
-   Alternatively, inspect the program-generated log files.
+   または、プログラムが生成したログファイルを確認します。
 
    .. code-block:: shell
 
       cat /opt/pipower5/log
 
-Web Dashboard
+Web ダッシュボード
 ----------------------------------------------------
 
-The PiPower 5 Tool includes a built-in Web Dashboard for monitoring and configuration.
+PiPower 5 ツールには、監視と設定のための内蔵 Web ダッシュボードが含まれています。
 
-Access the dashboard from your browser:
+ブラウザからダッシュボードにアクセスします:
 
 .. code-block:: text
 
    http://<raspberry-pi-ip>:34001
 
-Dashboard features include:
+ダッシュボードの機能:
 
-- Battery percentage monitoring
-- Charging status monitoring
-- Input and output voltage monitoring
-- Current monitoring
-- Shutdown percentage configuration
-- Notification management
-- Raspberry Pi device information
+- バッテリー残量の監視
+- 充電状態の監視
+- 入力・出力電圧の監視
+- 電流の監視
+- シャットダウン残量の設定
+- 通知管理
+- Raspberry Pi デバイス情報
 
 .. image:: img/web_dashboard.png
    :width: 100%
@@ -230,131 +230,131 @@ Dashboard features include:
    :width: 100%
    :align: center
 
-You can also configure the shutdown percentage directly from the dashboard:
+ダッシュボードから直接シャットダウン残量を設定することもできます:
 
 .. image:: img/web_dashboard_3.png
    :width: 100%
    :align: center
 
-If you do not need the dashboard, remove it with:
+ダッシュボードが不要な場合は、以下のコマンドで削除します:
 
 .. code-block:: shell
 
    pipower5 --remove-dashboard
 
-Safe Shutdown
+安全なシャットダウン
 ----------------------------------------------------
 
-PiPower 5 supports automatic safe shutdown protection for Raspberry Pi systems.
+PiPower 5 は Raspberry Pi システムの自動安全シャットダウン保護をサポートします。
 
-Shutdown workflow:
+シャットダウンのワークフロー:
 
 .. code-block:: text
 
-   Shutdown triggered
-   -> Raspberry Pi performs safe shutdown
-   -> PiPower 5 detects shutdown completion
-   -> PiPower 5 automatically cuts power
+   シャットダウンがトリガーされる
+   -> Raspberry Pi が安全なシャットダウンを実行
+   -> PiPower 5 がシャットダウン完了を検出
+   -> PiPower 5 が自動的に電源を切断
 
-This helps prevent:
+これにより以下を防止します:
 
-- SD card corruption
-- File system damage
-- Unexpected power loss issues
+- SD カードの破損
+- ファイルシステムの損傷
+- 予期しない電源喪失の問題
 
 
-Power-Off After Raspberry Pi Shutdown
-++++++++++++++++++++++++++++++++++++++
+Raspberry Pi シャットダウン後の電源オフ
++++++++++++++++++++++++++++++++++++++++
 
 .. start_power_off_after_shutdown
 
-To allow PiPower 5 to automatically cut power after the Raspberry Pi shuts down, some additional configuration is required.
+Raspberry Pi のシャットダウン後に PiPower 5 が自動的に電源を切断できるようにするには、追加の設定が必要です。
 
-1. If you are using a **Raspberry Pi 4 or 5**:
+1. **Raspberry Pi 4 または 5** を使用している場合:
 
-   * Ensure the ``SDSIG`` jumper on PiPower 5 is connected to ``PI3V3``.
+   * PiPower 5 の ``SDSIG`` ジャンパーが ``PI3V3`` に接続されていることを確認します。
 
      .. image:: img/safe_shutdown_3v3.png
         :width: 400
 
-   * Open Raspberry Pi Configuration:
+   * Raspberry Pi 設定を開きます:
 
      .. code-block:: shell
-  
+
         sudo raspi-config
 
-   * Navigate to:
+   * 以下に移動します:
 
      .. code-block:: text
-  
+
         6 Advanced Options
         -> A11 Shutdown Behaviour
         -> B1 Full power off Switch off Pi ...
 
-   * Reboot the Raspberry Pi when prompted.
+   * プロンプトが表示されたら Raspberry Pi を再起動します。
 
-2. If you are using a **Raspberry Pi 3** or earlier:
+2. **Raspberry Pi 3** 以前を使用している場合:
 
-   * Set the ``SDSIG`` jumper on PiPower 5 to ``GPIO26``.
+   * PiPower 5 の ``SDSIG`` ジャンパーを ``GPIO26`` に設定します。
 
      .. image:: img/safe_shutdown_io26.png
         :width: 400
-        
-   * Open ``/boot/firmware/config.txt``:
+
+   * ``/boot/firmware/config.txt`` を開きます:
 
      .. code-block:: shell
-  
+
         sudo nano /boot/firmware/config.txt
 
-   * Add the following lines:
+   * 以下の行を追加します:
 
      .. code-block:: shell
-  
+
         dtoverlay=gpio-poweroff,gpio_pin=26,active_low=1
         gpio=26=op,dh
 
-   * Press ``Ctrl+X``, then ``Y``, and press ``Enter`` to save the file and exit.
-   
-   * Reboot the Raspberry Pi.
+   * ``Ctrl+X`` を押し、``Y`` を押し、``Enter`` を押してファイルを保存して終了します。
+
+   * Raspberry Pi を再起動します。
 
      .. code-block:: shell
-  
+
         sudo reboot
 
-After configuration, PiPower 5 can automatically detect Raspberry Pi shutdown and safely disconnect power.
+設定後、PiPower 5 は自動的に Raspberry Pi のシャットダウンを検出し、安全に電源を切断できます。
 
-Supported safe shutdown methods include:
+サポートされている安全なシャットダウン方法:
 
-- Hold the PiPower button for 2 seconds
-- Shut down from the Raspberry Pi desktop menu
-- Run ``sudo shutdown now``
-- Automatic shutdown when battery level falls below the configured shutdown percentage
+- PiPower ボタンを 2 秒間長押し
+- Raspberry Pi デスクトップメニューからシャットダウン
+- ``sudo shutdown now`` の実行
+- バッテリーレベルが設定されたシャットダウン残量を下回った場合の自動シャットダウン
 
 .. end_power_off_after_shutdown
 
-Configure Shutdown Percentage
-++++++++++++++++++++++++++++++++++++++
+シャットダウン残量の設定
++++++++++++++++++++++++++++++++++++++++
 
-You can configure the battery percentage that triggers automatic shutdown.
+自動シャットダウンをトリガーするバッテリー残量を設定できます。
 
-Example:
+例:
 
 .. code-block:: shell
 
    pipower5 -sp 30
 
-This sets the shutdown threshold to 30%.
+これでシャットダウン閾値が 30% に設定されます。
 
-Then use the following command to make the configuration changes take effect.
+次に以下のコマンドで設定変更を反映させます。
 
 .. code-block:: shell
 
    sudo systemctl restart pipower5.service
 
-When the battery level falls below 30%, PiPower 5 will notify the Raspberry Pi to shut down and disconnect power automatically.
+バッテリーレベルが 30% を下回ると、PiPower 5 は Raspberry Pi にシャットダウンを通知し、自動的に電源を切断します。
 
 
-You can also read the current shutdown percentage:
+現在のシャットダウン残量を読み取ることもできます:
 
 .. code-block:: shell
 
@@ -362,67 +362,67 @@ You can also read the current shutdown percentage:
 
 .. tip::
 
-   For Raspberry Pi 5 systems with high power consumption (>3A), it is recommended to set the shutdown percentage to ``100%``.
+   高電力消費 (>3A) の Raspberry Pi 5 システムでは、シャットダウン残量を ``100%`` に設定することを推奨します。
 
-   This ensures the Raspberry Pi shuts down immediately when external power is disconnected, helping protect the system and storage devices.
+   これにより、外部電源が切断されたときに Raspberry Pi がすぐにシャットダウンし、システムとストレージデバイスを保護できます。
 
 
-Power Monitoring
+電力監視
 ----------------------------------------------------
 
-PiPower 5 provides real-time monitoring for:
+PiPower 5 は以下をリアルタイムで監視します:
 
-- Battery percentage
-- Charging status
-- Input voltage
-- Output voltage
-- Input current
-- Output current
-- Battery voltage
-- Battery current
+- バッテリー残量
+- 充電状態
+- 入力電圧
+- 出力電圧
+- 入力電流
+- 出力電流
+- バッテリー電圧
+- バッテリー電流
 
-Useful commands:
+便利なコマンド:
 
-Show battery percentage:
+バッテリー残量の表示:
 
 .. code-block:: shell
 
    pipower5 -bp
 
-Show charging status:
+充電状態の表示:
 
 .. code-block:: shell
 
    pipower5 -ichg
 
-Show input voltage:
+入力電圧の表示:
 
 .. code-block:: shell
 
    pipower5 -iv
 
-Show all status information:
+すべてのステータス情報の表示:
 
 .. code-block:: shell
 
    pipower5 -a
 
-For the full command list:
+全コマンドリスト:
 
 .. code-block:: shell
 
    pipower5 --help
 
 
-Notifications
+通知
 ----------------------------------------------------
 
-PiPower5 supports event-driven notifications through:
+PiPower5 は以下を通じてイベント駆動型通知をサポートします:
 
-- Buzzer alerts
-- Email notifications
+- ブザーアラート
+- メール通知
 
-Supported events include:
+サポートされているイベント:
 
 - ``battery_activated``
 - ``low_battery``
@@ -434,143 +434,143 @@ Supported events include:
 
 .. note::
 
-   Each time you modify the status of ``pipower5.service``, you need to use the following command to make the configuration changes take effect.
+   ``pipower5.service`` の状態を変更するたびに、以下のコマンドを使用して設定変更を反映させる必要があります。
 
    .. code-block:: shell
 
       sudo systemctl restart pipower5.service
 
-Event Descriptions
+イベントの説明
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
 1. ``battery_activated``
 
-   Triggered when the battery begins supplying power. This typically occurs if the external power source is disconnected or unable to provide sufficient power.
+   バッテリーが電力供給を開始したときにトリガーされます。これは通常、外部電源が切断されたか、十分な電力を供給できない場合に発生します。
 
-   * **Reset Condition**: Resets automatically after external power is disconnected.
+   * **リセット条件**: 外部電源が切断された後、自動的にリセットされます。
 
 2. ``low_battery``
 
-   Activated when the battery charge level falls below the **configured shutdown threshold**.
+   バッテリー充電レベルが**設定されたシャットダウン閾値**を下回ったときに有効になります。
 
-   * **Repetition**: If the battery remains below this threshold, the event is triggered every 10 minutes.
-   * **Reset Condition**: Resets once the battery charge rises above **shutdown threshold + 5%**.
+   * **繰り返し**: バッテリーがこの閾値を下回ったままの場合、10分ごとにイベントがトリガーされます。
+   * **リセット条件**: バッテリー充電量が**シャットダウン閾値 + 5%** を超えるとリセットされます。
 
 3. ``power_disconnected``
 
-   Triggered when the external power source is disconnected.
+   外部電源が切断されたときにトリガーされます。
 
-   * **Reset Condition**: Resets once the external power supply is restored.
+   * **リセット条件**: 外部電源が復旧するとリセットされます。
 
 4. ``power_restored``
 
-   Triggered when the external power source is restored.
+   外部電源が復旧したときにトリガーされます。
 
-   * **Reset Condition**: Resets if the external power is disconnected again.
+   * **リセット条件**: 外部電源が再び切断されるとリセットされます。
 
 5. ``power_insufficient``
 
-   Occurs when the external power supply is insufficient, requiring the battery to provide supplemental power.
+   外部電源が不十分で、バッテリーが補助電力を供給する必要がある場合に発生します。
 
-   * **Recommended Action**: Check the rated output of the power source, or verify the configured charging power settings.
-   * **Reset Condition**: Resets when the external power source is disconnected.
+   * **推奨アクション**: 電源の定格出力を確認するか、設定された充電電力設定を確認してください。
+   * **リセット条件**: 外部電源が切断されるとリセットされます。
 
 6. ``battery_critical_shutdown``
 
-   Triggered just before the system shuts down due to **critically low battery capacity**.
+   **バッテリー容量が極めて低い**\ ためにシステムがシャットダウンする直前にトリガーされます。
 
 7. ``battery_voltage_critical_shutdown``
 
-   Triggered when the **battery voltage** drops below the critical threshold, leading to shutdown.
+   **バッテリー電圧**\ が危険閾値を下回り、シャットダウンにつながる場合にトリガーされます。
 
-   * **Note**: This event is rarely triggered in normal use. Typically, the ``low_battery`` event will initiate a shutdown sequence before the voltage drops this far. This serves as a **failsafe shutdown mechanism**.
+   * **注意**: このイベントは通常の使用ではめったにトリガーされません。通常、``low_battery`` イベントが電圧がここまで低下する前にシャットダウンシーケンスを開始します。これは**フェイルセーフシャットダウンメカニズム**として機能します。
 
-With these events, PiPower5 provides both proactive warnings (e.g., low battery, insufficient power) and critical safeguards (e.g., shutdown triggers), ensuring stable operation and data protection.
+これらのイベントにより、PiPower5 はプロアクティブな警告 (低バッテリー、電力不足など) と重要な保護 (シャットダウントリガー) の両方を提供し、安定した動作とデータ保護を保証します。
 
 
 
-Buzzer Alerts
+ブザーアラート
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
-PiPower5 supports buzzer notifications for different system events.
+PiPower5 は異なるシステムイベントに対するブザー通知をサポートします。
 
-You can configure buzzer alerts through the **Web Dashboard** or the **command-line tool**.  
-When a configured event occurs, PiPower5 will play the corresponding buzzer sound.
+**Web ダッシュボード**\ または\ **コマンドラインツール**\ を通じてブザーアラートを設定できます。
+設定されたイベントが発生すると、PiPower5 は対応するブザー音を再生します。
 
-Features include:
+機能:
 
-- Event-based buzzer notifications
-- Adjustable buzzer volume (1–10)
-- Event sound preview
-- Custom sound effect support
+- イベントベースのブザー通知
+- 調整可能なブザー音量 (1～10)
+- イベント音のプレビュー
+- カスタムサウンドエフェクトのサポート
 
-Advanced users can also create custom buzzer sound effects.
+上級ユーザーはカスタムブザーサウンドエフェクトを作成することもできます。
 
-1. Open the configuration file:
+1. 設定ファイルを開きます:
 
    .. code-block:: shell
 
       /opt/pipower5/venv/lib/python3.11/site-packages/pipower5/config.json
 
-2. Locate the ``pipower5_buzz_sequence`` section.
+2. ``pipower5_buzz_sequence`` セクションを見つけます。
 
-3. Each sound effect is defined using the following format:
+3. 各サウンドエフェクトは以下の形式で定義されます:
 
    .. code-block:: text
 
       [action, duration]
 
-   Where:
+   ここで:
 
-   - ``action`` can be:
+   - ``action`` は以下が可能です:
 
-     - A musical note, such as ``"A4"``, ``"D3"``, or ``"C#4"``
-     - A frequency value (integer)
-     - ``"pause"`` for silence
+     - ``"A4"``、``"D3"``、``"C#4"`` などの音符
+     - 周波数値 (整数)
+     - 無音を表す ``"pause"``
 
-   - ``duration`` is the playback time in milliseconds (ms)
+   - ``duration`` は再生時間 (ミリ秒)
 
 
-Email Alerts
+メールアラート
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
-PiPower5 supports email notifications for important system events, such as:
+PiPower5 は以下のような重要なシステムイベントに対するメール通知をサポートします:
 
-- Low battery
-- Power disconnected
-- Power restored
-- Critical shutdown events
+- 低バッテリー
+- 電源切断
+- 電源復旧
+- 重大なシャットダウンイベント
 
-Email notifications can be configured through the **Web Dashboard** or the **command-line tool**.
+メール通知は **Web ダッシュボード**\ または\ **コマンドラインツール**\ を通じて設定できます。
 
-To use email alerts, an SMTP server is required. Most email providers support SMTP services.
+メールアラートを使用するには SMTP サーバーが必要です。ほとんどのメールプロバイダーが SMTP サービスをサポートしています。
 
-- For Gmail, simply create an **App Password**
-- For other providers, enable SMTP access and generate a dedicated SMTP password if required
+- Gmail の場合、**アプリパスワード**\ を作成するだけです
+- その他のプロバイダーの場合、SMTP アクセスを有効にし、必要に応じて専用の SMTP パスワードを生成してください
 
-Before configuration, prepare the following information:
+設定前に以下の情報を準備してください:
 
-- SMTP server address  
-  (Example: ``smtp.gmail.com``)
+- SMTP サーバーアドレス
+  (例: ``smtp.gmail.com``)
 
-- SMTP port  
-  (Example: ``465`` or ``25``)
+- SMTP ポート
+  (例: ``465`` または ``25``)
 
-- Encryption type  
+- 暗号化タイプ
   (``None`` / ``SSL`` / ``TLS``)
 
-- SMTP account  
-  (Usually your email address)
+- SMTP アカウント
+  (通常はメールアドレス)
 
-- SMTP password  
-  (App Password or SMTP password)
+- SMTP パスワード
+  (アプリパスワードまたは SMTP パスワード)
 
-After entering the SMTP information, configure the recipient email address.
+SMTP 情報を入力した後、受信者メールアドレスを設定します。
 
 .. note::
 
-   PiPower5 uses the SMTP server to log into your email account and send notifications.
+   PiPower5 は SMTP サーバーを使用してメールアカウントにログインし、通知を送信します。
 
-   You may use the same email address as both the sender and recipient.
+   同じメールアドレスを送信者と受信者の両方に使用できます。
 
-After setup, use the test command to verify the SMTP connection and email delivery.
+セットアップ後、テストコマンドを使用して SMTP 接続とメール配信を確認します。

@@ -1,5 +1,7 @@
 # PiPower 5 Documentation Repository
 
+> **Synced from canonical source.** This CLAUDE.md is synced from the English source repository (`docs` branch). The authoritative version lives in the main workspace. When adding rules, update the canonical file first, then propagate here. This branch: `docs-ja` — Japanese translation.
+
 ## Project Identity
 
 | Field | Value |
@@ -54,6 +56,8 @@ pipower5/
         ├── use_with_arduino.rst   # Arduino library usage
         ├── use_with_micropython.rst  # MicroPython library usage
         ├── compatible_sbc.rst     # Compatible SBC list
+        ├── faq.rst               # Frequently asked questions
+        ├── troubleshooting.rst   # Troubleshooting guide
         ├── _static/
         │   └── lang.js        # Multi-language redirect script
         ├── _templates/
@@ -197,7 +201,7 @@ https://docs.sunfounder.com/projects/pipower5/en/latest/
 
 | Extension | Purpose |
 |---|---|
-| `sphinx.ext.autosectionlabel` | Auto-generates section labels for cross-referencing |
+| `sphinx.ext.autosectionlabel` | **DISABLED** — comment out in `conf.py`. Causes duplicate label warnings with CJK section titles |
 | `sphinx_copybutton` | Adds copy button to code blocks |
 | `sphinx_rtd_theme` | ReadTheDocs theme |
 
@@ -274,10 +278,37 @@ When working on this repository:
 2. **The Facebook community note** at the top of each `.rst` file is part of SunFounder's documentation standard. It appears in `index.rst`, `pipower5_software.rst`, and other user-facing pages.
 3. **`conf.py` link substitutions** are the single source of external URLs. Never hardcode external links in `.rst` files — use `|link_xxx|` substitutions.
 4. **Reference labels** (`.. _label:`) are code identifiers, not human-readable text. Never translate them.
-5. **RST section underlines must match title length.** When translating section titles, the underline characters (`=`, `-`, `^`, `~`) must be at least as long as the title text. Translated titles are often longer — extend the underline accordingly.
-6. **Code blocks** (Python, bash, shell) are never translated. Command strings and file paths stay as-is.
-7. **The `_static` and `_templates` directories** contain custom assets. Changes here affect the global look and behavior of the published site.
-8. **Build output** goes to `docs/build/` and is gitignored — never commit build artifacts.
-9. **Images** are all under `docs/source/img/`. When adding new images, place them there and reference with relative paths.
-10. **Register tables** in `pipower_hat.rst` use raw HTML. When updating register values, edit both the "Register Table" (read) and "Register Settings Table" (write) sections.
-11. **The `show` script** at the repo root is a GPL license display utility — it is Python 2 syntax and should be considered legacy.
+5. **RST section underlines (and overlines) must match title display width.** 
+   
+   - For single-underline headings (title followed by `=` or `-`), the underline must be at least as long as the title text.
+   - For overline+underline headings (e.g., `----` above and below the title), **both** the overline and underline must use the same character, be the **exact same length**, and be at least as long as the title. When translating titles, always update both lines together.
+   - **CJK display width**: docutils counts CJK characters as **2 display columns** each (ASCII = 1 column). The overline/underline must match the total display width, not the character count. For example, `LED & ブザークイックリファレンス` = 6 ASCII columns + 13 CJK × 2 = 32 columns → needs ≥ 32 dashes.
+   
+   Translated titles are often longer than the English originals — extend overlines and underlines accordingly. When the title contains CJK characters, the underline/overline will be significantly longer than the character count suggests.
+6. **Inline strong markup (`**...**`) breaks when adjacent to CJK characters.** docutils inline markup recognition requires the `**` delimiters to be adjacent to whitespace or ASCII punctuation (`- : / . , ; ! ? ' " ( ) [ ] { } < >`). CJK characters (Chinese, Japanese, Korean) are **not** valid delimiters.
+
+   When `**text**` is immediately preceded or followed by a CJK character, docutils emits `WARNING: Inline strong start-string without end-string.` because it cannot find the closing `**`.
+
+   **Fix**: Insert `\ ` (backslash-escaped space) between the `**` delimiter and the adjacent CJK character:
+
+   .. code-block:: rst
+
+      # WRONG — closing ** followed by CJK に, warning emitted:
+      **PI3V3**にブリッジすると
+
+      # RIGHT — \  acts as a valid delimiter:
+      **PI3V3**\ にブリッジすると
+
+      # WRONG — opening ** preceded by CJK は, warning emitted:
+      または**コマンドラインツール**
+
+      # RIGHT:
+      または\ **コマンドラインツール**
+
+   This applies equally to other inline markup (`*emphasis*`, ```literal```) when adjacent to CJK text. Always check the build warnings for "Inline ... start-string without end-string" after translating content with inline markup.
+7. **Code blocks** (Python, bash, shell) are never translated. Command strings and file paths stay as-is.
+8. **The `_static` and `_templates` directories** contain custom assets. Changes here affect the global look and behavior of the published site.
+9. **Build output** goes to `docs/build/` and is gitignored — never commit build artifacts.
+10. **Images** are all under `docs/source/img/`. When adding new images, place them there and reference with relative paths.
+11. **Register tables** in `pipower_hat.rst` use raw HTML. When updating register values, edit both the "Register Table" (read) and "Register Settings Table" (write) sections.
+12. **The `show` script** at the repo root is a GPL license display utility — it is Python 2 syntax and should be considered legacy.

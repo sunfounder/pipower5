@@ -1,4 +1,4 @@
-Battery
+バッテリー
 =================
 
 .. image:: img/vh2pin_battery.png
@@ -9,16 +9,16 @@ Battery
 
    <br/>
 
-* **VCC**: Battery positive terminal.
-* **GND**: Negative battery terminal.
+* **VCC**: バッテリーのプラス端子。
+* **GND**: バッテリーのマイナス端子。
 
-This is a custom battery pack made by SunFounder consisting of two 18650 batteries with a capacity of 2000mAh. The connector is VH3.96 2P, which can be charged directly after being inserted into the shield.
+これは SunFounder 製のカスタムバッテリーパックで、容量 2000mAh の 18650 バッテリー 2 本で構成されています。コネクターは VH3.96 2P で、シールドに挿入後直接充電できます。
 
-**Features**
+**仕様**
 
-* **Composition**: Li-ion
-* **Battery Capacity**: 2000mAh, 14.8Wh
-* **Battery Weight**: 90.8g
-* **Number of Cells**: 2
-* **Connector**: VH3.96 2pin
-* **Over-discharge protection**: 6.0V
+* **構成**: Li-ion
+* **バッテリー容量**: 2000mAh、14.8Wh
+* **バッテリー重量**: 90.8g
+* **セル数**: 2
+* **コネクター**: VH3.96 2ピン
+* **過放電保護**: 6.0V

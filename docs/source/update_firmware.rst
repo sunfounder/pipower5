@@ -1,9 +1,9 @@
-Update PiPower5 Firmware Using Raspberry Pi
+Raspberry Pi を使用した PiPower5 ファームウェアの更新
 ===================================================================
 
-This guide explains how to update the firmware of **PiPower5** on a Raspberry Pi.  
+このガイドでは、Raspberry Pi で **PiPower5** のファームウェアを更新する方法を説明します。
 
-**1. Download** ``pipower5_update_tools`` **and install dependencies**
+**1.** ``pipower5_update_tools`` **をダウンロードして依存関係をインストール**
 
 .. code-block:: shell
 
@@ -12,102 +12,102 @@ This guide explains how to update the firmware of **PiPower5** on a Raspberry Pi
    sudo pip3 install blessed --break
    sudo pip3 install smbus2 --break
 
-**2. Check for updates**
+**2. 更新を確認**
 
 .. code-block:: shell
 
    cd pipower5_update_tools
    git pull
 
-**3. Run the update tool**
+**3. 更新ツールを実行**
 
 .. code-block:: shell
 
    python3 run.py
 
-**4. Stop the service if prompted**
+**4. プロンプトが表示されたらサービスを停止**
 
-When running ``pipower5_update_tools``, you may be prompted to stop ``pipower5.service``.  Press ``Y`` to stop the service.  
+``pipower5_update_tools`` の実行中に、``pipower5.service`` を停止するよう求められる場合があります。``Y`` を押してサービスを停止します。
 
 .. image:: img/upd_frw_1.png
 
-**5. Select** ``Update Firmware``
+**5.** ``Update Firmware`` **を選択**
 
-Choose **Update Firmware**. The Raspberry Pi will send a command that switches PiPower5 into **BOOT mode**.  
+**Update Firmware** を選択します。Raspberry Pi がコマンドを送信し、PiPower5 を **BOOT モード**\ に切り替えます。
 
 .. image:: img/upd_frw_2.png
 
-**6. Verify BOOT mode**
+**6. BOOT モードを確認**
 
-Once successfully in BOOT mode, the **two middle LEDs** on the PiPower5 will flash alternately, indicating BOOT mode is active.  
+BOOT モードに正常に入ると、PiPower5 の**中央の 2 つの LED** が交互に点滅し、BOOT モードがアクティブであることを示します。
 
 .. image:: img/upd_frw_3.png
 
-**7. Choose the firmware file**
+**7. ファームウェアファイルを選択**
 
-Select a firmware file in ``.bin`` format and press ``Enter`` to start writing.  
+``.bin`` 形式のファームウェアファイルを選択し、``Enter`` を押して書き込みを開始します。
 
 .. image:: img/upd_frw_4.png
 
-**8. Complete the update**
+**8. 更新を完了**
 
-After flashing is complete, select **Restart**.  
-PiPower5 will reboot and start running the new firmware.  
+書き込みが完了したら、**Restart** を選択します。
+PiPower5 が再起動し、新しいファームウェアの実行を開始します。
 
 .. image:: img/upd_frw_5.png
 
 ----------------------------------------------------------------
 
-**Restore Factory Firmware**
+**工場出荷時ファームウェアの復元**
 
-If you need to roll back to the factory firmware, use the **Restore Factory Firmware** option in ``pipower5_update_tools``.  
-This will reload the firmware stored in the factory partition and revert to the original version.  
+工場出荷時のファームウェアにロールバックする必要がある場合は、``pipower5_update_tools`` の **Restore Factory Firmware** オプションを使用します。
+これにより、工場出荷時パーティションに保存されているファームウェアが再ロードされ、元のバージョンに戻ります。
 
 .. image:: img/upd_frw_6.png
 
 
 ----------------------------------------------------------------
 
-**Force BOOT Mode**
+**BOOT モードの強制**
 
-If you cannot enter BOOT mode normally, you can force it:
+通常の方法で BOOT モードに入れない場合は、強制的に入ることができます:
 
-1. Power off PiPower5.  
-2. Short the **Boot 1 pin**.  
-3. Power on the device.  
+1. PiPower5 の電源を切ります。
+2. **Boot 1 ピン**\ を短絡します。
+3. デバイスの電源を入れます。
 
-PiPower5 will start directly in BOOT mode.  
+PiPower5 が直接 BOOT モードで起動します。
 
 .. image:: img/upd_frw_7.png
 
-To exit BOOT mode, press and hold the power button for two seconds.  
-PiPower5 will then reboot into normal mode.  
+BOOT モードを終了するには、電源ボタンを 2 秒間長押しします。
+PiPower5 は通常モードで再起動します。
 
 .. image:: img/upd_frw_8.png
 
 ----------------------------------------------------------------
 
-**Troubleshooting**
+**トラブルシューティング**
 
 
-Here are some common issues you may encounter during the update process and their solutions:
+更新プロセス中に発生する可能性のある一般的な問題とその解決策は以下の通りです:
 
-- **Device not detected**  
+- **デバイスが検出されない**
 
-  - Try rebooting both the Raspberry Pi and PiPower5, then re-run the update tool.  
+  - Raspberry Pi と PiPower5 の両方を再起動してから、更新ツールを再実行してください。
 
-- **Failed to enter BOOT mode**  
+- **BOOT モードに入れなかった**
 
-  - Ensure that ``pipower5.service`` is stopped before updating.  
-  - If automatic BOOT mode fails, use the **Force BOOT Mode** method (shorting the Boot 1 pin).  
+  - 更新前に ``pipower5.service`` が停止していることを確認してください。
+  - 自動 BOOT モードが失敗した場合は、**BOOT モードの強制**\ 方法 (Boot 1 ピンの短絡) を使用してください。
 
-- **Update process stuck or flashing failed**  
+- **更新プロセスが停止するか、書き込みに失敗した**
 
-  - Double-check that the firmware file is in ``.bin`` format.  
-  - Re-run the update tool and try again.  
-  - Use a stable power supply to prevent interruptions during flashing.  
+  - ファームウェアファイルが ``.bin`` 形式であることを再確認してください。
+  - 更新ツールを再実行して再試行してください。
+  - 書き込み中の中断を防ぐために安定した電源を使用してください。
 
-- **Firmware update completed, but device not working properly**  
+- **ファームウェア更新は完了したが、デバイスが正常に動作しない**
 
-  - Restore the factory firmware using the built-in tool.  
-  - If the problem persists, verify that the firmware file matches your PiPower5 version.  
+  - 内蔵ツールを使用して工場出荷時ファームウェアを復元してください。
+  - 問題が解決しない場合は、ファームウェアファイルが PiPower5 のバージョンと一致していることを確認してください。

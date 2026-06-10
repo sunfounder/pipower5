@@ -1,9 +1,9 @@
 .. _pipower5_assembly:
 
-Assembly Instructions
+組み立て手順
 ------------------------
 
-Before assembling the PiPower 5, please verify that all parts and components are included. If any components are missing or damaged, please contact SunFounder at service@sunfounder.com for prompt assistance.
+PiPower 5 を組み立てる前に、すべての部品とコンポーネントが揃っていることを確認してください。コンポーネントが不足しているか破損している場合は、service@sunfounder.com まで SunFounder にご連絡ください。
 
 
 

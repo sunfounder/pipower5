@@ -1,35 +1,35 @@
 .. note::
 
-    Hello, welcome to the SunFounder Raspberry Pi & Arduino & ESP32 Enthusiasts Community on Facebook! Dive deeper into Raspberry Pi, Arduino, and ESP32 with fellow enthusiasts.
+    Facebook上のSunFounder Raspberry Pi & Arduino & ESP32エンスージアストコミュニティへようこそ！仲間のエンスージアストと共に、Raspberry Pi、Arduino、ESP32についてより深く学びましょう。
 
-    **Why Join?**
+    **参加する理由**
 
-    - **Expert Support**: Solve post-sale issues and technical challenges with help from our community and team.
-    - **Learn & Share**: Exchange tips and tutorials to enhance your skills.
-    - **Exclusive Previews**: Get early access to new product announcements and sneak peeks.
-    - **Special Discounts**: Enjoy exclusive discounts on our newest products.
-    - **Festive Promotions and Giveaways**: Take part in giveaways and holiday promotions.
+    - **エキスパートサポート**: コミュニティとチームの助けを借りて、販売後の問題や技術的な課題を解決します。
+    - **学びと共有**: ヒントやチュートリアルを交換してスキルを向上させましょう。
+    - **独占プレビュー**: 新製品の発表や先行紹介にいち早くアクセスできます。
+    - **特別割引**: 最新製品の独占割引をお楽しみください。
+    - **お祭りプロモーションとプレゼント**: プレゼント企画やホリデープロモーションに参加しましょう。
 
-    👉 Ready to explore and create with us? Click [|link_sf_facebook|] and join today!
+    👉 私たちと一緒に探求し創造する準備はできましたか？[|link_sf_facebook|]をクリックして今すぐ参加しましょう！
 
 .. _faq:
 
-FAQ
-===
+よくある質問
+============
 
-How to Reinstall PiPower 5
---------------------------
+PiPower 5 の再インストール方法
+------------------------------
 
-If PiPower 5 is not working correctly and you want to perform a clean reinstall, follow these steps:
+PiPower 5 が正常に動作せず、クリーンな再インストールを実行したい場合は、以下の手順に従ってください:
 
-**1. Uninstall the current installation:**
+**1. 現在のインストールをアンインストール:**
 
 .. code-block:: shell
 
    cd ~/pipower5
    sudo python3 install.py --uninstall
 
-**2. Reinstall from source:**
+**2. ソースから再インストール:**
 
 .. code-block:: shell
 
@@ -37,9 +37,9 @@ If PiPower 5 is not working correctly and you want to perform a clean reinstall,
    cd pipower5
    sudo python3 install.py
 
-**3. Reboot the Raspberry Pi when prompted.**
+**3. プロンプトが表示されたら Raspberry Pi を再起動します。**
 
-After reboot, verify the installation:
+再起動後、インストールを確認します:
 
 .. code-block:: shell
 
@@ -48,51 +48,51 @@ After reboot, verify the installation:
 
 .. tip::
 
-   If the ``~/pipower5`` directory no longer exists from the original installation, skip the uninstall step and go directly to the reinstall step.
+   元のインストールから ``~/pipower5`` ディレクトリがもう存在しない場合は、アンインストール手順をスキップして、再インストール手順に直接進んでください。
 
 
-Dashboard Shows "Database Required" or No Data
-----------------------------------------------
+ダッシュボードに「Database Required」またはデータが表示されない
+------------------------------------------------------------------
 
-**What you see**: The Web Dashboard opens normally in your browser, but all data panels are empty or show "database required".
+**表示される症状**: Web ダッシュボードはブラウザで正常に開くが、すべてのデータパネルが空であるか、「database required」と表示される。
 
-**What this usually means**: This is rarely a hardware problem. In most cases, the InfluxDB backend has a configuration issue — a corrupted database, a missing bucket, or an expired token.
+**これが通常意味すること**: これはめったにハードウェアの問題ではありません。ほとんどの場合、InfluxDB バックエンドに設定の問題があります — 破損したデータベース、不足しているバケット、または期限切れのトークンです。
 
-**Check these, in order:**
+**以下の順序で確認してください:**
 
-1. **Check that the PiPower 5 service is running:**
+1. **PiPower 5 サービスが実行中か確認:**
 
    .. code-block:: shell
 
       sudo systemctl status pipower5
 
-   If the service is not active, start it:
+   サービスがアクティブでない場合、起動します:
 
    .. code-block:: shell
 
       sudo systemctl start pipower5
 
-2. **Check whether the InfluxDB bucket exists:**
+2. **InfluxDB バケットが存在するか確認:**
 
    .. code-block:: shell
 
       sudo influx bucket list
 
-   Look for a bucket named ``pipower5`` in the output. If it is missing, the database needs to be recreated.
+   出力で ``pipower5`` という名前のバケットを探します。不足している場合、データベースを再作成する必要があります。
 
-3. **Check the service logs for errors:**
+3. **サービルログでエラーを確認:**
 
    .. code-block:: shell
 
       journalctl -u pipower5 -n 50
 
-   Look for error messages related to InfluxDB, such as:
+   InfluxDB に関連するエラーメッセージを探します。例:
 
-   - ``unauthorized`` or ``token`` — indicates an authentication token issue.
-   - ``bucket not found`` — the database bucket is missing.
-   - ``connection refused`` — InfluxDB is not running.
+   - ``unauthorized`` または ``token`` — 認証トークンの問題を示します。
+   - ``bucket not found`` — データベースバケットが不足しています。
+   - ``connection refused`` — InfluxDB が実行されていません。
 
-4. **If InfluxDB itself is down**, restart it:
+4. **InfluxDB 自体がダウンしている場合**、再起動します:
 
    .. code-block:: shell
 
@@ -101,4 +101,4 @@ Dashboard Shows "Database Required" or No Data
 
 .. note::
 
-   If InfluxDB was installed manually or migrated from an older version, configuration paths or authentication tokens may have changed. In that case, a clean reinstall of PiPower 5 (see above) will also reinitialize the InfluxDB setup.
+   InfluxDB が手動でインストールされたか、古いバージョンから移行された場合、設定パスや認証トークンが変更されている可能性があります。その場合、PiPower 5 のクリーンな再インストール (上記参照) により、InfluxDB セットアップも再初期化されます。

@@ -1,63 +1,63 @@
-Quick User Guide
+クイックユーザーガイド
 ===============================
 
-This guide helps you quickly get started with PiPower 5 after hardware assembly.
+このガイドは、ハードウェア組み立て後の PiPower 5 のクイックスタートを支援します。
 
-Charge the Battery
+バッテリーの充電
 ----------------------------------------------------
 
-Before first use, fully charge the battery.
+初めて使用する前に、バッテリーを完全に充電してください。
 
-Recommendations:
+推奨事項:
 
-- Use a high-quality USB-C power adapter
-- A 5V 5A power supply is recommended for Raspberry Pi 5
-- Higher-power adapters are recommended when using SSDs or other high-power peripherals
+- 高品質の USB-C 電源アダプターを使用してください
+- Raspberry Pi 5 には 5V 5A 電源を推奨します
+- SSD やその他の高電力周辺機器を使用する場合は、より高出力のアダプターを推奨します
 
-While Charging:
+充電中:
 
-- Use a high-quality USB-C power supply to charge PiPower 5.
+- 高品質の USB-C 電源を使用して PiPower 5 を充電してください。
 
   .. image:: img/power_input.png
      :width: 50%
      :align: center
 
-- During charging, the battery indicator LEDs light up progressively in sequence. 
+- 充電中、バッテリーインジケーター LED が順次点灯します。
 
   .. image:: img/battery_indicator.png
      :width: 50%
      :align: center
 
-  Battery status is indicated by the number of lit LEDs:
-  
-  * **4 LEDs lit**: Battery >80%
-  * **3 LEDs lit**: 60%< Battery <80%
-  * **2 LEDs lit**: 40%< Battery <60%
-  * **1 LED lit**: 20%< Battery <40%
-  * **First LED flashing**: Battery <20%
-  * **LEDs incrementally light up in a cycle**: Charging
-  * **Middle two LEDs flashing**: Waiting for shutdown signal
-  * **All LEDs off**: Unpowered or in sleep mode
-  * During charging, the indicator remains lit **even in the off state** until fully charged.
-  
-Power On
+  点灯しているLEDの数でバッテリー状態がわかります:
+
+  * **4 LED 点灯**: バッテリー >80%
+  * **3 LED 点灯**: 60%< バッテリー <80%
+  * **2 LED 点灯**: 40%< バッテリー <60%
+  * **1 LED 点灯**: 20%< バッテリー <40%
+  * **最初のLEDが点滅**: バッテリー <20%
+  * **LEDがサイクルで順次点灯**: 充電中
+  * **中央の2つのLEDが点滅**: シャットダウン信号待ち
+  * **全LED消灯**: 電源未供給またはスリープモード
+  * 充電中は、満充電になるまで**オフの状態でも**インジケーターが点灯したままです。
+
+電源オン
 ----------------------------------------------------
 
-For Raspberry Pi devices, no additional power wiring is required. PiPower 5 supplies power directly through the GPIO header.
+Raspberry Pi デバイスの場合、追加の電源配線は不要です。PiPower 5 は GPIO ヘッダーを通じて直接電力を供給します。
 
-For other devices, you can power them using:
+その他のデバイスには、以下を使用して給電できます:
 
-- The USB-A output port
-- The 5V/GND pins next to the USB-A port
+- USB-A 出力ポート
+- USB-A ポート横の 5V/GND ピン
 
 .. image:: img/power_output.png
    :width: 50%
    :align: center
 
-Press the power button once to turn on PiPower 5. When powered on:
+電源ボタンを1回押して PiPower 5 をオンにします。電源が入ると:
 
-- The **PWR LED** lights up
-- The connected device begins receiving power from PiPower 5
+- **PWR LED** が点灯します
+- 接続されたデバイスが PiPower 5 から電力を受け取り始めます
 
 .. image:: img/pwr_led.png
    :width: 50%
@@ -67,29 +67,29 @@ Press the power button once to turn on PiPower 5. When powered on:
     :start-after: start_install_pipower5
     :end-before: end_install_pipower5
 
-Open the Web Dashboard
+Web ダッシュボードを開く
 ----------------------------------------------------
 
-After installation, open the dashboard in your browser:
+インストール後、ブラウザでダッシュボードを開きます:
 
 .. code-block:: text
 
    http://<raspberry-pi-ip>:34001
 
-The dashboard allows you to:
+ダッシュボードで以下が可能です:
 
-- View battery percentage
-- Monitor charging status
-- Check voltage and current
-- Configure shutdown percentage
-- Manage notifications
+- バッテリー残量の表示
+- 充電状態の監視
+- 電圧と電流の確認
+- シャットダウン残量の設定
+- 通知の管理
 
 .. image:: img/web_dashboard.png
    :width: 100%
    :align: center
 
 
-Safe Shutdown
+安全なシャットダウン
 ----------------------------------------------------
 
 .. include:: /pipower5_software.rst
@@ -98,14 +98,14 @@ Safe Shutdown
 
 .. note::
 
-   For advanced features and detailed configuration options, including:
+   以下のような高度な機能と詳細な設定オプションについては:
 
-   - Power monitoring commands
-   - Notification settings
-   - Buzzer alerts
-   - Email alerts
-   - Advanced configuration
+   - 電力監視コマンド
+   - 通知設定
+   - ブザーアラート
+   - メールアラート
+   - 高度な設定
 
-   Please refer to:
+   以下を参照してください:
 
    * :ref:`pipower5_tool`
