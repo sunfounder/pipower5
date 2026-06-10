@@ -1,4 +1,4 @@
-Battery
+Batterie
 =================
 
 .. image:: img/vh2pin_battery.png
@@ -9,16 +9,16 @@ Battery
 
    <br/>
 
-* **VCC**: Battery positive terminal.
-* **GND**: Negative battery terminal.
+* **VCC** : Borne positive de la batterie.
+* **GND** : Borne négative de la batterie.
 
-This is a custom battery pack made by SunFounder consisting of two 18650 batteries with a capacity of 2000mAh. The connector is VH3.96 2P, which can be charged directly after being inserted into the shield.
+Il s'agit d'un pack batterie personnalisé fabriqué par SunFounder, composé de deux batteries 18650 d'une capacité de 2000mAh. Le connecteur est VH3.96 2P, qui peut être chargé directement après avoir été inséré dans le shield.
 
-**Features**
+**Caractéristiques**
 
-* **Composition**: Li-ion
-* **Battery Capacity**: 2000mAh, 14.8Wh
-* **Battery Weight**: 90.8g
-* **Number of Cells**: 2
-* **Connector**: VH3.96 2pin
-* **Over-discharge protection**: 6.0V
+* **Composition** : Li-ion
+* **Capacité de la batterie** : 2000mAh, 14,8Wh
+* **Poids de la batterie** : 90,8g
+* **Nombre de cellules** : 2
+* **Connecteur** : VH3.96 2 broches
+* **Protection contre la décharge excessive** : 6,0V

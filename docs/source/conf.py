@@ -102,7 +102,7 @@ html_css_files = [
 
 # Multi-language
 
-language = 'en' # Before running make html, set the language.
+language = 'fr' # Before running make html, set the language.
 locale_dirs = ['locale/'] # .po files for other languages are placed in the locale/ folder.
 
 gettext_compact = False # Support for generating the contents of the folders inside source/ into other languages.
@@ -114,8 +114,8 @@ rst_epilog = """
 
 .. |link_sf_facebook| raw:: html
 
-    <a href="https://bit.ly/raphaelkit" target="_blank">here</a>
-    
+    <a href="https://bit.ly/raphaelkit" target="_blank">ici</a>
+
 .. |link_german_tutorials| raw:: html
 
     <a href="https://docs.sunfounder.com/projects/pipower5/de/latest/" target="_blank">Deutsch Online-Kurs</a>
@@ -124,13 +124,17 @@ rst_epilog = """
 
     <a href="https://docs.sunfounder.com/projects/pipower5/ja/latest/" target="_blank">日本語オンライン教材</a>
 
+.. |link_fr_tutorials| raw:: html
+
+    <a href="https://docs.sunfounder.com/projects/pipower5/fr/latest/" target="_blank">Tutoriels en ligne en français</a>
+
 .. |link_en_tutorials| raw:: html
 
     <a href="https://docs.sunfounder.com/projects/pipower5/en/latest/" target="_blank">English Online-tutorials</a>
 
 .. |link_PiPower_5_buy| raw:: html
 
-    <a href="https://www.sunfounder.com" target="_blank">Purchase Link for PiPower 5</a>
+    <a href="https://www.sunfounder.com" target="_blank">Lien d'achat pour PiPower 5</a>
 
 .. |link_PiPower_5| raw:: html
 
@@ -142,6 +146,6 @@ rst_epilog = """
 
 .. |link_pipower_tool| raw:: html
 
-    <a href="https://github.com/sunfounder/pipower5" target="_blank">PiPower 5 tool</a>
+    <a href="https://github.com/sunfounder/pipower5" target="_blank">Outil PiPower 5</a>
 
 """

@@ -1,6 +1,6 @@
 # PiPower 5 Documentation Repository
 
-> **Canonical AI guidance.** This is the authoritative CLAUDE.md for the PiPower 5 documentation project. All language-variant repositories (`pipower5-rtd-*-sync`) should sync their CLAUDE.md from this file. When adding rules or fixes, update this file first, then propagate to other language repos.
+> **Synced from canonical source.** This CLAUDE.md is synced from the English source repository (`docs` branch). The authoritative version lives in the main workspace. When adding rules, update the canonical file first, then propagate here. This branch: `docs-fr` — French translation.
 
 ## Project Identity
 

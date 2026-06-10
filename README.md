@@ -1,56 +1,56 @@
 # SunFounder PiPower 5
-This repository is for PiPower 5. you can buy it on [our website](https://www.sunfounder.com/), or search sunfounder in Amazon.
+Ce dépôt est pour le PiPower 5. Vous pouvez l'acheter sur [notre site Web](https://www.sunfounder.com/), ou rechercher sunfounder sur Amazon.
 
 Quick Links:
 
- * [About this kit](#about_this_kit)
- * [Update](#update)
- * [Trouble Shootings](#trouble)
- * [About SunFounder](#about_sunfounder)
- * [License](#license)
- * [Contact us](#contact_us)
+ * [À propos de ce kit](#about_this_kit)
+ * [Mise à jour](#update)
+ * [Dépannage](#trouble)
+ * [À propos de SunFounder](#about_sunfounder)
+ * [Licence](#license)
+ * [Contactez-nous](#contact_us)
 
 <a id="about_this_kit"></a>
-## About this kit:
+## À propos de ce kit :
 
-Document: https://docs.sunfounder.com/projects/pipower5/en/latest/
+Document : https://docs.sunfounder.com/projects/pipower5/en/latest/
 
-PiPower 5 is a versatile UPS solution designed for seamless integration with Raspberry Pi devices. It features robust power path management, dual lithium battery charging and discharging capabilities, and essential protections against reverse polarity, overcharging, and over-discharging.
+Le PiPower 5 est une solution UPS polyvalente conçue pour une intégration transparente avec les appareils Raspberry Pi. Il dispose d'une gestion robuste du chemin d'alimentation, de capacités de charge et décharge de deux batteries au lithium, et de protections essentielles contre l'inversion de polarité, la surcharge et la décharge excessive.
 
 <a id="update"></a>
-## Update:
+## Mise à jour :
 
 <a id="trouble"></a>
-## Trouble Shootings:
+## Dépannage :
 
 <a id="about_sunfounder"></a>
-## About SunFounder
-SunFounder is a company focused on STEAM education with products like open source robots, development boards, STEAM kit, modules, tools and other smart devices distributed globally. In SunFounder, we strive to help elementary and middle school students as well as hobbyists, through STEAM education, strengthen their hands-on practices and problem-solving abilities. In this way, we hope to disseminate knowledge and provide skill training in a full-of-joy way, thus fostering your interest in programming and making, and exposing you to a fascinating world of science and engineering. To embrace the future of artificial intelligence, it is urgent and meaningful to learn abundant STEAM knowledge.
+## À propos de SunFounder
+SunFounder est une entreprise axée sur l'éducation STEAM avec des produits tels que des robots open source, des cartes de développement, des kits STEAM, des modules, des outils et d'autres appareils intelligents distribués dans le monde entier. Chez SunFounder, nous nous efforçons d'aider les élèves du primaire et du secondaire ainsi que les passionnés, grâce à l'éducation STEAM, à renforcer leurs compétences pratiques et leurs capacités de résolution de problèmes. De cette façon, nous espérons diffuser les connaissances et offrir une formation technique de manière ludique, favorisant ainsi votre intérêt pour la programmation et la création, et vous exposant à un monde fascinant de science et d'ingénierie. Pour embrasser l'avenir de l'intelligence artificielle, il est urgent et significatif d'apprendre des connaissances STEAM abondantes.
 
 <a id="license"></a>
-## License
-This is the documentation for PiPower 5.
+## Licence
+Ceci est la documentation du PiPower 5.
 
-This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier selon les termes de la Licence Publique Générale GNU telle que publiée par la Free Software Foundation ; soit la version 2 de la Licence, ou (à votre choix) toute version ultérieure.
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied wa rranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+Ce programme est distribué dans l'espoir qu'il sera utile, mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de QUALITÉ MARCHANDE ou d'ADÉQUATION À UN USAGE PARTICULIER. Voir la Licence Publique Générale GNU pour plus de détails.
 
-You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+Vous devriez avoir reçu une copie de la Licence Publique Générale GNU avec ce programme ; si ce n'est pas le cas, écrivez à la Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-This resposity comes with ABSOLUTELY NO WARRANTY; for details run ./show w. This is free software, and you are welcome to redistribute it under certain conditions; run ./show c for details.
+Ce dépôt est fourni SANS ABSOLUMENT AUCUNE GARANTIE ; pour plus de détails, exécutez ./show w. Ceci est un logiciel libre, et vous êtes invités à le redistribuer sous certaines conditions ; exécutez ./show c pour plus de détails.
 
-SunFounder, Inc., hereby disclaims all copyright interest in the program 'PiPower 5' (which makes passes at compilers).
+SunFounder, Inc., décline par la présente tout intérêt de droit d'auteur dans le programme « PiPower 5 » (qui fait des passes aux compilateurs).
 
-Mike Huang, 21 August 2015
+Mike Huang, 21 août 2015
 
-Mike Huang, Chief Executive Officer
+Mike Huang, Directeur Général
 
-Email: service@sunfounder.com
+Email : service@sunfounder.com
 
 <a id="contact_us"></a>
-## Contact us:
-website:
+## Contactez-nous :
+site Web :
     www.sunfounder.com
 
-E-mail:
+E-mail :
     service@sunfounder.com

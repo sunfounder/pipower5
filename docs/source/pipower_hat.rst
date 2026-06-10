@@ -3,173 +3,173 @@ PiPower 5 HAT
 
 .. interface:
 
-Interface Overview
--------------------
+Aperçu de l'interface
+----------------------
 
 .. image:: img/pipower5_ov.png
   :width: 100%
 
 
 
-1. **USB Type-C Power Input**  
+1. **Entrée d'alimentation USB Type-C**
 
-   - External power input for supplying the Raspberry Pi and charging the battery simultaneously.  
-   - Supports **USB Power Delivery (PD) protocol**, input range **5V–15V**.
+   - Entrée d'alimentation externe pour alimenter le Raspberry Pi et charger la batterie simultanément.
+   - Prend en charge le protocole **USB Power Delivery (PD)**, plage d'entrée **5V–15V**.
 
-2. **Power Input Selector (DIP Switch)**  
+2. **Sélecteur d'entrée d'alimentation (DIP Switch)**
 
-   - Allows selection of different input power profiles for flexible configuration.
+   - Permet la sélection de différents profils de puissance d'entrée pour une configuration flexible.
 
-3. **Default ON Jumper**  
+3. **Cavalier Default ON**
 
-   - Defines whether the system should automatically power on when external power is connected while the device is shut down.  
-   - ON = Auto power-on enabled, OFF = Manual start required.
+   - Définit si le système doit s'allumer automatiquement lorsque l'alimentation externe est connectée alors que l'appareil est éteint.
+   - ON = Mise sous tension automatique activée, OFF = Démarrage manuel requis.
 
-4. **SDSIG (Shutdown Signal)**  
+4. **SDSIG (Signal d'arrêt)**
 
-   - Provides shutdown detection for Raspberry Pi.  
-   - When bridged to **PI3V3**, it works with Raspberry Pi 4 and Pi 5.  
-   - When shorted to **Pin 26**, it supports Pi 3 and Pi Zero.  
-   - After proper configuration, PiPower5 will cut power automatically once the Raspberry Pi shuts down.
+   - Fournit la détection d'arrêt pour le Raspberry Pi.
+   - Lorsqu'il est relié à **PI3V3**, il fonctionne avec les Raspberry Pi 4 et Pi 5.
+   - Lorsqu'il est court-circuité à la **broche 26**, il prend en charge les Pi 3 et Pi Zero.
+   - Après une configuration appropriée, le PiPower5 coupera automatiquement l'alimentation une fois le Raspberry Pi arrêté.
 
-5. **PWR LED (Output Status Indicator)**  
+5. **LED PWR (Indicateur d'état de sortie)**
 
-   - Lights up when the system output is active.
+   - S'allume lorsque la sortie du système est active.
 
-6. **BAT LED (Battery Status Indicator)**  
+6. **LED BAT (Indicateur d'état de la batterie)**
 
-   - Lights up when the system is powered by the battery.  
-   - A reminder to monitor battery consumption when running without external power.
+   - S'allume lorsque le système est alimenté par la batterie.
+   - Un rappel pour surveiller la consommation de la batterie lors du fonctionnement sans alimentation externe.
 
-7. **Power Button**  
+7. **Bouton d'alimentation**
 
-   - **Single press**: Enable output power.  
-   - **Long press (2 seconds)**: Sends a safe shutdown request via I²C.  
-   - **Long press (5 seconds)**: Forces an immediate power-off (hard shutdown).  
-   - **Customizable**: Single and double-press actions can be reconfigured by software.
+   - **Appui simple** : Activer la sortie d'alimentation.
+   - **Appui long (2 secondes)** : Envoie une demande d'arrêt sécurisé via I²C.
+   - **Appui long (5 secondes)** : Force une mise hors tension immédiate (arrêt brutal).
+   - **Personnalisable** : Les actions d'appui simple et double peuvent être reconfigurées par logiciel.
 
-8. **External Power Button Terminal (ZH1.5 2P)**  
+8. **Borne pour bouton d'alimentation externe (ZH1.5 2P)**
 
-   - Allows connection of an external physical power button.
+   - Permet la connexion d'un bouton d'alimentation physique externe.
 
-9. **External Power Button Header (2.54mm)**  
+9. **Connecteur pour bouton d'alimentation externe (2.54mm)**
 
-   - An alternative solderable header option for external power button connection.
+   - Une option de connecteur soudable alternative pour la connexion d'un bouton d'alimentation externe.
 
-10. **Battery Indicator LEDs**  
+10. **LED indicatrices de batterie**
 
-    - Display remaining battery capacity and charging status.  
-    - Note: Even when the system is off, LEDs remain active during charging until the battery is fully charged.
+    - Affichent la capacité restante de la batterie et l'état de charge.
+    - Remarque : Même lorsque le système est éteint, les LED restent actives pendant la charge jusqu'à ce que la batterie soit complètement chargée.
 
-11. **I²C Interface (SH1.0 4P)**  
+11. **Interface I²C (SH1.0 4P)**
 
-    - Compatible with **Qwiic** and **STEMMA QT** ecosystems.  
-    - Used for communication with the onboard microcontroller and external peripherals.
+    - Compatible avec les écosystèmes **Qwiic** et **STEMMA QT**.
+    - Utilisée pour la communication avec le microcontrôleur intégré et les périphériques externes.
 
-12. **I²C Interface (1x4P 2.54mm Header)**  
+12. **Interface I²C (connecteur 1x4P 2.54mm)**
 
-    - Alternative I²C breakout with **3V3 power output**, configurable as always-on or switched.
+    - Sortie I²C alternative avec **sortie d'alimentation 3V3**, configurable comme toujours active ou commutée.
 
-13. **I²C Power Selection Jumper**  
+13. **Cavalier de sélection d'alimentation I²C**
 
-    - **PERM**: 3V3 power is always on when external power is connected.  
-    - **SHUT (default)**: 3V3 power cuts off automatically when the system shuts down.
+    - **PERM** : L'alimentation 3V3 est toujours active lorsque l'alimentation externe est connectée.
+    - **SHUT (par défaut)** : L'alimentation 3V3 se coupe automatiquement lorsque le système s'arrête.
 
-14. **USB Type-A Output Port**  
+14. **Port de sortie USB Type-A**
 
-    - Provides **regulated 5V output**, suitable for powering peripherals or other devices.
-    - When powering a Raspberry Pi, you may encounter a non-PD power supply warning, which can be safely ignored.
+    - Fournit une **sortie 5V régulée**, adaptée pour alimenter des périphériques ou d'autres appareils.
+    - Lors de l'alimentation d'un Raspberry Pi, vous pouvez rencontrer un avertissement d'alimentation non-PD, qui peut être ignoré en toute sécurité.
 
-15. **2x4P 2.54mm Power Output Header**  
+15. **Connecteur de sortie d'alimentation 2x4P 2.54mm**
 
-    - Additional 5V output for external modules or SBCs.
+    - Sortie 5V supplémentaire pour les modules externes ou les SBC.
 
-16. **Raspberry Pi GPIO Header (Female Connector)**  
+16. **Connecteur GPIO Raspberry Pi (connecteur femelle)**
 
-    - Direct interface for Raspberry Pi, passing through power, I²C, and other signals.  
-    - Fully compatible with Raspberry Pi pinout.
+    - Interface directe pour le Raspberry Pi, transmettant l'alimentation, l'I²C et d'autres signaux.
+    - Entièrement compatible avec le brochage du Raspberry Pi.
 
-17. **Raspberry Pi GPIO Header (Male Pin Breakout)** 
+17. **Connecteur GPIO Raspberry Pi (sortie sur broches mâles)**
 
-    - Brings Raspberry Pi GPIO pins out for stacking HATs or external expansion.  
-    - **Note**: I²C lines and Pin 26 are already occupied by PiPower5 functions.
-    - You can also connect a GPIO extension cable (from the bottom of the side panel) to experiment on a breadboard.
+    - Expose les broches GPIO du Raspberry Pi pour l'empilage de HAT ou l'extension externe.
+    - **Remarque** : Les lignes I²C et la broche 26 sont déjà occupées par les fonctions du PiPower5.
+    - Vous pouvez également connecter un câble d'extension GPIO (depuis le bas du panneau latéral) pour expérimenter sur une platine d'essai.
 
-18. **Battery Connector (XH2.54 3P)**  
+18. **Connecteur de batterie (XH2.54 3P)**
 
-    - Battery connection interface.  
-    - Pin order (left to right): Negative, Mid-point (between two cells), Positive.  
-    - Designed for **7.4V (2-cell) Li-ion/LiPo batteries**.
+    - Interface de connexion de la batterie.
+    - Ordre des broches (de gauche à droite) : Négatif, Point milieu (entre deux cellules), Positif.
+    - Conçu pour les **batteries Li-ion/LiPo 7.4V (2 cellules)**.
 
-19. **Reverse Battery Warning LEDs**  
+19. **LED d'avertissement de batterie inversée**
 
-    - Two red LEDs light up if the battery is connected in reverse polarity, warning of incorrect installation.
+    - Deux LED rouges s'allument si la batterie est connectée en polarité inversée, avertissant d'une installation incorrecte.
 
-20. **Screw Terminals for Battery & Input Power**  
+20. **Bornes à vis pour batterie et alimentation d'entrée**
 
-    - Alternative connection method for external batteries and power sources.  
-    - Supports **5V–15V external input** (recommended: >9V).  
-    - Battery support: **2 x 3.7V Li-ion / LiPo cells only** (NOT compatible with LiFePO₄ batteries).  
+    - Méthode de connexion alternative pour les batteries externes et les sources d'alimentation.
+    - Prend en charge une **entrée externe 5V–15V** (recommandé : >9V).
+    - Prise en charge batterie : **2 x 3.7V Li-ion / LiPo uniquement** (NON compatible avec les batteries LiFePO₄).
 
 
-Specification Table
+Tableau des spécifications
 -----------------------------
 
-.. list-table:: 
+.. list-table::
    :header-rows: 1
    :widths: 20 20 20 20 20
 
-   * - Parameter
+   * - Paramètre
      - Minimum
-     - Typical
+     - Typique
      - Maximum
-     - Unit
-   * - Battery Shutdown Current
+     - Unité
+   * - Courant d'arrêt de la batterie
      - \-
      - 60
      - \-
      - µA
-   * - Battery Quiescent Current
+   * - Courant de repos de la batterie
      - \-
      - 25
      - \-
      - mA
-   * - DC-DC Output Voltage
-     - 5.1957
-     - 5.2855
-     - 5.3766
+   * - Tension de sortie DC-DC
+     - 5,1957
+     - 5,2855
+     - 5,3766
      - V
-   * - DC-DC Over-Temperature Protection
+   * - Protection contre la surchauffe DC-DC
      - \-
      - 150
      - \-
      - ℃
-   * - Battery Charging Power
+   * - Puissance de charge de la batterie
      - \-
      - \-
      - 20
      - W
-   * - Charging Over-Temperature Protection
+   * - Protection contre la surchauffe de charge
      - \-
      - 125
      - \-
      - ℃
-   * - Balancing Resistor
+   * - Résistance d'équilibrage
      - \-
      - 60
      - \-
      - Ω
-   * - Balancing Activation Voltage
+   * - Tension d'activation d'équilibrage
      - \-
-     - 4.2
+     - 4,2
      - \-
      - V
 
 
 .. _power_input:
 
-Power Input
--------------
+Entrée d'alimentation
+----------------------
 
 .. image:: img/power_input.png
   :width: 50%
@@ -179,9 +179,9 @@ Power Input
 
    <br/>
 
-When using Raspberry Pi 5, it is recommended to use a USB PD power supply or a DC power supply with a minimum output of 32W. Otherwise, during periods of high power consumption, the battery may fail to charge properly or even deplete its charge due to insufficient power supply.
+Lors de l'utilisation du Raspberry Pi 5, il est recommandé d'utiliser une alimentation USB PD ou une alimentation CC avec une sortie minimale de 32W. Sinon, pendant les périodes de forte consommation d'énergie, la batterie peut ne pas se charger correctement ou même épuiser sa charge en raison d'une alimentation insuffisante.
 
-You can monitor the **BAT LED** indicator to check the battery status. When external power is sufficient, the BAT LED should remain off, indicating that the battery is in standby mode and not being discharged. If the BAT LED lights up, it means the battery is supplying power to the device, possibly due to insufficient or disconnected external power. Prolonged illumination of the BAT LED may lead to excessive battery discharge, preventing it from functioning as an uninterrupted power supply (UPS) during power outages. Ensure you are using a power source that meets the required specifications to avoid such scenarios.
+Vous pouvez surveiller l'indicateur **LED BAT** pour vérifier l'état de la batterie. Lorsque l'alimentation externe est suffisante, la LED BAT doit rester éteinte, indiquant que la batterie est en mode veille et ne se décharge pas. Si la LED BAT s'allume, cela signifie que la batterie alimente l'appareil, probablement en raison d'une alimentation externe insuffisante ou déconnectée. Une illumination prolongée de la LED BAT peut entraîner une décharge excessive de la batterie, l'empêchant de fonctionner comme une alimentation sans interruption (UPS) pendant les coupures de courant. Assurez-vous d'utiliser une source d'alimentation qui répond aux spécifications requises pour éviter de tels scénarios.
 
 
 
@@ -195,47 +195,47 @@ You can monitor the **BAT LED** indicator to check the battery status. When exte
    <br/>
 
 
-**Power Path**
+**Chemin d'alimentation**
 
-The PiPower 5 integrates power path management, enabling automatic power source switching to minimize battery wear and ensure uninterrupted power supply. The key functionalities include:
+Le PiPower 5 intègre la gestion du chemin d'alimentation, permettant la commutation automatique de la source d'alimentation pour minimiser l'usure de la batterie et assurer une alimentation ininterrompue. Les fonctionnalités clés incluent :
 
-- When an external power source is connected, the 5V output is supplied via a step-down circuit from the external source. The output can be turned off using a switch. If conditions allow, the external power source can also charge the battery simultaneously (see the "Charging Current" section for details).
-- Upon disconnection of the external power source, the system immediately switches to battery power via a step-down circuit. This seamless transition ensures the system continues functioning normally during power interruptions.
+- Lorsqu'une source d'alimentation externe est connectée, la sortie 5V est fournie via un circuit abaisseur à partir de la source externe. La sortie peut être désactivée à l'aide d'un interrupteur. Si les conditions le permettent, la source d'alimentation externe peut également charger la batterie simultanément (voir la section « Courant de charge » pour plus de détails).
+- Lors de la déconnexion de la source d'alimentation externe, le système passe immédiatement à l'alimentation par batterie via un circuit abaisseur. Cette transition transparente garantit que le système continue de fonctionner normalement pendant les interruptions d'alimentation.
 
-You can check the BAT LED indicator to confirm whether the battery is currently powering the system.
-
-
+Vous pouvez vérifier l'indicateur LED BAT pour confirmer si la batterie alimente actuellement le système.
 
 
-**Charging Current**
 
-The charging current is subject to two types of limitations:
+
+**Courant de charge**
+
+Le courant de charge est soumis à deux types de limitations :
 
 .. note::
 
-   The charging current is determined by both the "Screw Terminal Power Charging Limitation" and the "Charge Power Selection Limitation" and is constrained by the smaller value between the two.
+   Le courant de charge est déterminé à la fois par la « Limitation de charge par alimentation via bornes à vis » et la « Limitation de sélection de puissance de charge » et est contraint par la plus petite valeur des deux.
 
-1. Screw Terminal Power Charging Limitation
-   
-   When supplying power via screw terminal power input, the charging current is automatically adjusted based on the input voltage, as shown below:
+1. Limitation de charge par alimentation via bornes à vis
+
+   Lors de l'alimentation via l'entrée d'alimentation par bornes à vis, le courant de charge est automatiquement ajusté en fonction de la tension d'entrée, comme indiqué ci-dessous :
 
    .. list-table::
       :header-rows: 1
 
-      * - Input Voltage (VBUS)
-        - Maximum Charging Current
-      * - 4.5 < VBUS ≤ 6.5V
+      * - Tension d'entrée (VBUS)
+        - Courant de charge maximal
+      * - 4,5 < VBUS ≤ 6,5V
         - 3A
-      * - 6.5 < VBUS ≤ 9.5V
+      * - 6,5 < VBUS ≤ 9,5V
         - 2A
-      * - 9.5 < VBUS ≤ 13.5V
-        - 1.5A
-      * - 13.5 < VBUS ≤ 16.5V
+      * - 9,5 < VBUS ≤ 13,5V
+        - 1,5A
+      * - 13,5 < VBUS ≤ 16,5V
         - 2A
 
-2. Charge Power Selection Limitation
-   
-   A 2-position DIP switch on the board allows selection of different charge power levels. The corresponding allocation of charging power and output power for each setting is as follows:
+2. Limitation de sélection de puissance de charge
+
+   Un commutateur DIP à 2 positions sur la carte permet la sélection de différents niveaux de puissance de charge. L'allocation correspondante de la puissance de charge et de la puissance de sortie pour chaque réglage est la suivante :
 
    .. image:: img/power_selector.png
      :width: 50%
@@ -246,7 +246,7 @@ The charging current is subject to two types of limitations:
 
       * - Charge Sel 1
         - Charge Sel 2
-        - Charging Power
+        - Puissance de charge
       * - 0
         - 0
         - 5W
@@ -261,48 +261,50 @@ The charging current is subject to two types of limitations:
         - 20W
 
 
-**How to choose the charging power**
+**Comment choisir la puissance de charge**
 
-The formula is:
+La formule est :
 
-*Power supply capacity = Raspberry Pi required power + Charging power*
+*Capacité d'alimentation = Puissance requise du Raspberry Pi + Puissance de charge*
 
-We recommend estimating the Raspberry Pi’s power requirement at **20W to 25W**.
+Nous recommandons d'estimer la puissance requise du Raspberry Pi à **20W à 25W**.
 
-- If you use a **30W power supply**, set charging power to **10W** or **5W**.  
-- If you use a **45W power supply**, you can safely set charging power to **20W**.  
+- Si vous utilisez une **alimentation 30W**, réglez la puissance de charge sur **10W** ou **5W**.
+- Si vous utilisez une **alimentation 45W**, vous pouvez régler en toute sécurité la puissance de charge sur **20W**.
 
-If you are familiar with your Raspberry Pi’s power needs, you may set a higher charging power as long as you reserve enough margin for occasional power spikes.  
+Si vous connaissez bien les besoins en puissance de votre Raspberry Pi, vous pouvez définir une puissance de charge plus élevée tant que vous réservez une marge suffisante pour les pics de puissance occasionnels.
 
-⚠️ Be cautious: insufficient power may cause the Raspberry Pi to shut down unexpectedly.
-
-
+⚠️ Attention : une puissance insuffisante peut entraîner l'arrêt inattendu du Raspberry Pi.
 
 
-**Charging Process**
 
-- When the battery voltage ``VBAT <= 2.5V``, the system performs trickle charging at a low current, approximately 50 mA.
-- When ``2.5V < VBAT <= VTRKL``, trickle charging continues, and the battery charging current increases to approximately 200 mA.
-- When ``VTRKL < VBAT < VCV``, the system switches to constant current charging, supplying a preset constant current to the battery.
-- Once ``VBAT = VCV``, and the battery voltage approaches the fully charged level, the charging current gradually decreases, transitioning to constant voltage charging.
-- During constant voltage charging, when the charging current drops below ``ISTOP`` and the battery voltage is near the constant voltage threshold, charging stops, and the battery enters a fully charged state.- In the fully charged state, the system continuously monitors the battery voltage. If the voltage falls below ``VRCH``, charging resumes automatically.
 
-**Protection Features**
+**Processus de charge**
 
-The PiPower 5 offers comprehensive protection features, including input undervoltage and overvoltage protection, as well as overheating protection for both the charging chip and DC-DC converter. These features ensure stable and reliable system operation.
+- Lorsque la tension de la batterie ``VBAT <= 2,5V``, le système effectue une charge d'entretien à faible courant, environ 50 mA.
+- Lorsque ``2,5V < VBAT <= VTRKL``, la charge d'entretien se poursuit et le courant de charge de la batterie augmente à environ 200 mA.
+- Lorsque ``VTRKL < VBAT < VCV``, le système passe en charge à courant constant, fournissant un courant constant prédéfini à la batterie.
+- Une fois ``VBAT = VCV`` et que la tension de la batterie approche du niveau de charge complète, le courant de charge diminue progressivement, passant en charge à tension constante.
+- Pendant la charge à tension constante, lorsque le courant de charge descend en dessous de ``ISTOP`` et que la tension de la batterie est proche du seuil de tension constante, la charge s'arrête et la batterie entre dans un état complètement chargé.
+- Dans l'état complètement chargé, le système surveille en continu la tension de la batterie. Si la tension descend en dessous de ``VRCH``, la charge reprend automatiquement.
 
-**Charge Balancing**
+**Fonctionnalités de protection**
 
-The onboard charge-balancing chip activates a 60Ω resistor to discharge the battery at a low current when it detects that a single cell's voltage exceeds 4.2V. This feature helps maintain voltage balance across cells.
+Le PiPower 5 offre des fonctionnalités de protection complètes, y compris la protection contre les sous-tensions et surtensions d'entrée, ainsi que la protection contre la surchauffe pour la puce de charge et le convertisseur DC-DC. Ces fonctionnalités assurent un fonctionnement stable et fiable du système.
 
-**Temperature Protection**
+**Équilibrage de charge**
 
-The charging process is automatically halted when the internal temperature of the charging chip exceeds 125°C. Similarly, the DC-DC chip disables output when its internal temperature surpasses 150°C.
+La puce d'équilibrage de charge intégrée active une résistance de 60Ω pour décharger la batterie à faible courant lorsqu'elle détecte que la tension d'une cellule unique dépasse 4,2V. Cette fonctionnalité aide à maintenir l'équilibre de tension entre les cellules.
+
+**Protection de température**
+
+Le processus de charge est automatiquement interrompu lorsque la température interne de la puce de charge dépasse 125°C. De même, la puce DC-DC désactive la sortie lorsque sa température interne dépasse 150°C.
 
 .. _power_button:
 
-Power Button
-----------------
+Bouton d'alimentation
+-----------------------
+
 
 
 
@@ -315,23 +317,23 @@ Power Button
 
    <br/>
 
-Onboard power button for controlling the board's power:
+Bouton d'alimentation intégré pour contrôler l'alimentation de la carte :
 
-* **Single press**: Activates output.
-* **Hold for 2 seconds until the middle two battery LEDs light up, then release**: Sends a shutdown request via I2C.
-* **Hold for more than 5 seconds**: Directly turns off output.
-  
+* **Appui simple** : Active la sortie.
+* **Maintenir pendant 2 secondes jusqu'à ce que les deux LED centrales de batterie s'allument, puis relâcher** : Envoie une demande d'arrêt via I2C.
+* **Maintenir plus de 5 secondes** : Coupe directement la sortie.
+
 
 .. _battery_indicators:
 
-Battery Indicators
+Indicateurs de batterie
 --------------------------------
 
-Four onboard LEDs indicate the battery level and charging status.
+Quatre LED intégrées indiquent le niveau de la batterie et l'état de charge.
 
 .. note::
 
-   If the device is charging during shutdown, the indicator light will continue to display the charging status until charging is complete.
+   Si l'appareil est en charge pendant l'arrêt, le voyant indicateur continuera d'afficher l'état de charge jusqu'à ce que la charge soit terminée.
 
 
 
@@ -344,20 +346,20 @@ Four onboard LEDs indicate the battery level and charging status.
 
    <br/>
 
-* **4 LEDs lit**: Battery >80%
-* **3 LEDs lit**: 60%< Battery <80%
-* **2 LEDs lit**: 40%< Battery <60%
-* **1 LED lit**: 20%< Battery <40%
-* **First LED flashing**: Battery <20%
-* **LEDs light up sequentially in a cycle**: Charging in progress
-* **Middle two LEDs flashing**: Waiting shutdown signal
-* **All LEDs off**: Unpowered or in sleep mode
+* **4 LED allumées** : Batterie > 80%
+* **3 LED allumées** : 60% < Batterie < 80%
+* **2 LED allumées** : 40% < Batterie < 60%
+* **1 LED allumée** : 20% < Batterie < 40%
+* **Première LED clignotante** : Batterie < 20%
+* **Les LED s'allument séquentiellement en cycle** : Charge en cours
+* **Deux LED centrales clignotantes** : En attente du signal d'arrêt
+* **Toutes les LED éteintes** : Hors tension ou en mode veille
 
 .. _battery_connector:
 
-Battery Connector
+Connecteur de batterie
 ------------------------
-VH3.96 2P battery connector and screw terminal battery connector.
+Connecteur de batterie VH3.96 2P et connecteur de batterie à bornes à vis.
 
 .. image:: img/battery_pin.png
   :width: 50%
@@ -369,8 +371,8 @@ VH3.96 2P battery connector and screw terminal battery connector.
 
 .. _cap_btn:
 
-External Power Button Terminal & Header
---------------------------------------------
+Borne et connecteur pour bouton d'alimentation externe
+-------------------------------------------------------
 
 .. image:: img/btn_jumper.png
   :width: 50%
@@ -380,12 +382,13 @@ External Power Button Terminal & Header
 
    <br/>
 
-This terminal or header is designed for connecting an external power button. Connect a momentary switch, such as a tactile switch or a vintage-style metal button, to the jumper pins. The two leads of the button can be connected to the jumper's pins in any direction, as polarity is not required. Once connected, you can use the external button just like the onboard power button.
+Cette borne ou ce connecteur est conçu pour connecter un bouton d'alimentation externe. Connectez un interrupteur momentané, tel qu'un bouton tactile ou un bouton métallique de style vintage, aux broches du cavalier. Les deux fils du bouton peuvent être connectés aux broches du cavalier dans n'importe quel sens, car la polarité n'est pas requise. Une fois connecté, vous pouvez utiliser le bouton externe comme le bouton d'alimentation intégré.
 
 .. _cap_sdsig:
 
-SDSIG Jumper
-------------
+Cavalier SDSIG
+----------------
+
 
 
 
@@ -398,17 +401,18 @@ SDSIG Jumper
 
    <br/>
 
-Provides shutdown detection for Raspberry Pi.
+Fournit la détection d'arrêt pour le Raspberry Pi.
 
-* When bridged to PI3V3, it works with Raspberry Pi 4 and Pi 5.
-* When shorted to Pin 26, it supports Pi 3 and Pi Zero.
+* Lorsqu'il est relié à PI3V3, il fonctionne avec les Raspberry Pi 4 et Pi 5.
+* Lorsqu'il est court-circuité à la broche 26, il prend en charge les Pi 3 et Pi Zero.
 
-After proper configuration, PiPower5 will cut power automatically once the Raspberry Pi shuts down.
+Après une configuration appropriée, le PiPower5 coupera automatiquement l'alimentation une fois le Raspberry Pi arrêté.
 
 .. _cap_onoff:
 
-Default ON/OFF Jumper
-----------------------
+Cavalier Default ON/OFF
+-------------------------
+
 
 
 
@@ -421,19 +425,19 @@ Default ON/OFF Jumper
 
    <br/>
 
-This jumper is used to select whether the USB power output is enabled by default after a shutdown. Use the jumper cap to connect the pins labeled ON or OFF to make the selection.
+Ce cavalier est utilisé pour sélectionner si la sortie d'alimentation USB est activée par défaut après un arrêt. Utilisez le capuchon de cavalier pour connecter les broches étiquetées ON ou OFF pour faire la sélection.
 
-* If the jumper cap is positioned on the left and connected to OFF, inserting USB power after a shutdown will not activate the output.
-* If the jumper cap is positioned on the right and connected to ON, inserting USB power after a shutdown will activate the output.
+* Si le capuchon de cavalier est positionné à gauche et connecté à OFF, l'insertion de l'alimentation USB après un arrêt n'activera pas la sortie.
+* Si le capuchon de cavalier est positionné à droite et connecté à ON, l'insertion de l'alimentation USB après un arrêt activera la sortie.
 
-This feature is typically used for devices that need to start automatically, such as personal servers. For example, if there is a power outage, PiPower 5 will take over the Raspberry Pi's power supply, ensuring a safe shutdown. Once power is restored, PiPower 5 automatically powers on the Raspberry Pi, eliminating the need for manual intervention.
+Cette fonctionnalité est généralement utilisée pour les appareils qui doivent démarrer automatiquement, tels que les serveurs personnels. Par exemple, en cas de panne de courant, le PiPower 5 prendra le relais de l'alimentation du Raspberry Pi, assurant un arrêt sécurisé. Une fois l'alimentation rétablie, le PiPower 5 allume automatiquement le Raspberry Pi, éliminant le besoin d'intervention manuelle.
 
 .. _pin_header:
 
-Pin Headers for RPi
----------------------------
+Connecteurs à broches pour RPi
+-------------------------------
 
-The pin header is designed for direct connection to a Raspberry Pi, including both I2C communication and power supply. 
+Le connecteur à broches est conçu pour une connexion directe à un Raspberry Pi, incluant à la fois la communication I2C et l'alimentation électrique.
 
 
 
@@ -446,14 +450,14 @@ The pin header is designed for direct connection to a Raspberry Pi, including bo
 
    <br/>
 
-The header supports stacking additional HATs. However, note that the I2C pins and pin 26 are already connected and may need to be managed carefully to avoid conflicts.
+Le connecteur prend en charge l'empilage de HAT supplémentaires. Cependant, notez que les broches I2C et la broche 26 sont déjà connectées et peuvent nécessiter une gestion attentive pour éviter les conflits.
 
-.. list-table:: 
+.. list-table::
    :widths: 15 15
    :header-rows: 1
 
    * - Raspberry Pi
-     - MCU On Board
+     - MCU intégré
    * - SDA
      - SDA
    * - SCL
@@ -465,8 +469,9 @@ The header supports stacking additional HATs. However, note that the I2C pins an
    * - ID_SC
      - ID_EEPROM SCL
 
-I2C Communication
+Communication I2C
 -------------------------------
+
 
 
 
@@ -480,9 +485,9 @@ I2C Communication
 
    <br/>
 
-I2C address: 0x5C
+Adresse I2C : 0x5C
 
-The onboard microcontroller collects various signals from the board and stores them in registers. These signals can be accessed via I2C using the following register tables.
+Le microcontrôleur intégré collecte divers signaux de la carte et les stocke dans des registres. Ces signaux sont accessibles via I2C en utilisant les tables de registres suivantes.
 
 .. raw:: html
 
@@ -517,20 +522,20 @@ The onboard microcontroller collects various signals from the board and stores t
    </style>
 
    <table class="custom-register-table">
-       <caption>Register Table</caption>
+       <caption>Table des registres</caption>
        <thead>
            <tr>
-               <th>Name</th>
-               <th>Address</th>
-               <th>Data Length</th>
-               <th>Data Type</th>
-               <th>Unit</th>
+               <th>Nom</th>
+               <th>Adresse</th>
+               <th>Longueur des données</th>
+               <th>Type de données</th>
+               <th>Unité</th>
                <th>Description</th>
            </tr>
        </thead>
        <tbody>
            <tr>
-               <td>Input Voltage</td>
+               <td>Tension d'entrée</td>
                <td>0</td>
                <td>2</td>
                <td>u16</td>
@@ -538,7 +543,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Input Current</td>
+               <td>Courant d'entrée</td>
                <td>2</td>
                <td>2</td>
                <td>u16</td>
@@ -546,7 +551,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Output Voltage</td>
+               <td>Tension de sortie</td>
                <td>4</td>
                <td>2</td>
                <td>u16</td>
@@ -554,7 +559,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Output Current</td>
+               <td>Courant de sortie</td>
                <td>6</td>
                <td>2</td>
                <td>u16</td>
@@ -562,7 +567,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Battery Voltage</td>
+               <td>Tension de la batterie</td>
                <td>8</td>
                <td>2</td>
                <td>u16</td>
@@ -570,7 +575,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Battery Current</td>
+               <td>Courant de la batterie</td>
                <td>10</td>
                <td>2</td>
                <td>i16</td>
@@ -578,7 +583,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Battery Percentage</td>
+               <td>Pourcentage de la batterie</td>
                <td>12</td>
                <td>1</td>
                <td>u8</td>
@@ -586,7 +591,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Battery Capacity</td>
+               <td>Capacité de la batterie</td>
                <td>13</td>
                <td>2</td>
                <td>u16</td>
@@ -594,23 +599,23 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Power Source</td>
+               <td>Source d'alimentation</td>
                <td>15</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0: Battery not supplying power.<br> 1: Battery supplying power.</td>
+               <td>0 : La batterie ne fournit pas d'alimentation.<br> 1 : La batterie fournit l'alimentation.</td>
            </tr>
            <tr>
-               <td>USB Connection Status</td>
+               <td>État de connexion USB</td>
                <td>16</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0: USB unplugged.<br> 1: USB plugged in.</td>
+               <td>0 : USB débranché.<br> 1 : USB branché.</td>
            </tr>
            <tr>
-               <td>RESERVED</td>
+               <td>RÉSERVÉ</td>
                <td>17</td>
                <td>1</td>
                <td>-</td>
@@ -618,31 +623,31 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Charging Status</td>
+               <td>État de charge</td>
                <td>18</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0: Not charging.<br> 1: Charging.</td>
+               <td>0 : Pas en charge.<br> 1 : En charge.</td>
            </tr>
            <tr>
-               <td>Fan Power</td>
+               <td>Puissance du ventilateur</td>
                <td>19</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Fan power level (0–100).</td>
+               <td>Niveau de puissance du ventilateur (0–100).</td>
            </tr>
            <tr>
-               <td>Shutdown Request</td>
+               <td>Demande d'arrêt</td>
                <td>20</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>1: Triggered by low battery.<br>2: Triggered by pressing the power button.</td>
+               <td>1 : Déclenché par batterie faible.<br>2 : Déclenché par l'appui sur le bouton d'alimentation.</td>
            </tr>
            <tr>
-               <td>Firmware Version (Major)</td>
+               <td>Version du firmware (Majeure)</td>
                <td>128</td>
                <td>1</td>
                <td>u8</td>
@@ -650,7 +655,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Firmware Version (Minor)</td>
+               <td>Version du firmware (Mineure)</td>
                <td>129</td>
                <td>1</td>
                <td>u8</td>
@@ -658,7 +663,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Firmware Version (Patch)</td>
+               <td>Version du firmware (Correctif)</td>
                <td>130</td>
                <td>1</td>
                <td>u8</td>
@@ -666,15 +671,15 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Reset Code</td>
+               <td>Code de réinitialisation</td>
                <td>131</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>MCU reset reason code.</td>
+               <td>Code de raison de réinitialisation du MCU.</td>
            </tr>
            <tr>
-               <td>RTC Year</td>
+               <td>RTC Année</td>
                <td>132</td>
                <td>1</td>
                <td>u8</td>
@@ -682,7 +687,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Month</td>
+               <td>RTC Mois</td>
                <td>133</td>
                <td>1</td>
                <td>u8</td>
@@ -690,7 +695,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Day</td>
+               <td>RTC Jour</td>
                <td>134</td>
                <td>1</td>
                <td>u8</td>
@@ -698,7 +703,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Hour</td>
+               <td>RTC Heure</td>
                <td>135</td>
                <td>1</td>
                <td>u8</td>
@@ -714,7 +719,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Second</td>
+               <td>RTC Seconde</td>
                <td>137</td>
                <td>1</td>
                <td>u8</td>
@@ -722,31 +727,31 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Sub-Second</td>
+               <td>RTC Sous-seconde</td>
                <td>138</td>
                <td>1</td>
                <td>u8</td>
                <td>1/128 s</td>
-               <td>RTC sub-second (1/128 second).</td>
+               <td>Sous-seconde RTC (1/128 seconde).</td>
            </tr>
            <tr>
-               <td>Always-On Feature</td>
+               <td>Fonction Always-On</td>
                <td>139</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0: Enabled.<br> 1: Disabled.</td>
+               <td>0 : Activé.<br> 1 : Désactivé.</td>
            </tr>
            <tr>
-               <td>Board ID</td>
+               <td>ID de la carte</td>
                <td>140</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Board identification: <br> 0: Pironman U1.<br> 1: Pironman 4.<br> 2: PiPower 3.<br>4: PiPower 5.</td>
+               <td>Identification de la carte : <br> 0 : Pironman U1.<br> 1 : Pironman 4.<br> 2 : PiPower 3.<br>4 : PiPower 5.</td>
            </tr>
            <tr>
-               <td>RESERVED</td>
+               <td>RÉSERVÉ</td>
                <td>141</td>
                <td>1</td>
                <td>-</td>
@@ -754,7 +759,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RESERVED</td>
+               <td>RÉSERVÉ</td>
                <td>142</td>
                <td>1</td>
                <td>-</td>
@@ -762,15 +767,15 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Shutdown Percentage</td>
+               <td>Pourcentage d'arrêt</td>
                <td>143</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Current low battery shutdown percentage threshold.</td>
+               <td>Seuil actuel de pourcentage de batterie pour l'arrêt.</td>
            </tr>
            <tr>
-               <td>RESERVED</td>
+               <td>RÉSERVÉ</td>
                <td>144</td>
                <td>1</td>
                <td>-</td>
@@ -782,57 +787,57 @@ The onboard microcontroller collects various signals from the board and stores t
 
 
    <table class="custom-register-table">
-       <caption>Register Settings Table</caption>
+       <caption>Table des paramètres des registres</caption>
        <thead>
            <tr>
-               <th>Name</th>
-               <th>Address</th>
-               <th>Data Length</th>
-               <th>Data Type</th>
-               <th>Unit</th>
+               <th>Nom</th>
+               <th>Adresse</th>
+               <th>Longueur des données</th>
+               <th>Type de données</th>
+               <th>Unité</th>
                <th>Description</th>
            </tr>
        </thead>
        <tbody>
            <tr>
-               <td>Fan Power</td>
+               <td>Puissance du ventilateur</td>
                <td>0</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set fan speed (0–100).</td>
+               <td>Définir la vitesse du ventilateur (0–100).</td>
            </tr>
            <tr>
-               <td>RTC Year</td>
+               <td>RTC Année</td>
                <td>1</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC year.</td>
+               <td>Définir l'année RTC.</td>
            </tr>
            <tr>
-               <td>RTC Month</td>
+               <td>RTC Mois</td>
                <td>2</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC month.</td>
+               <td>Définir le mois RTC.</td>
            </tr>
            <tr>
-               <td>RTC Day</td>
+               <td>RTC Jour</td>
                <td>3</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC day.</td>
+               <td>Définir le jour RTC.</td>
            </tr>
            <tr>
-               <td>RTC Hour</td>
+               <td>RTC Heure</td>
                <td>4</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC hour.</td>
+               <td>Définir l'heure RTC.</td>
            </tr>
            <tr>
                <td>RTC Minute</td>
@@ -840,49 +845,48 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC minute.</td>
+               <td>Définir la minute RTC.</td>
            </tr>
            <tr>
-               <td>RTC Second</td>
+               <td>RTC Seconde</td>
                <td>6</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC second.</td>
+               <td>Définir la seconde RTC.</td>
            </tr>
            <tr>
-               <td>RTC Sub-Second</td>
+               <td>RTC Sous-seconde</td>
                <td>7</td>
                <td>1</td>
                <td>u8</td>
                <td>1/128 s</td>
-               <td>Set RTC sub-second.</td>
+               <td>Définir la sous-seconde RTC.</td>
            </tr>
            <tr>
-               <td>RTC Setting</td>
+               <td>Paramètre RTC</td>
                <td>8</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Enable RTC setting: <br> 1: Enabled.</td>
+               <td>Activer le paramètre RTC : <br> 1 : Activé.</td>
            </tr>
            <tr>
-               <td>Shutdown Percentage</td>
+               <td>Pourcentage d'arrêt</td>
                <td>9</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set low battery shutdown percentage threshold (0–100).</td>
+               <td>Définir le seuil de pourcentage de batterie pour l'arrêt (0–100).</td>
            </tr>
            <tr>
-               <td>Power Off Percentage</td>
+               <td>Pourcentage de mise hors tension</td>
                <td>10</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set low battery power-off percentage threshold (0–100).</td>
+               <td>Définir le seuil de pourcentage de batterie pour la mise hors tension (0–100).</td>
            </tr>
        </tbody>
    </table>
 
-   
