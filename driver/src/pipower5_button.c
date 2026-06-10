@@ -67,12 +67,32 @@ void pipower5_button_cleanup(struct pipower5_device *pi_dev)
 
 void pipower5_button_check(struct pipower5_device *pi_dev)
 {
-    if (pi_dev->input_dev && pi_dev->power_button_state != pi_dev->last_power_button_state) {
-        input_report_key(pi_dev->input_dev, KEY_POWER, pi_dev->power_button_state);
-        input_sync(pi_dev->input_dev);
+    /* Button state register (154) values from MCU:
+     * 0=RELEASED, 1=CLICK, 2=DOUBLE_CLICK,
+     * 3=LONG_PRESS_2S, 4=LONG_PRESS_2S_RELEASED,
+     * 5=LONG_PRESS_5S, 6=LONG_PRESS_5S_RELEASED
+     *
+     * Shutdown is handled by the MCU via shutdown_request register (20).
+     * We only log button events here; do NOT send KEY_POWER to avoid
+     * systemd-logind triggering immediate shutdown. */
 
-        if (pi_dev->power_button_state)
-            pipower5_log_event(pi_dev, "BUTTON pressed");
+    if (pi_dev->power_button_state != pi_dev->last_power_button_state &&
+        pi_dev->power_button_state != 0) {
+
+        switch (pi_dev->power_button_state) {
+        case 1:
+            pipower5_log_event(pi_dev, "BUTTON click");
+            break;
+        case 2:
+            pipower5_log_event(pi_dev, "BUTTON double_click");
+            break;
+        case 3:
+            pipower5_log_event(pi_dev, "BUTTON long_press_2s");
+            break;
+        case 5:
+            pipower5_log_event(pi_dev, "BUTTON long_press_5s");
+            break;
+        }
 
         pi_dev->last_power_button_state = pi_dev->power_button_state;
     }
