@@ -299,6 +299,13 @@ static int pipower5_probe(struct i2c_client *client) {
     pipower5_fix_sysfs_perms();
   }
 
+  /* Initialize button input device */
+  ret = pipower5_button_init(pi_dev);
+  if (ret) {
+    dev_warn(dev, "Failed to init button input device, continuing: %d\n", ret);
+    /* Non-fatal: everything else works without the button */
+  }
+
   /* Create upower interface */
   ret = pipower5_create_upower(pi_dev);
   if (ret < 0) {
@@ -334,6 +341,9 @@ static void pipower5_remove(struct i2c_client *client) {
 
   /* Remove upower interface */
   pipower5_remove_upower(pi_dev);
+
+  /* Remove button input device */
+  pipower5_button_cleanup(pi_dev);
 
   /* Remove hwmon device */
   hwmon_device_unregister(pi_dev->hwmon_dev);
