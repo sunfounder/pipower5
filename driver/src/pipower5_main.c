@@ -115,8 +115,10 @@ static void pipower5_poll_work(struct work_struct *work) {
       power_supply_changed(pi_dev->power_supply);
     }
 
-    /* ── Event detection (first poll is skipped to avoid false events) ── */
+    /* ── Event detection (first poll skipped to avoid false events) ── */
     if (pi_dev->events_initialized) {
+      s16 batt_cur = (s16)pi_dev->battery_current; /* signed: +charge, -discharge */
+
       /* POWER_DISCONNECTED / POWER_RESTORED */
       if (pi_dev->is_input_plugged_in != pi_dev->last_is_input_plugged_in) {
         if (pi_dev->is_input_plugged_in)
@@ -128,21 +130,33 @@ static void pipower5_poll_work(struct work_struct *work) {
       /* BATTERY_ACTIVATED: switched to battery power */
       if (pi_dev->power_source != pi_dev->last_power_source &&
           pi_dev->power_source == 1) {
-        pipower5_log_event(pi_dev, "BATTERY_ACTIVATED");
+        pipower5_log_event(pi_dev, "BATTERY_ACTIVATED bat=%d%%",
+                           pi_dev->battery_percentage);
       }
 
-      /* POWER_INSUFFICIENT: input plugged in but battery still discharging */
+      /* POWER_INSUFFICIENT: input plugged in but battery still discharging.
+       * Rate-limited: only log if input state changed or every 60s. */
       if (pi_dev->is_input_plugged_in && !pi_dev->is_charging &&
-          pi_dev->battery_current > 20) {
-        pipower5_log_event(pi_dev, "POWER_INSUFFICIENT bat=%d%% cur=%dmA",
-                           pi_dev->battery_percentage, pi_dev->battery_current);
+          batt_cur < -20) {
+        static unsigned long last_pwr_insuf_log;
+        if (time_after(jiffies, last_pwr_insuf_log + 60 * HZ) ||
+            pi_dev->is_input_plugged_in != pi_dev->last_is_input_plugged_in) {
+          pipower5_log_event(pi_dev, "POWER_INSUFFICIENT bat=%d%% cur=%dmA",
+                             pi_dev->battery_percentage, batt_cur);
+          last_pwr_insuf_log = jiffies;
+        }
       }
 
-      /* LOW_BATTERY: percentage below shutdown threshold */
+      /* LOW_BATTERY: percentage below shutdown threshold.
+       * Rate-limited: once every 60s. */
       if (pi_dev->battery_percentage < pi_dev->shutdown_percentage) {
-        pipower5_log_event(pi_dev, "LOW_BATTERY bat=%d%% threshold=%d%%",
-                           pi_dev->battery_percentage,
-                           pi_dev->shutdown_percentage);
+        static unsigned long last_low_bat_log;
+        if (time_after(jiffies, last_low_bat_log + 60 * HZ)) {
+          pipower5_log_event(pi_dev, "LOW_BATTERY bat=%d%% threshold=%d%%",
+                             pi_dev->battery_percentage,
+                             pi_dev->shutdown_percentage);
+          last_low_bat_log = jiffies;
+        }
       }
     }
 
