@@ -36,15 +36,15 @@ static void pipower5_poll_work(struct work_struct *work);
 static struct class *pipower5_class;
 
 /* ── Module parameters (persisted via /etc/modprobe.d/pipower5.conf) ── */
-static unsigned int buzz_on = 0x7F;
+unsigned int buzz_on = 0x7F;
 module_param(buzz_on, uint, 0644);
 MODULE_PARM_DESC(buzz_on, "Buzzer event bitmask (default 0x7F = all on)");
 
-static unsigned int buzzer_volume = 3;
+unsigned int buzzer_volume = 3;
 module_param_named(volume, buzzer_volume, uint, 0644);
 MODULE_PARM_DESC(volume, "Buzzer volume 0-10 (default 3)");
 
-static unsigned int shutdown_pct = 10;
+unsigned int shutdown_pct = 10;
 module_param_named(shutdown_percentage, shutdown_pct, uint, 0644);
 MODULE_PARM_DESC(shutdown_percentage, "Auto-shutdown battery % (default 10)");
 
@@ -161,7 +161,7 @@ static void pipower5_poll_work(struct work_struct *work) {
       /* POWER_INSUFFICIENT: input plugged in but battery still discharging.
        * Rate-limited to once per 60s or on state change. */
       if (pi_dev->is_input_plugged_in && !pi_dev->is_charging &&
-          batt_cur < -20) {
+          batt_cur < -100) {  /* significant discharge (>100mA), not float current */
         static unsigned long last_pwr_insuf_log;
         if (time_after(jiffies, last_pwr_insuf_log + 60 * HZ) ||
             pi_dev->is_input_plugged_in != pi_dev->last_is_input_plugged_in) {
