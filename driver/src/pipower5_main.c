@@ -127,9 +127,11 @@ static int pipower5_probe(struct i2c_client *client) {
   pi_dev->client = client;
   mutex_init(&pi_dev->lock);
 
-  /* Create device under /sys/class/pipower5/ */
+  /* Create device under /sys/class/pipower5/ as virtual device.
+   * Using NULL parent avoids I2C device directory permission issues
+   * (I2C core creates 1-005c without execute bit, blocking traversal). */
   pi_dev->pipower5_dev =
-      device_create(pipower5_class, dev, MKDEV(0, 0), pi_dev, "pipower5");
+      device_create(pipower5_class, NULL, MKDEV(0, 0), pi_dev, "pipower5");
   if (IS_ERR(pi_dev->pipower5_dev)) {
     ret = PTR_ERR(pi_dev->pipower5_dev);
     dev_err(dev, "Failed to create pipower5 device: %d\n", ret);
