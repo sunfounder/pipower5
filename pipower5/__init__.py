@@ -311,8 +311,14 @@ Versions:
 
     # power failure simulation
     if args.power_failure_simulation != '':
-        print("Power failure simulation requires kernel driver ADV_CMD support (not yet implemented).")
-        print("Use 'pipower5 --all' to monitor battery drain manually.")
+        test_time = 60
+        if args.power_failure_simulation != None:
+            try:
+                test_time = int(args.power_failure_simulation)
+                test_time = max(10, min(test_time, 600))
+            except ValueError:
+                pass
+        pipower5.power_failure_simulation(test_time)
     # send email config
     if args.send_email_on != '':
         if args.send_email_on == None:

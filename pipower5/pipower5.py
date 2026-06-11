@@ -83,10 +83,35 @@ class PiPower5:
     read_buzzer_volume       = lambda self: self._read_sysfs_int("buzzer_volume")
     get_buzzer_volume        = read_buzzer_volume
     read_power_btn           = lambda self: ButtonState(self._read_sysfs_int("power_button_state"))
+    # backward compat: old code expects this, kernel driver handles it internally now
+    read_shutdown_request    = lambda self: ShutdownRequest.NONE
 
     # ---- Write operations ----
 
     write_shutdown_percentage = lambda self, v: self._write_sysfs("shutdown_percentage", v)
+    set_buzzer_volume         = lambda self, v: self._write_sysfs("buzzer_volume", v)
+    write_buzzer_volume       = set_buzzer_volume
+
+    # ---- Backward compatibility stubs ----
+
+    def buzz_sequence(self, sequence):
+        """Play a buzzer sequence via kernel sysfs.
+        Accepts old Python format: [[freq,dur], ...] or "freq,dur;freq,dur;..."
+        """
+        if isinstance(sequence, str):
+            s = sequence
+        elif isinstance(sequence, list):
+            s = ";".join(f"{n[0]},{n[1]}" for n in sequence)
+        else:
+            raise TypeError(f"Expected str or list, got {type(sequence)}")
+        self._write_sysfs("buzzer_play", s)
+
+    def power_failure_simulation(self, test_time=60):
+        """Backward compat stub: kernel driver does not support VBUS control yet.
+        Use 'pipower5 --all' to monitor battery drain manually."""
+        print("Power failure simulation requires kernel driver ADV_CMD support.")
+        print("Monitor battery manually: watch -n 1 cat /sys/class/pipower5/pipower5/battery_percentage")
+        return None
     set_buzzer_volume         = lambda self, v: self._write_sysfs("buzzer_volume", v)
     write_buzzer_volume       = set_buzzer_volume
 
