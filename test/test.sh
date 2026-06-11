@@ -132,6 +132,81 @@ pipower5 send-email 2>&1 | grep -qiE "Usage|Script|install|Permission|not found"
 pipower5 uninstall 2>&1 | grep -qi "Permission\|Uninstall\|PiPower" \
   && _p "pipower5 uninstall (needs root)" || _f "pipower5 uninstall" "unexpected"
 
+
+#=== Interactive Tests (requires human verification) ===
+INTERACTIVE=1
+if [ "${1:-}" = "--full" ] || [ "${1:-}" = "-f" ]; then
+  echo ""
+  echo "========================================"
+  echo "  Interactive Tests"
+  echo "  (Press Enter after each check)"
+  echo "========================================"
+
+  echo ""
+  echo ">>> TEST 1: Buzzer Sound"
+  echo "    Playing 440Hz tone for 1 second..."
+  echo 440 > "$SYSFS/buzzer_play" 2>/dev/null
+  echo "    Did you hear a beep? (y/n)"
+  read -r ans
+  [ "$ans" = "y" ] && _p "buzzer: audible beep" || _f "buzzer: no sound" "check hardware"
+
+  echo ""
+  echo ">>> TEST 2: Button Press"
+  echo "    Press the power button ONCE (short press) within 5 seconds..."
+  echo "    Waiting..."
+  sleep 5
+  STATE=$(cat "$SYSFS/power_button_state" 2>/dev/null || echo 0)
+  if [ "$STATE" != "0" ]; then
+    _p "button: detected press (state=$STATE)"
+    echo "$STATE" | grep -qE '[12356]' && _p "button: event type OK" || _f "button: unknown state $STATE"
+  else
+    echo "    No button press detected. Try again?"
+    read -r ans
+    if [ "${ans:-n}" = "y" ]; then
+      echo "    Press the button NOW..."
+      sleep 5
+      STATE=$(cat "$SYSFS/power_button_state" 2>/dev/null || echo 0)
+      [ "$STATE" != "0" ] && _p "button: detected (state=$STATE)" || _f "button: still no press" "check hardware"
+    else
+      _skip "button: skipped"
+    fi
+  fi
+
+  echo ""
+  echo ">>> TEST 3: Desktop Battery Icon"
+  echo "    Look at the desktop taskbar battery icon."
+  echo "    Does it show battery percentage and charging status? (y/n)"
+  read -r ans
+  [ "$ans" = "y" ] && _p "desktop: battery icon visible" || _f "desktop: icon not visible" "check desktop environment"
+
+  echo ""
+  echo ">>> TEST 4: VBUS Disable (power cut test)"
+  echo "    WARNING: This will BRIEFLY disable input power."
+  echo "    The system will run on battery for ~5 seconds."
+  echo "    Press Enter to continue, or Ctrl+C to skip..."
+  read -r ans
+  echo "    Disabling VBUS..."
+  echo 0 > "$SYSFS/vbus_enable" 2>/dev/null
+  sleep 3
+  echo "    Re-enabling VBUS..."
+  echo 1 > "$SYSFS/vbus_enable" 2>/dev/null
+  echo "    Did you see the 'Power Disconnected' notification? (y/n)"
+  read -r ans
+  [ "$ans" = "y" ] && _p "VBUS: disable/re-enable OK" || _skip "VBUS: notification not checked"
+
+  echo ""
+  echo ">>> TEST 5: CLI --buzzer-test"
+  echo "    Testing buzzer via CLI..."
+  pipower5 --buzzer-test 440 2>/dev/null &
+  sleep 1
+  echo "    Did you hear a continuous tone for a few seconds? (y/n)"
+  read -r ans
+  [ "$ans" = "y" ] && _p "CLI --buzzer-test OK" || _f "CLI --buzzer-test: no sound" "check buzzer hardware"
+
+  echo ""
+  echo "=== Interactive tests complete ==="
+fi
+
 #=== Summary ===
 echo ""
 echo "========================================"
