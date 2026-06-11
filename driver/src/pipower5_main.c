@@ -139,6 +139,9 @@ static void pipower5_poll_work(struct work_struct *work) {
   if (ret < 0) {
     dev_err(&pi_dev->client->dev, "Failed to update status: %d\n", ret);
   } else {
+    /* Update always-on statistics (averages, peaks, mAh, estimated runtime) */
+    pipower5_stats_update(pi_dev);
+
     /* Notify power_supply subsystem so desktop/UIs see updated battery data */
     if (pi_dev->power_supply) {
       power_supply_changed(pi_dev->power_supply);
@@ -317,6 +320,10 @@ static int pipower5_probe(struct i2c_client *client) {
   __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL, (u8)buzzer_volume);
   __pipower5_write_byte(pi_dev, REG_WRITE_SHUTDOWN_PERCENTAGE, (u8)shutdown_pct);
 
+  /* Initialize always-on statistics and power failure test */
+  pipower5_stats_init(pi_dev);
+  pipower5_pft_init(pi_dev);
+
   /* Initialize buzzer playback */
   pipower5_buzzer_init(pi_dev);
 
@@ -370,6 +377,7 @@ static void pipower5_remove(struct i2c_client *client) {
   struct pipower5_device *pi_dev = i2c_get_clientdata(client);
 
   /* Cancel work */
+  cancel_delayed_work_sync(&pi_dev->pft_work);
   cancel_delayed_work_sync(&pi_dev->buzzer_work);
   cancel_delayed_work_sync(&pi_dev->poll_work);
   cancel_delayed_work_sync(&pi_dev->button_poll_work);

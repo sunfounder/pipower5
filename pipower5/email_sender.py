@@ -11,7 +11,13 @@ import logging
 DEFAULT_SMTP_PORT = 465
 DEFAULT_SMTP_SECURITY = 'ssl'
 
-TEMPLATE_DIR = '/opt/pipower5/email_templates/'
+import os as _os
+if _os.path.isdir('/opt/pipower5/email_templates'):
+    TEMPLATE_DIR = '/opt/pipower5/email_templates/'
+elif _os.path.isdir('/opt/pironman5/email_templates'):
+    TEMPLATE_DIR = '/opt/pironman5/email_templates/'
+else:
+    TEMPLATE_DIR = '/opt/pipower5/email_templates/'
 TEMPLATES = TEMPLATE_DIR + 'email_templates.json'
 
 class EmailSender():

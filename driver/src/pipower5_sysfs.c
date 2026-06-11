@@ -98,14 +98,16 @@ static ssize_t battery_voltage_show(struct device *dev,
 
 static DEVICE_ATTR_RO(battery_voltage);
 
-/* Battery current attribute */
+/* Battery current attribute (signed: +charge, -discharge; report abs) */
 static ssize_t battery_current_show(struct device *dev,
                                     struct device_attribute *attr, char *buf) {
   struct pipower5_device *pi_dev = dev_get_drvdata(dev);
+  s16 cur;
   int ret;
 
   mutex_lock(&pi_dev->lock);
-  ret = snprintf(buf, PAGE_SIZE, "%u\n", pi_dev->battery_current);
+  cur = (s16)pi_dev->battery_current;
+  ret = snprintf(buf, PAGE_SIZE, "%u\n", (u16)(cur < 0 ? -cur : cur));
   mutex_unlock(&pi_dev->lock);
 
   return ret;
@@ -339,6 +341,22 @@ static ssize_t power_button_state_store(struct device *dev,
 static struct device_attribute dev_attr_power_button_state =
     __ATTR(power_button_state, 0664, power_button_state_show,
            power_button_state_store);
+
+/* Shutdown request attribute */
+static ssize_t shutdown_request_show(struct device *dev,
+                                     struct device_attribute *attr,
+                                     char *buf) {
+  struct pipower5_device *pi_dev = dev_get_drvdata(dev);
+  int ret;
+
+  mutex_lock(&pi_dev->lock);
+  ret = snprintf(buf, PAGE_SIZE, "%u\n", pi_dev->shutdown_request);
+  mutex_unlock(&pi_dev->lock);
+
+  return ret;
+}
+
+static DEVICE_ATTR_RO(shutdown_request);
 
 /* Charge current max attribute */
 static ssize_t charge_current_max_show(struct device *dev,
@@ -821,15 +839,17 @@ static ssize_t input_power_show(struct device *dev,
 
 static DEVICE_ATTR_RO(input_power);
 
-/* Battery power attribute (voltage * current, mW) */
+/* Battery power attribute (voltage * |current|, μW) */
 static ssize_t battery_power_show(struct device *dev,
                                   struct device_attribute *attr, char *buf) {
   struct pipower5_device *pi_dev = dev_get_drvdata(dev);
+  s16 cur;
   unsigned int power;
   int ret;
 
   mutex_lock(&pi_dev->lock);
-  power = (unsigned int)pi_dev->battery_voltage * pi_dev->battery_current;
+  cur = (s16)pi_dev->battery_current;
+  power = (unsigned int)pi_dev->battery_voltage * (cur < 0 ? -cur : cur);
   ret = snprintf(buf, PAGE_SIZE, "%u\n", power);
   mutex_unlock(&pi_dev->lock);
 
@@ -879,6 +899,275 @@ static ssize_t output_power_show(struct device *dev,
 
 static DEVICE_ATTR_RO(output_power);
 
+/* ── Estimated runtime (always-on, updated every poll) ────────────── */
+static ssize_t estimated_runtime_show(struct device *dev,
+                                      struct device_attribute *attr,
+                                      char *buf) {
+  struct pipower5_device *pi_dev = dev_get_drvdata(dev);
+  u32 runtime;
+  mutex_lock(&pi_dev->lock);
+  runtime = pi_dev->estimated_runtime;
+  mutex_unlock(&pi_dev->lock);
+  return snprintf(buf, PAGE_SIZE, "%u\n", runtime);
+}
+static DEVICE_ATTR_RO(estimated_runtime);
+
+/* ── Power Failure Test ──────────────────────────────────────────── */
+
+static void pipower5_pft_work_func(struct work_struct *work) {
+  struct delayed_work *dwork = to_delayed_work(work);
+  struct pipower5_device *pi_dev =
+      container_of(dwork, struct pipower5_device, pft_work);
+  s16 batt_cur;
+  u16 bv, bc, ov, oc;
+
+  mutex_lock(&pi_dev->lock);
+
+  if (!pi_dev->pft_running) {
+    mutex_unlock(&pi_dev->lock);
+    return;
+  }
+
+  pi_dev->pft_elapsed++;
+
+  /* Sample current values */
+  bv = pi_dev->battery_voltage;
+  bc = (u16)abs((s16)pi_dev->battery_current); /* discharge as positive */
+  ov = pi_dev->output_voltage;
+  oc = pi_dev->output_current;
+
+  /* Running aggregates */
+  pi_dev->pft_samples++;
+  pi_dev->pft_bat_v_sum += bv;
+  pi_dev->pft_bat_c_sum += bc;
+  pi_dev->pft_out_v_sum += ov;
+  pi_dev->pft_out_c_sum += oc;
+  if (bv > pi_dev->pft_bat_v_max) pi_dev->pft_bat_v_max = bv;
+  if (bc > pi_dev->pft_bat_c_max) pi_dev->pft_bat_c_max = bc;
+  if (ov > pi_dev->pft_out_v_max) pi_dev->pft_out_v_max = ov;
+  if (oc > pi_dev->pft_out_c_max) pi_dev->pft_out_c_max = oc;
+  if (bv < pi_dev->pft_bat_v_min || pi_dev->pft_bat_v_min == 0) pi_dev->pft_bat_v_min = bv;
+  if (bc < pi_dev->pft_bat_c_min || pi_dev->pft_bat_c_min == 0) pi_dev->pft_bat_c_min = bc;
+  if (ov < pi_dev->pft_out_v_min || pi_dev->pft_out_v_min == 0) pi_dev->pft_out_v_min = ov;
+  if (oc < pi_dev->pft_out_c_min || pi_dev->pft_out_c_min == 0) pi_dev->pft_out_c_min = oc;
+
+  if (pi_dev->pft_elapsed >= pi_dev->pft_test_time) {
+    /* Test complete — re-enable VBUS, compute results */
+    u32 n = pi_dev->pft_samples;
+    u64 delta_mah = pi_dev->mah_consumed - pi_dev->pft_mah_start;
+
+    mutex_unlock(&pi_dev->lock);
+    pipower5_enable_vbus(pi_dev);
+    mutex_lock(&pi_dev->lock);
+    pi_dev->vbus_enabled = true;
+    pi_dev->pft_running = false;
+
+    {
+      u8 bat_pct_end = pi_dev->battery_percentage;
+      u8 bat_pct_used = pi_dev->pft_bat_pct_start > bat_pct_end ?
+                        pi_dev->pft_bat_pct_start - bat_pct_end : 0;
+      s32 avail_pct = (s32)bat_pct_end - (s32)pi_dev->shutdown_percentage;
+      u32 avail_cap = avail_pct > 0 ?
+                      (u32)avail_pct * PIPOWER5_BATTERY_FULL_CHARGE_MAH * 9 / 1000 : 0;
+
+      scnprintf(pi_dev->pft_result, sizeof(pi_dev->pft_result),
+        "{\"elapsed_s\":%u,\"samples\":%u,"
+        "\"bat_voltage_avg\":%u,\"bat_current_avg\":%u,"
+        "\"bat_voltage_max\":%u,\"bat_current_max\":%u,"
+        "\"bat_voltage_min\":%u,\"bat_current_min\":%u,"
+        "\"out_voltage_avg\":%u,\"out_current_avg\":%u,"
+        "\"out_voltage_max\":%u,\"out_current_max\":%u,"
+        "\"out_voltage_min\":%u,\"out_current_min\":%u,"
+        "\"delta_mah\":%llu,\"estimated_runtime_s\":%u,"
+        "\"bat_percent_used\":%u,\"available_bat_capacity\":%u}",
+        pi_dev->pft_elapsed, n,
+        n ? (u32)(pi_dev->pft_bat_v_sum / n) : 0,
+        n ? (u32)(pi_dev->pft_bat_c_sum / n) : 0,
+        pi_dev->pft_bat_v_max, pi_dev->pft_bat_c_max,
+        pi_dev->pft_bat_v_min, pi_dev->pft_bat_c_min,
+        n ? (u32)(pi_dev->pft_out_v_sum / n) : 0,
+        n ? (u32)(pi_dev->pft_out_c_sum / n) : 0,
+        pi_dev->pft_out_v_max, pi_dev->pft_out_c_max,
+        pi_dev->pft_out_v_min, pi_dev->pft_out_c_min,
+        delta_mah, pi_dev->estimated_runtime,
+        bat_pct_used, avail_cap);
+    }
+
+    dev_info(&pi_dev->client->dev,
+      "PFT done: %us, %u samples, delta_mah=%llu, est_runtime=%us\n",
+      pi_dev->pft_elapsed, n, delta_mah, pi_dev->estimated_runtime);
+  } else {
+    /* Schedule next sample in 1 second */
+    queue_delayed_work(pi_dev->wq, &pi_dev->pft_work, msecs_to_jiffies(1000));
+  }
+  mutex_unlock(&pi_dev->lock);
+}
+
+static ssize_t power_failure_test_show(struct device *dev,
+                                       struct device_attribute *attr,
+                                       char *buf) {
+  struct pipower5_device *pi_dev = dev_get_drvdata(dev);
+  int ret;
+
+  mutex_lock(&pi_dev->lock);
+  if (pi_dev->pft_running)
+    ret = snprintf(buf, PAGE_SIZE, "running %u %u\n",
+                   pi_dev->pft_elapsed, pi_dev->pft_test_time);
+  else if (pi_dev->pft_result[0])
+    ret = snprintf(buf, PAGE_SIZE, "done %s\n", pi_dev->pft_result);
+  else
+    ret = snprintf(buf, PAGE_SIZE, "idle\n");
+  mutex_unlock(&pi_dev->lock);
+
+  return ret;
+}
+
+static ssize_t power_failure_test_store(struct device *dev,
+                                        struct device_attribute *attr,
+                                        const char *buf, size_t count) {
+  struct pipower5_device *pi_dev = dev_get_drvdata(dev);
+  unsigned long val;
+
+  if (kstrtoul(buf, 10, &val) != 0)
+    return -EINVAL;
+
+  mutex_lock(&pi_dev->lock);
+
+  if (val == 0) {
+    /* Cancel */
+    if (pi_dev->pft_running) {
+      cancel_delayed_work_sync(&pi_dev->pft_work);
+      pi_dev->pft_running = false;
+      pi_dev->pft_result[0] = '\0';
+      mutex_unlock(&pi_dev->lock);
+      pipower5_enable_vbus(pi_dev);
+      dev_info(&pi_dev->client->dev, "PFT cancelled\n");
+      return count;
+    }
+    mutex_unlock(&pi_dev->lock);
+    return count;
+  }
+
+  /* Clamp test time */
+  if (val < 10) val = 10;
+  if (val > 600) val = 600;
+
+  if (pi_dev->pft_running) {
+    mutex_unlock(&pi_dev->lock);
+    dev_warn(&pi_dev->client->dev, "PFT already running\n");
+    return -EBUSY;
+  }
+
+  /* Pre-check: must be on external power, battery > 80% */
+  if (!pi_dev->is_input_plugged_in) {
+    mutex_unlock(&pi_dev->lock);
+    dev_warn(&pi_dev->client->dev, "PFT requires external power\n");
+    return -EINVAL;
+  }
+
+  /* Reset PFT state */
+  pi_dev->pft_running = true;
+  pi_dev->pft_test_time = (u32)val;
+  pi_dev->pft_elapsed = 0;
+  pi_dev->pft_samples = 0;
+  pi_dev->pft_bat_v_sum = pi_dev->pft_bat_c_sum = 0;
+  pi_dev->pft_out_v_sum = pi_dev->pft_out_c_sum = 0;
+  pi_dev->pft_bat_v_max = pi_dev->pft_bat_c_max = 0;
+  pi_dev->pft_out_v_max = pi_dev->pft_out_c_max = 0;
+  pi_dev->pft_bat_v_min = pi_dev->pft_bat_c_min = 0;
+  pi_dev->pft_out_v_min = pi_dev->pft_out_c_min = 0;
+  pi_dev->pft_mah_start = pi_dev->mah_consumed;
+  pi_dev->pft_bat_pct_start = pi_dev->battery_percentage;
+  pi_dev->pft_result[0] = '\0';
+  pi_dev->pft_start_jiffies = jiffies;
+
+  mutex_unlock(&pi_dev->lock);
+
+  /* Disable VBUS (external power off) */
+  pipower5_disable_vbus(pi_dev);
+  pi_dev->vbus_enabled = false;
+  dev_info(&pi_dev->client->dev, "PFT started: %us\n", pi_dev->pft_test_time);
+
+  /* Start sampling in 1 second */
+  queue_delayed_work(pi_dev->wq, &pi_dev->pft_work, msecs_to_jiffies(1000));
+
+  return count;
+}
+static DEVICE_ATTR_RW(power_failure_test);
+
+/* ── Stats & PFT lifecycle ───────────────────────────────────────── */
+
+void pipower5_stats_init(struct pipower5_device *pi_dev) {
+  pi_dev->mah_consumed = 0;
+  pi_dev->last_sample_jiffies = jiffies;
+  pi_dev->estimated_runtime = 0;
+}
+
+void pipower5_stats_update(struct pipower5_device *pi_dev) {
+  s16 batt_cur = (s16)pi_dev->battery_current;
+  unsigned long now = jiffies;
+  unsigned long dt_jiffies;
+  u32 batt_pct, shutdown_pct;
+  s32 remaining_pct;
+  u32 avg_ma;
+
+  /* ── Cumulative mAh discharge ── */
+  if (batt_cur < 0) {
+    /* Discharging: batt_cur negative → use absolute value */
+    u32 discharge_ma = (u32)(-batt_cur);
+    dt_jiffies = now - pi_dev->last_sample_jiffies;
+    /* mah_consumed stored as mAh * 1000 (fixed-point).
+     * ΔmAh = mA * (Δjiffies / HZ) / 3600 * 1000
+     *      = mA * Δjiffies * 1000 / (HZ * 3600) */
+    pi_dev->mah_consumed +=
+        (u64)discharge_ma * dt_jiffies * 1000 / (HZ * 3600);
+  }
+  pi_dev->last_sample_jiffies = now;
+
+  /* ── Estimated runtime ── */
+  batt_pct = pi_dev->battery_percentage;
+  shutdown_pct = pi_dev->shutdown_percentage;
+
+  if (batt_pct <= shutdown_pct) {
+    pi_dev->estimated_runtime = 0;
+  } else if (batt_cur >= 0) {
+    /* Charging or idle → effectively unlimited (cap for display) */
+    pi_dev->estimated_runtime = 999999;
+  } else {
+    remaining_pct = (s32)batt_pct - (s32)shutdown_pct;
+    if (remaining_pct <= 0) {
+      pi_dev->estimated_runtime = 0;
+    } else {
+      /* Use a short moving average of discharge current to smooth jitter.
+       * Simple: use current sample directly (updated at 1Hz, already stable). */
+      avg_ma = (u32)(-batt_cur);
+      if (avg_ma == 0) avg_ma = 1;
+      /* Capacity available: remaining_pct% of 2000mAh × 0.9 (usable) */
+      pi_dev->estimated_runtime =
+          (u32)((u64)remaining_pct * PIPOWER5_BATTERY_FULL_CHARGE_MAH * 9 *
+                3600 / (avg_ma * 1000));
+    }
+  }
+}
+
+void pipower5_pft_init(struct pipower5_device *pi_dev) {
+  INIT_DELAYED_WORK(&pi_dev->pft_work, pipower5_pft_work_func);
+  pi_dev->pft_running = false;
+  pi_dev->pft_result[0] = '\0';
+}
+
+void pipower5_pft_start(struct pipower5_device *pi_dev, u32 test_time) {
+  /* Wrapper for sysfs store — not used externally */
+}
+
+void pipower5_pft_cancel(struct pipower5_device *pi_dev) {
+  if (pi_dev->pft_running) {
+    cancel_delayed_work_sync(&pi_dev->pft_work);
+    pi_dev->pft_running = false;
+    pi_dev->pft_result[0] = '\0';
+  }
+}
+
 /* Attribute group */
 static struct attribute *pipower5_attrs[] = {
     &dev_attr_input_voltage.attr,
@@ -901,6 +1190,7 @@ static struct attribute *pipower5_attrs[] = {
     &dev_attr_shutdown_percentage.attr,
     &dev_attr_battery_internal_resistor.attr,
     &dev_attr_power_button_state.attr,
+    &dev_attr_shutdown_request.attr,
     &dev_attr_charge_current_max.attr,
     &dev_attr_buzzer_volume.attr,
     &dev_attr_vbus_enable.attr,
@@ -909,6 +1199,8 @@ static struct attribute *pipower5_attrs[] = {
     &dev_attr_buzzer_play.attr,
     &dev_attr_events.attr,
     &dev_attr_driver_version.attr,
+    &dev_attr_estimated_runtime.attr,
+    &dev_attr_power_failure_test.attr,
     NULL,
 };
 

@@ -107,7 +107,7 @@ struct pipower5_device {
   u16 output_voltage;
   u16 output_current;
   u16 battery_voltage;
-  u16 battery_current;
+  u16 battery_current;   /* raw; use (s16) cast: +charge, -discharge */
   u8 battery_percentage;
   u8 battery_capacity;
   u8 power_source;
@@ -129,6 +129,26 @@ struct pipower5_device {
 
   /* VBUS control (for power failure simulation) */
   bool vbus_enabled;
+
+  /* ── Cumulative tracking (always updated every poll) ──────────── */
+  u64 mah_consumed;               /* mAh*1000 — cumulative discharge since boot */
+  unsigned long last_sample_jiffies;
+  u32 estimated_runtime;          /* seconds at current discharge rate */
+
+  /* ── Power failure test ────────────────────────────────────────── */
+  struct delayed_work pft_work;
+  bool pft_running;
+  u32 pft_elapsed;
+  u32 pft_test_time;
+  unsigned long pft_start_jiffies;
+  u64 pft_mah_start;              /* snapshot of mah_consumed at test start */
+  u8  pft_bat_pct_start;          /* snapshot of battery_percentage at test start */
+  /* Running aggregates during test period */
+  u32 pft_samples;
+  u64 pft_bat_v_sum, pft_bat_c_sum, pft_out_v_sum, pft_out_c_sum;
+  u16 pft_bat_v_max, pft_bat_c_max, pft_out_v_max, pft_out_c_max;
+  u16 pft_bat_v_min, pft_bat_c_min, pft_out_v_min, pft_out_c_min;
+  char pft_result[512];
 
   /* State tracking for event detection */
   u8 last_is_input_plugged_in;
@@ -171,6 +191,11 @@ void pipower5_remove_sysfs(struct pipower5_device *pi_dev);
 void pipower5_buzzer_init(struct pipower5_device *pi_dev);
 void pipower5_buzzer_event(struct pipower5_device *pi_dev, const char *event_name);
 void pipower5_buzz_seq_load(const char *buf, size_t len);
+void pipower5_stats_init(struct pipower5_device *pi_dev);
+void pipower5_stats_update(struct pipower5_device *pi_dev);
+void pipower5_pft_init(struct pipower5_device *pi_dev);
+void pipower5_pft_start(struct pipower5_device *pi_dev, u32 test_time);
+void pipower5_pft_cancel(struct pipower5_device *pi_dev);
 
 /* Module parameters (extern for sysfs access) */
 extern unsigned int buzz_on;

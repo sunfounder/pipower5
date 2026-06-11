@@ -1,36 +1,34 @@
 {
     "battery_activated": {
-        "subject": "🔋 {device_name} Battery Activated",
+        "subject": "\ud83d\udd0b {device_name} Battery Activated",
         "body_path": "battery_activated.html"
     },
-
     "low_battery": {
-        "subject": "🚨 {device_name} Critical Battery Level - Only {battery_percentage}% Remaining",
+        "subject": "\ud83d\udea8 {device_name} Critical Battery Level - Only {battery_percentage}% Remaining",
         "body_path": "low_battery.html"
     },
- 
     "battery_critical_shutdown": {
-        "subject": "🔥 {device_name} Critical Battery Level - Shutting Down Immediately",
+        "subject": "\ud83d\udd25 {device_name} Critical Battery Level - Shutting Down Immediately",
         "body_path": "battery_critical_shutdown.html"
     },
-    
     "battery_voltage_critical_shutdown": {
-        "subject": "⚡ {device_name} Critical Battery Voltage - Shutting Down Immediately",
+        "subject": "\u26a1 {device_name} Critical Battery Voltage - Shutting Down Immediately",
         "body_path": "battery_voltage_critical_shutdown.html"
     },
-    
     "power_disconnected": {
-        "subject": "⚠️ {device_name} External Power Disconnected",
+        "subject": "\u26a0\ufe0f {device_name} External Power Disconnected",
         "body_path": "power_disconnected.html"
     },
-    
     "power_restored": {
-        "subject": "✅ {device_name} External Power Restored",
+        "subject": "\u2705 {device_name} External Power Restored",
         "body_path": "power_restored.html"
     },
-    
     "power_insufficient": {
-        "subject": "⚠️ {device_name} Insufficient External Power",
+        "subject": "\u26a0\ufe0f {device_name} Insufficient External Power",
         "body_path": "power_insufficient.html"
+    },
+    "test": {
+        "subject": "\u2705 PiPower5 Test Email - Configuration Successful",
+        "body_path": "test.html"
     }
 }

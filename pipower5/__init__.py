@@ -17,9 +17,7 @@ def main():
     import time
     import argparse
 
-    from .constants import SYSTEM_DEFAULT_CONFIG
     from .version import __version__
-    from .utils import get_varient_id_and_version
     from .pipower5 import PiPower5, Event, PowerSource
 
     from importlib.resources import files as resource_files
@@ -27,10 +25,53 @@ def main():
     import sys
     import os
 
+    SYSTEM_DEFAULT_CONFIG = {
+        "enable_history": True,
+        "debug_level": "INFO",
+        "data_interval": 1,
+        "database_retention_days": 30,
+        "temperature_unit": "C",
+        "power-failure-simulation": True,
+        "shutdown_percentage": 10,
+        "send_email_on": [
+            "battery_activated",
+            "low_battery",
+            "power_disconnected",
+            "power_restored",
+            "power_insufficient",
+            "battery_critical_shutdown",
+            "battery_voltage_critical_shutdown",
+        ],
+        "pipower5_buzzer_volume": 3,
+        "pipower5_buzz_on": [
+            "battery_activated",
+            "low_battery",
+            "power_disconnected",
+            "power_restored",
+            "power_insufficient",
+            "battery_critical_shutdown",
+            "battery_voltage_critical_shutdown",
+        ],
+        "pipower5_buzz_sequence": {
+            "battery_activated": "A4,50:p,100:B4,50",
+            "low_battery": "A4,50:p,100:A4,50",
+            "power_disconnected": "D5,50:p,100:G4,50",
+            "power_restored": "G4,50:p,100:D5,50",
+            "power_insufficient": "B4,50:p,100:B4,50:p,100:B4,100",
+            "battery_critical_shutdown": "C6,50:p,60:C6,50:p,60:C6,100",
+            "battery_voltage_critical_shutdown": "C6,50:p,60:C6,50:p,60:C6,100:p,60:C6,100",
+        },
+        "send_email_to": "",
+        "smtp_email": "",
+        "smtp_password": "",
+        "smtp_server": "",
+        "smtp_port": 465,
+        "smtp_security": "ssl",
+    }
+
     TRUE_LIST = ['true', 'True', 'TRUE', '1', 'on', 'On', 'ON']
     FALSE_LIST = ['false', 'False', 'FALSE', '0', 'off', 'Off', 'OFF']
     AVAILABLE_EVENTS = [i.value for i in Event]
-    _, BOARD_VERSION = get_varient_id_and_version()
 
     __package_name__ = __name__.split('.')[0]
     _TEMPLATE_CONFIG = str(resource_files(__package_name__).joinpath('config.json'))
@@ -63,9 +104,6 @@ def main():
     parser.add_argument('-ov', '--output-voltage', action='store_true', help='Read output voltage')
     parser.add_argument('-oc', '--output-current', action='store_true', help='Read output current')
     parser.add_argument('-bv', '--battery-voltage', action='store_true', help='Read battery voltage')
-    if BOARD_VERSION == '50':
-        parser.add_argument('-b1v', '--battery-1-voltage', action='store_true', help='Read battery 1 voltage')
-        parser.add_argument('-b2v', '--battery-2-voltage', action='store_true', help='Read battery 2 voltage')
     parser.add_argument('-bc', '--battery-current', action='store_true', help='Read battery current')
     parser.add_argument('-bp', '--battery-percentage', action='store_true', help='Read battery percentage')
     parser.add_argument('-bs', '--battery-source', action='store_true', help='Read battery source')
@@ -91,7 +129,7 @@ def main():
 
     parser.add_argument("-u", "--temperature-unit", choices=["C", "F"], nargs='?', default='', help="Temperature unit")
 
-    args = parser.parse_args()
+    args, extra = parser.parse_known_args()
 
     if not len(sys.argv) > 1:
         parser.print_help()
@@ -171,22 +209,45 @@ def main():
         args.all = True  # alias for -a
 
     if args.command == "send-email":
-        from .device import DEVICE_PATH
-        event = args.event
-        if not event:
+        if len(extra) < 1:
             print("Usage: pipower5 send-email <event>")
-            print("Events: low_battery power_disconnected power_restored battery_activated power_insufficient")
+            print("Events: battery_activated low_battery power_disconnected power_restored power_insufficient")
+            print("        battery_critical_shutdown battery_voltage_critical_shutdown")
             quit()
-        import subprocess, sys
-        script = "/usr/local/bin/pipower5-send-mail"
-        try:
-            subprocess.run([sys.executable, script, event], check=True)
+        event = extra[0]
+
+        # Load config: try pironman5 first, then pipower5 standalone
+        pironman5_config = "/opt/pironman5/config.json"
+        if os.path.exists(pironman5_config):
+            with open(pironman5_config, 'r') as f:
+                cfg = json.load(f).get('system', {})
+        elif os.path.exists(config_path):
+            cfg = current_config.get('system', {})
+        else:
+            cfg = SYSTEM_DEFAULT_CONFIG
+
+        from .email_sender import EmailSender
+        sender = EmailSender(cfg)
+        bat_pct = pipower5.read_battery_percentage()
+        bat_cur = pipower5.read_battery_current()
+        is_plugged = pipower5.read_is_input_plugged_in()
+        is_charging = pipower5.read_is_charging()
+        data = {
+            'device_name': 'PiPower5',
+            'battery_percentage': bat_pct,
+            'battery_voltage': f"{pipower5.read_battery_voltage() / 1000:.1f}V",
+            'shutdown_percentage': pipower5.read_shutdown_percentage(),
+            'battery_current_output': bat_cur,
+            'estimated_time': 'N/A',
+            'switch_time': time.strftime('%Y-%m-%d %H:%M:%S'),
+            'input_status': 'Plugged In' if is_plugged else 'Unplugged',
+            'charging_status': 'Charging' if is_charging else ('Not Charging' if is_plugged else 'N/A (on battery)'),
+        }
+        result = sender.send_preset_email(event, data)
+        if result is True:
             print(f"Email sent for: {event}")
-        except FileNotFoundError:
-            print(f"Script not installed: {script}")
-            print("Install with: sudo cp rules/pipower5-send-mail /usr/local/bin/")
-        except Exception as e:
-            print(f"Failed: {e}")
+        else:
+            print(f"Failed to send email: {result}")
         quit()
 
     if args.command == "uninstall":
@@ -234,6 +295,7 @@ def main():
                 print("Failed, shutdown battery percentage maximal is 100%")
             else:
                 pipower5.write_shutdown_percentage(int(args.shutdown_percentage))
+                new_sys_config['shutdown_percentage'] = int(args.shutdown_percentage)
                 time.sleep(0.5)
                 if pipower5.read_shutdown_percentage() == int(args.shutdown_percentage):
                     print(f"Success, shutdown battery percentage: {pipower5.read_shutdown_percentage()}%")
@@ -395,10 +457,29 @@ Versions:
             except ValueError:
                 print(f"Event '{val}' - buzzer auto-triggers on kernel events. Use frequency value to test manually.")
 
+    # ── Also sync to pironman5 config if running under pironman5 ──────
+    def _sync_to_pironman5_config(patches):
+        """If pironman5 config exists, apply the same patches to it."""
+        pironman5_config = "/opt/pironman5/config.json"
+        if not os.path.exists(pironman5_config):
+            return
+        try:
+            with open(pironman5_config, 'r') as f:
+                pm5 = json.load(f)
+            if 'system' not in pm5:
+                pm5['system'] = {}
+            for k, v in patches.items():
+                pm5['system'][k] = v
+            with open(pironman5_config, 'w') as f:
+                json.dump(pm5, f, indent=4)
+        except Exception as e:
+            print(f"  [notice] Could not sync to pironman5 config: {e}")
+
     if len(new_sys_config) > 0 or len(new_peripheral_config) > 0:
         new_config = {
             'system': new_sys_config,
             'peripherals': new_peripheral_config
         }
-        
+
         update_config_file(new_config, config_path)
+        _sync_to_pironman5_config(new_sys_config)
