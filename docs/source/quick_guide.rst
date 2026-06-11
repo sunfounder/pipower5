@@ -1,63 +1,63 @@
-Quick User Guide
+快速用户指南
 ===============================
 
-This guide helps you quickly get started with PiPower 5 after hardware assembly.
+本指南帮助您在硬件组装后快速开始使用 PiPower 5。
 
-Charge the Battery
+给电池充电
 ----------------------------------------------------
 
-Before first use, fully charge the battery.
+首次使用前，请将电池充满电。
 
-Recommendations:
+建议：
 
-- Use a high-quality USB-C power adapter
-- A 5V 5A power supply is recommended for Raspberry Pi 5
-- Higher-power adapters are recommended when using SSDs or other high-power peripherals
+- 使用高质量的 USB-C 电源适配器
+- Raspberry Pi 5 推荐使用 5V 5A 电源
+- 使用 SSD 或其他高功率外设时推荐使用更高功率的适配器
 
-While Charging:
+充电时：
 
-- Use a high-quality USB-C power supply to charge PiPower 5.
+- 使用高质量的 USB-C 电源为 PiPower 5 充电。
 
   .. image:: img/power_input.png
      :width: 50%
      :align: center
 
-- During charging, the battery indicator LEDs light up progressively in sequence. 
+- 充电期间，电池指示灯 LED 按顺序逐步亮起。
 
   .. image:: img/battery_indicator.png
      :width: 50%
      :align: center
 
-  Battery status is indicated by the number of lit LEDs:
-  
-  * **4 LEDs lit**: Battery >80%
-  * **3 LEDs lit**: 60%< Battery <80%
-  * **2 LEDs lit**: 40%< Battery <60%
-  * **1 LED lit**: 20%< Battery <40%
-  * **First LED flashing**: Battery <20%
-  * **LEDs incrementally light up in a cycle**: Charging
-  * **Middle two LEDs flashing**: Waiting for shutdown signal
-  * **All LEDs off**: Unpowered or in sleep mode
-  * During charging, the indicator remains lit **even in the off state** until fully charged.
-  
-Power On
+  电池状态通过亮起的 LED 数量指示：
+
+  * **4 个 LED 亮起**：电池 >80%
+  * **3 个 LED 亮起**：60%< 电池 <80%
+  * **2 个 LED 亮起**：40%< 电池 <60%
+  * **1 个 LED 亮起**：20%< 电池 <40%
+  * **第一个 LED 闪烁**：电池 <20%
+  * **LED 循环递增亮起**：正在充电
+  * **中间两个 LED 闪烁**：等待关机信号
+  * **所有 LED 熄灭**：未通电或处于休眠模式
+  * 充电期间，指示灯**即使在关机状态下**也保持亮起，直到充满电。
+
+开机
 ----------------------------------------------------
 
-For Raspberry Pi devices, no additional power wiring is required. PiPower 5 supplies power directly through the GPIO header.
+对于 Raspberry Pi 设备，无需额外的电源接线。PiPower 5 通过 GPIO 排针直接供电。
 
-For other devices, you can power them using:
+对于其他设备，您可以通过以下方式供电：
 
-- The USB-A output port
-- The 5V/GND pins next to the USB-A port
+- USB-A 输出端口
+- USB-A 端口旁的 5V/GND 引脚
 
 .. image:: img/power_output.png
    :width: 50%
    :align: center
 
-Press the power button once to turn on PiPower 5. When powered on:
+按一次电源按钮以开启 PiPower 5。开机时：
 
-- The **PWR LED** lights up
-- The connected device begins receiving power from PiPower 5
+- **PWR LED** 亮起
+- 连接的设备开始从 PiPower 5 接收电源
 
 .. image:: img/pwr_led.png
    :width: 50%
@@ -67,29 +67,29 @@ Press the power button once to turn on PiPower 5. When powered on:
     :start-after: start_install_pipower5
     :end-before: end_install_pipower5
 
-Open the Web Dashboard
+打开 Web 仪表板
 ----------------------------------------------------
 
-After installation, open the dashboard in your browser:
+安装完成后，在浏览器中打开仪表板：
 
 .. code-block:: text
 
    http://<raspberry-pi-ip>:34001
 
-The dashboard allows you to:
+仪表板允许您：
 
-- View battery percentage
-- Monitor charging status
-- Check voltage and current
-- Configure shutdown percentage
-- Manage notifications
+- 查看电池百分比
+- 监控充电状态
+- 检查电压和电流
+- 配置关机百分比
+- 管理通知
 
 .. image:: img/web_dashboard.png
    :width: 100%
    :align: center
 
 
-Safe Shutdown
+安全关机
 ----------------------------------------------------
 
 .. include:: /pipower5_software.rst
@@ -98,14 +98,14 @@ Safe Shutdown
 
 .. note::
 
-   For advanced features and detailed configuration options, including:
+   有关高级功能和详细配置选项，包括：
 
-   - Power monitoring commands
-   - Notification settings
-   - Buzzer alerts
-   - Email alerts
-   - Advanced configuration
+   - 电源监控命令
+   - 通知设置
+   - 蜂鸣器警报
+   - 邮件警报
+   - 高级配置
 
-   Please refer to:
+   请参阅：
 
    * :ref:`pipower5_tool`

@@ -1,36 +1,22 @@
-.. note::
-
-    Hello, welcome to the SunFounder Raspberry Pi & Arduino & ESP32 Enthusiasts Community on Facebook! Dive deeper into Raspberry Pi, Arduino, and ESP32 with fellow enthusiasts.
-
-    **Why Join?**
-
-    - **Expert Support**: Solve post-sale issues and technical challenges with help from our community and team.
-    - **Learn & Share**: Exchange tips and tutorials to enhance your skills.
-    - **Exclusive Previews**: Get early access to new product announcements and sneak peeks.
-    - **Special Discounts**: Enjoy exclusive discounts on our newest products.
-    - **Festive Promotions and Giveaways**: Take part in giveaways and holiday promotions.
-
-    👉 Ready to explore and create with us? Click [|link_sf_facebook|] and join today!
-
 .. _troubleshooting:
 
-Troubleshooting
+故障排除
 ===============
 
-This page helps you diagnose PiPower 5 issues using the onboard LEDs, buzzer, and software tools. Start with the quick reference tables below, then follow the symptom-based guides for detailed steps.
+本页面帮助您使用板载 LED、蜂鸣器和软件工具诊断 PiPower 5 问题。从下面的快速参考表开始，然后按照基于症状的指南进行详细步骤。
 
-.. contents:: Table of Contents
+.. contents:: 目录
    :local:
    :depth: 2
 
 
-----
-LED & Buzzer Quick Reference
-----------------------------
+------------------------
+LED 与蜂鸣器快速参考
+------------------------
 
-Before diving into specific symptoms, use these tables to interpret what the board is telling you.
+在深入研究具体症状之前，使用这些表格解读板子在告诉您什么。
 
-Power & Status LEDs
+电源和状态 LED
 +++++++++++++++++++
 
 .. list-table::
@@ -38,376 +24,376 @@ Power & Status LEDs
    :widths: 15 25 60
 
    * - LED
-     - State
-     - What It Means
-   * - **PWR LED** (green)
-     - ON
-     - Output power is active — the board is supplying 5V to your device.
+     - 状态
+     - 含义
+   * - **PWR LED**\ （绿色）
+     - 亮
+     - 输出电源已激活 — 板子正在向您的设备提供 5V 电源。
    * -
-     - OFF
-     - Output is off. Press the power button once to turn it on.
-   * - **BAT LED** (yellow)
-     - ON
-     - Battery is currently supplying power. If external power is connected, this indicates insufficient input power.
+     - 灭
+     - 输出已关闭。按一次电源按钮将其打开。
+   * - **BAT LED**\ （黄色）
+     - 亮
+     - 电池当前正在供电。如果连接了外部电源，这表示输入功率不足。
    * -
-     - OFF
-     - Battery is in standby — external power is sufficient.
-   * - **Reverse Battery LEDs** (2× red)
-     - ON (both)
-     - Battery polarity is reversed! Disconnect immediately and correct the wiring.
+     - 灭
+     - 电池处于待机状态 — 外部电源充足。
+   * - **电池反接 LED**\ （2× 红色）
+     - 亮（两个）
+     - 电池极性接反！立即断开并纠正接线。
 
-Battery Level LEDs
+电池电量 LED
 ++++++++++++++++++
 
 .. list-table::
    :header-rows: 1
    :widths: 20 80
 
-   * - LED Pattern
-     - Meaning
-   * - 4 LEDs lit
-     - Battery > 80%
-   * - 3 LEDs lit
-     - Battery 60% – 80%
-   * - 2 LEDs lit
-     - Battery 40% – 60%
-   * - 1 LED lit
-     - Battery 20% – 40%
-   * - First LED flashing
-     - Battery < 20% — charge soon
-   * - LEDs cycling sequentially
-     - Charging in progress
-   * - Middle two LEDs flashing
-     - Waiting for shutdown signal from Raspberry Pi
-   * - All LEDs off
-     - Board unpowered or in sleep mode
+   * - LED 模式
+     - 含义
+   * - 4 个 LED 亮
+     - 电池 > 80%
+   * - 3 个 LED 亮
+     - 电池 60% – 80%
+   * - 2 个 LED 亮
+     - 电池 40% – 60%
+   * - 1 个 LED 亮
+     - 电池 20% – 40%
+   * - 第一个 LED 闪烁
+     - 电池 < 20% — 请尽快充电
+   * - LED 循环顺序亮起
+     - 正在充电
+   * - 中间两个 LED 闪烁
+     - 等待 Raspberry Pi 的关机信号
+   * - 所有 LED 灭
+     - 板子未通电或处于休眠模式
 
 .. note::
 
-   Battery LEDs remain active during charging even when the board is in the off state. They turn off only when charging is complete.
+   电池 LED 在充电期间保持活动状态，即使板子处于关闭状态。只有在充电完成时它们才会熄灭。
 
-Buzzer Signals
+蜂鸣器信号
 ++++++++++++++
 
-If the buzzer is enabled, these sounds indicate specific events:
+如果蜂鸣器已启用，这些声音表示特定事件：
 
 .. list-table::
    :header-rows: 1
    :widths: 25 25 50
 
-   * - Event
-     - Typical Sound
-     - What It Means
+   * - 事件
+     - 典型声音
+     - 含义
    * - ``battery_activated``
-     - Two ascending tones
-     - Battery has taken over power supply (external power lost or insufficient).
+     - 两个升调
+     - 电池已接管供电（外部电源丢失或不足）。
    * - ``low_battery``
-     - Two repeated tones of same pitch
-     - Battery level has fallen below the configured shutdown percentage. Charge immediately.
+     - 两个相同音高的重复音
+     - 电池电量已低于配置的关机百分比。请立即充电。
    * - ``power_disconnected``
-     - High tone → low tone
-     - External power was disconnected. System is now running on battery.
+     - 高音 → 低音
+     - 外部电源已断开。系统现在使用电池运行。
    * - ``power_restored``
-     - Low tone → high tone
-     - External power was restored. Battery is no longer discharging.
+     - 低音 → 高音
+     - 外部电源已恢复。电池不再放电。
    * - ``power_insufficient``
-     - Three rapid tones of same pitch
-     - External power is connected but too weak. Battery is supplementing. Check your power adapter.
+     - 三个相同音高的快速音
+     - 外部电源已连接但太弱。电池正在补充供电。请检查您的电源适配器。
    * - ``battery_critical_shutdown``
-     - Three rapid descending tones
-     - Battery capacity critically low. System will shut down.
+     - 三个快速降调
+     - 电池容量严重不足。系统将关机。
    * - ``battery_voltage_critical_shutdown``
-     - Four rapid descending tones
-     - Battery voltage critically low (failsafe). System will shut down immediately.
+     - 四个快速降调
+     - 电池电压严重过低（故障安全）。系统将立即关机。
 
 .. tip::
 
-   If you never hear buzzer sounds, the buzzer may be disabled or its volume set to 0. Run ``pipower5 -bzv`` to check the current volume, or test with ``pipower5 -bzt low_battery``.
+   如果您从未听到蜂鸣器声音，蜂鸣器可能已禁用或其音量设置为 0。运行 ``pipower5 -bzv`` 检查当前音量，或用 ``pipower5 -bzt low_battery`` 测试。
 
 
-----
-Symptom-Based Diagnosis
------------------------
+--------------
+基于症状的诊断
+--------------
 
-"No Power" — All LEDs Off, No Output
+"无电源" — 所有 LED 灭，无输出
 +++++++++++++++++++++++++++++++++++++
 
-**What you see**: PWR LED off, battery LEDs off, connected device shows no power.
+**您看到的情况**：PWR LED 灭，电池 LED 灭，连接的设备无电源显示。
 
-**Check these, in order:**
+**请按顺序检查以下内容：**
 
-1. **Is the battery installed?**
-   PiPower 5 cannot operate without a battery. Ensure the battery connector (XH2.54 3P) is firmly seated. See :ref:`battery_connector`.
+1. **电池是否安装？**
+   PiPower 5 没有电池无法运行。确保电池连接器（XH2.54 3P）牢固插入。请参阅 :ref:`battery_connector`。
 
-2. **Is the battery completely drained?**
-   A deeply discharged battery (< 2.5V per cell) enters trickle-charge mode and may not power the board for several minutes.
+2. **电池是否完全耗尽？**
+   深度放电的电池（< 2.5V 每节）会进入涓流充电模式，可能无法在几分钟内为板子供电。
 
-   - Connect external power and wait 10–15 minutes.
-   - If battery LEDs remain off after 15 minutes, the battery may be defective.
+   - 连接外部电源，等待 10–15 分钟。
+   - 如果 15 分钟后电池 LED 仍然不亮，电池可能有缺陷。
 
-3. **Is external power connected correctly?**
-   - Use a USB-C PD power supply (5V–15V) or DC power via the screw terminals.
-   - Ensure the USB-C cable supports power delivery — some data-only cables will not work.
-   - Try a different power adapter and cable.
+3. **外部电源是否正确连接？**
+   - 使用 USB-C PD 电源（5V–15V）或通过螺丝端子使用 DC 电源。
+   - 确保 USB-C 线缆支持电源输送 — 某些仅数据传输的线缆无法工作。
+   - 尝试不同的电源适配器和线缆。
 
-4. **Press the power button once.**
-   PiPower 5 requires a button press to activate output, unless the Default ON jumper is set.
+4. **按一次电源按钮。**
+   PiPower 5 需要按一下按钮来激活输出，除非设置了默认开机跳线。
 
-5. **Check the Default ON jumper.** See :ref:`cap_onoff`.
-   - Jumper on **ON**: Output activates automatically when external power is connected.
-   - Jumper on **OFF**: You must press the power button each time.
+5. **检查默认开机跳线。** 请参阅 :ref:`cap_onoff`。
+   - 跳线在 **ON**：连接外部电源时自动激活输出。
+   - 跳线在 **OFF**：每次都需要按电源按钮。
 
-6. **Check for reverse battery installation.**
-   If both red LEDs near the battery connector are lit, the battery polarity is reversed. Power off immediately, disconnect the battery, and reconnect with correct polarity. See :ref:`battery_connector`.
+6. **检查电池是否反接。**
+   如果电池连接器附近的红色 LED 都亮起，电池极性接反。立即断电，断开电池，按正确极性重新连接。请参阅 :ref:`battery_connector`。
 
 
-"BAT LED Always On" — External Power Seems Insufficient
+"BAT LED 常亮" — 外部电源似乎不足
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: External power is connected, but the BAT LED remains lit. The battery is discharging despite external power being present.
+**您看到的情况**：外部电源已连接，但 BAT LED 保持亮起。尽管外部电源存在，电池仍在放电。
 
-**What this means**: The external power supply cannot meet the total power demand. The battery is supplementing the shortfall.
+**这意味着什么**：外部电源无法满足总功率需求。电池正在补充不足的部分。
 
-**Check these, in order:**
+**请按顺序检查以下内容：**
 
-1. **Is your power adapter powerful enough?**
-   The formula is: *Adapter wattage ≥ Raspberry Pi power (~20–25W) + Charging power (set via DIP switch)*.
+1. **您的电源适配器功率是否足够？**
+   公式是：*适配器功率 ≥ Raspberry Pi 功率（约 20–25W）+ 充电功率（通过 DIP 开关设置）*。
 
-   - Raspberry Pi 5 under load can draw > 25W.
-   - If charging power is set to 20W (both DIP switches ON), you need a **45W+** adapter.
-   - For a 30W adapter, reduce charging power to 10W or 5W.
+   - Raspberry Pi 5 负载时可能消耗 > 25W。
+   - 如果充电功率设置为 20W（两个 DIP 开关都 ON），您需要一个 **45W+** 的适配器。
+   - 对于 30W 适配器，将充电功率降低到 10W 或 5W。
 
-2. **Check the DIP switch (charging power selector).**
-   See the charging power table in :ref:`power_input`. Lower the charging power if your adapter is underpowered.
+2. **检查 DIP 开关（充电功率选择器）。**
+   请参阅 :ref:`power_input` 中的充电功率表。如果适配器功率不足，降低充电功率。
 
-3. **Try a different USB-C cable.**
-   Not all cables support USB PD at higher wattages. Use the cable that came with your power adapter.
+3. **尝试不同的 USB-C 线缆。**
+   并非所有线缆都支持更高功率的 USB PD。使用电源适配器随附的线缆。
 
-4. **Check the adapter's PD profile.**
-   Some adapters advertise high wattage but only on specific voltage/current combinations. PiPower 5 requires a PD-compliant supply. Non-PD adapters (e.g., fixed 5V-only) may not provide enough current.
+4. **检查适配器的 PD 配置文件。**
+   某些适配器声称高功率但仅在特定的电压/电流组合下。PiPower 5 需要兼容 PD 的电源。非 PD 适配器（如固定 5V）可能无法提供足够的电流。
 
-5. **For screw terminal input**, ensure input voltage is ≥ 9V for optimal performance. See :ref:`power_input` for the voltage-to-current limits.
+5. **对于螺丝端子输入**，确保输入电压 ≥ 9V 以获得最佳性能。请参阅 :ref:`power_input` 了解电压对电流的限制。
 
 
-"PWR LED Off" — Device Not Receiving Power
+"PWR LED 灭" — 设备未收到电源
 +++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: Battery LEDs are on (board has power), but PWR LED is off and the connected device won't boot.
+**您看到的情况**：电池 LED 亮（板子有电），但 PWR LED 灭，连接的设备无法启动。
 
-**Check these:**
+**请检查：**
 
-1. **Press the power button once.**
-   The board has power but output is not enabled.
+1. **按一次电源按钮。**
+   板子有电但输出未启用。
 
-2. **Is the GPIO header properly seated?**
-   If using a Raspberry Pi, remove and re-seat the PiPower 5 HAT. Check for bent pins or debris in the header.
+2. **GPIO 排针是否正确插入？**
+   如果使用 Raspberry Pi，取下并重新安装 PiPower 5 HAT。检查排针是否有弯曲的引脚或杂物。
 
-3. **Try an alternative output.**
-   Connect a device to the USB-A port or the 2x4P header. If these work, the issue is with the GPIO passthrough.
+3. **尝试替代输出。**
+   将设备连接到 USB-A 端口或 2x4P 排针。如果这些能工作，问题出在 GPIO 直通。
 
 
-"Device Keeps Shutting Down Unexpectedly"
+"设备不断意外关机"
 +++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: Raspberry Pi or connected device shuts down without warning.
+**您看到的情况**：Raspberry Pi 或连接的设备在没有任何警告的情况下关机。
 
-**Check these:**
+**请检查：**
 
-1. **Check the shutdown percentage.**
-   Run ``pipower5 -sp``. If it is set high (e.g., 50% or more), the board will trigger a shutdown early. Set a lower value if needed:
+1. **检查关机百分比。**
+   运行 ``pipower5 -sp``。如果设置过高（如 50% 或更高），板子会提前触发关机。如有需要设置更低的值：
 
    .. code-block:: shell
 
       pipower5 -sp 10
       sudo systemctl restart pipower5.service
 
-2. **Check if the battery is actually discharging.**
-   Run ``pipower5 -a`` and look at:
-   - ``source``: Should be "0 - External" when external power is connected.
-   - ``battery current``: Negative = charging, positive = discharging.
+2. **检查电池是否真的在放电。**
+   运行 ``pipower5 -a`` 并查看：
+   - ``source``：连接外部电源时应为 "0 - External"。
+   - ``battery current``：负 = 充电，正 = 放电。
 
-3. **For Raspberry Pi 5 with high-power peripherals (SSD, HATs)**:
-   Consider setting ``pipower5 -sp 100`` to trigger immediate safe shutdown when external power is lost. See :ref:`pipower5_tool`.
+3. **对于带有高功率外设（SSD、HAT）的 Raspberry Pi 5**：
+   考虑设置 ``pipower5 -sp 100`` 以在外部电源丢失时立即触发安全关机。请参阅 :ref:`pipower5_tool`。
 
-4. **Check the power adapter.**
-   If ``power_insufficient`` events are triggered (buzzer or log), the adapter is too weak. Upgrade to a higher-wattage supply or lower the charging power DIP switch.
+4. **检查电源适配器。**
+   如果触发了 ``power_insufficient`` 事件（蜂鸣器或日志），适配器太弱。升级到更高功率的电源或降低充电功率 DIP 开关。
 
 
-"Battery Not Charging"
+"电池不充电"
 ++++++++++++++++++++++
 
-**What you see**: External power connected, but battery LEDs do not show the charging animation (sequential cycling).
+**您看到的情况**：外部电源已连接，但电池 LED 不显示充电动画（顺序循环）。
 
-**Check these:**
+**请检查：**
 
-1. **Is the battery already full?**
-   4 solid LEDs = battery > 80%. The charging circuit may have stopped because the battery is full or in the constant-voltage taper phase.
+1. **电池是否已经充满？**
+   4 个 LED 常亮 = 电池 > 80%。充电电路可能因为电池已满或处于恒压阶段而停止。
 
-2. **Check charging status via software.**
-   Run ``pipower5 -ichg``. If it returns ``False``, the board reports it is not charging. Check ``pipower5 -bp`` for the current battery percentage.
+2. **通过软件检查充电状态。**
+   运行 ``pipower5 -ichg``。如果返回 ``False``，板子报告未充电。检查 ``pipower5 -bp`` 了解当前电池百分比。
 
-3. **Over-temperature protection active.**
-   If the board has been under heavy load in a warm environment, the charging chip may have exceeded 125°C and halted charging. Let the board cool down and try again.
+3. **过温保护激活。**
+   如果板子在温暖环境中高负载运行，充电芯片可能超过 125°C 并停止充电。让板子冷却后再试。
 
-4. **Input voltage too low via screw terminals.**
-   If using screw terminals with voltage ≤ 6.5V, the charging current is limited. Use ≥ 9V for reliable charging.
+4. **螺丝端子输入电压过低。**
+   如果使用螺丝端子且电压 ≤ 6.5V，充电电流受限。使用 ≥ 9V 以获得可靠的充电。
 
-5. **Check the battery health.**
-   A battery that never reaches full charge or charges very slowly may have degraded cells. Try a different compatible battery (7.4V 2-cell Li-ion, XH2.54 3P).
+5. **检查电池健康状态。**
+   从未完全充满或充电非常缓慢的电池可能电芯已退化。尝试使用其他兼容电池（7.4V 2 节锂离子，XH2.54 3P）。
 
 
-"I2C Communication Fails" — `pipower5` Command Returns Errors
+"I2C 通信失败" — `pipower5` 命令返回错误
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: Running ``pipower5 -a`` produces an error or no data.
+**您看到的情况**：运行 ``pipower5 -a`` 产生错误或无数据。
 
-**Check these:**
+**请检查：**
 
-1. **Is I2C enabled on the Raspberry Pi?**
-   Run ``sudo raspi-config`` → Interface Options → I2C → Enable.
+1. **Raspberry Pi 上是否启用了 I2C？**
+   运行 ``sudo raspi-config`` → Interface Options → I2C → Enable。
 
-2. **Is the I2C device detected?**
+2. **是否检测到 I2C 设备？**
 
    .. code-block:: shell
 
       sudo i2cdetect -y 1
 
-   PiPower 5 should appear at address ``0x5a``. If no device shows up:
+   PiPower 5 应出现在地址 ``0x5a``。如果没有设备显示：
 
-   - Reseat the HAT on the GPIO header.
-   - Check that ``i2c-dev`` is loaded: ``lsmod | grep i2c``.
-   - Verify ``dtparam=i2c_arm=on`` is in ``/boot/firmware/config.txt``.
+   - 重新安装 HAT 到 GPIO 排针上。
+   - 检查 ``i2c-dev`` 是否加载：``lsmod | grep i2c``。
+   - 验证 ``dtparam=i2c_arm=on`` 是否在 ``/boot/firmware/config.txt`` 中。
 
-3. **Is the `pipower5` service running?**
+3. **`pipower5` 服务是否在运行？**
 
    .. code-block:: shell
 
       sudo systemctl status pipower5.service
 
-   If inactive, start it: ``sudo systemctl start pipower5.service``.
+   如果未激活，启动它：``sudo systemctl start pipower5.service``。
 
-4. **Multiple I2C devices conflict?**
-   PiPower 5 uses I2C address ``0x5a``. Check that no other HAT or device is using this address. See :ref:`pin_header`.
+4. **多个 I2C 设备冲突？**
+   PiPower 5 使用 I2C 地址 ``0x5a``。检查是否有其他 HAT 或设备使用此地址。请参阅 :ref:`pin_header`。
 
-5. **Reboot.**
-   Sometimes a cold restart of both the Raspberry Pi and PiPower 5 resolves I2C bus issues. Power off completely, wait 10 seconds, then power on.
+5. **重启。**
+   有时冷重启 Raspberry Pi 和 PiPower 5 可以解决 I2C 总线问题。完全断电，等待 10 秒，然后通电。
 
 
-"Buzzer Silent" — No Sound on Events
+"蜂鸣器无声" — 事件发生时无声音
 +++++++++++++++++++++++++++++++++++++
 
-**What you see**: Events occur (power disconnect, low battery, etc.) but no buzzer sound.
+**您看到的情况**：事件发生（电源断开、电池电量低等）但没有蜂鸣器声音。
 
-**Check these:**
+**请检查：**
 
-1. **Check buzzer volume.**
+1. **检查蜂鸣器音量。**
 
    .. code-block:: shell
 
       pipower5 -bzv
 
-   If it returns 0, the buzzer is muted. Set a volume (1–10):
+   如果返回 0，蜂鸣器已静音。设置音量（1–10）：
 
    .. code-block:: shell
 
       pipower5 -bzv 5
       sudo systemctl restart pipower5.service
 
-2. **Check which events have buzzer enabled.**
+2. **检查哪些事件启用了蜂鸣器。**
 
    .. code-block:: shell
 
       pipower5 -bzo
 
-   Ensure the event you expect is in the list. To add an event:
+   确保您期望的事件在列表中。要添加事件：
 
    .. code-block:: shell
 
       pipower5 -bzo low_battery,power_disconnected
 
-3. **Test the buzzer directly.**
+3. **直接测试蜂鸣器。**
 
    .. code-block:: shell
 
       pipower5 -bzt low_battery
 
-   If you hear sound, the buzzer hardware is working — the issue is with event configuration.
+   如果听到声音，蜂鸣器硬件正常工作 — 问题出在事件配置。
 
 
-"Raspberry Pi Shows Low Voltage Warning"
+"Raspberry Pi 显示低电压警告"
 ++++++++++++++++++++++++++++++++++++++++
 
-**What you see**: The Raspberry Pi desktop or ``dmesg`` shows under-voltage warnings.
+**您看到的情况**：Raspberry Pi 桌面或 ``dmesg`` 显示欠压警告。
 
-**This is expected behavior in some cases:**
+**在某些情况下这是预期行为：**
 
-- When powering a Raspberry Pi from the PiPower 5 USB-A port (instead of the GPIO header), the Pi may report a non-PD power supply warning. This can be safely ignored.
-- If using the GPIO header and still seeing warnings, the PiPower 5 output may be under heavy load. Check the total current draw of your setup.
+- 从 PiPower 5 的 USB-A 端口（而不是 GPIO 排针）为 Raspberry Pi 供电时，Pi 可能会报告非 PD 电源警告。这可以安全忽略。
+- 如果使用 GPIO 排针但仍然看到警告，PiPower 5 的输出可能处于重负载下。检查您设置的总电流消耗。
 
-**Check these:**
+**请检查：**
 
-1. Run ``pipower5 -a`` and check ``Output: voltage``. It should be stable around 5.2–5.3V. If it drops below 5.0V under load, total current draw may exceed the 5A limit.
+1. 运行 ``pipower5 -a`` 并检查 ``Output: voltage``。应在 5.2–5.3V 左右保持稳定。如果在负载下降至 5.0V 以下，总电流消耗可能超过 5A 限制。
 
-2. Disconnect non-essential USB peripherals and re-test.
+2. 断开非必要的 USB 外设并重新测试。
 
-3. If the issue persists, the DC-DC converter may be faulty. Contact support.
+3. 如果问题仍然存在，DC-DC 转换器可能有故障。请联系支持。
 
 
-----
-Software Diagnostic Commands
-----------------------------
+------------
+软件诊断命令
+------------
 
-The ``pipower5`` CLI tool is your primary diagnostic interface. Here are the most useful commands:
+``pipower5`` CLI 工具是您的主要诊断接口。以下是最有用的命令：
 
 .. list-table::
    :header-rows: 1
    :widths: 35 65
 
-   * - Command
-     - What It Tells You
+   * - 命令
+     - 告诉您什么
    * - ``pipower5 -a``
-     - Complete status snapshot: input/output voltage, battery state, charging status, shutdown request, button state.
+     - 完整状态快照：输入/输出电压、电池状态、充电状态、关机请求、按钮状态。
    * - ``pipower5 -bp``
-     - Battery percentage.
+     - 电池百分比。
    * - ``pipower5 -ichg``
-     - Whether the battery is currently charging (``True`` / ``False``).
+     - 电池当前是否正在充电（``True`` / ``False``）。
    * - ``pipower5 -ii``
-     - Whether external power is connected.
+     - 外部电源是否已连接。
    * - ``pipower5 -sp``
-     - Current shutdown percentage threshold.
+     - 当前关机百分比阈值。
    * - ``pipower5 -sr``
-     - Current shutdown request status (0 = None, 1 = Low Battery, 2 = Button).
+     - 当前关机请求状态（0 = 无，1 = 低电量，2 = 按钮）。
    * - ``pipower5 -pb``
-     - Current power button state.
+     - 当前电源按钮状态。
    * - ``pipower5 -bzv``
-     - Current buzzer volume.
+     - 当前蜂鸣器音量。
    * - ``pipower5 -fv``
-     - Firmware version (verify you're on the latest).
+     - 固件版本（验证您是否使用最新版本）。
    * - ``pipower5 -c``
-     - Full configuration dump.
+     - 完整配置转储。
    * - ``pipower5 -pfs 60``
-     - Run a 60-second power failure simulation to test battery runtime.
+     - 运行 60 秒电源故障模拟以测试电池续航时间。
    * - ``sudo systemctl status pipower5.service``
-     - Check if the PiPower 5 background service is running.
+     - 检查 PiPower 5 后台服务是否在运行。
    * - ``cat /opt/pipower5/log``
-     - View service logs for error messages.
+     - 查看服务日志中的错误消息。
 
 .. tip::
 
-   For a quick health check, run ``pipower5 -a`` and verify:
+   要快速进行健康检查，运行 ``pipower5 -a`` 并验证：
 
-   - ``shutdown request`` is ``0 - NONE`` (no pending shutdown).
-   - ``battery percentage`` is above your ``shutdown percentage``.
-   - ``Output: voltage`` is between 5.1V and 5.4V.
+   - ``shutdown request`` 为 ``0 - NONE``\ （无待处理关机）。
+   - ``battery percentage`` 高于您的 ``shutdown percentage``。
+   - ``Output: voltage`` 在 5.1V 到 5.4V 之间。
 
 
-----
-Still Having Issues?
---------------------
+----------
+仍有问题？
+----------
 
-If none of the above resolves your problem, collect the following information before contacting support:
+如果以上方法都无法解决您的问题，在联系支持之前收集以下信息：
 
-1. **System information**:
+1. **系统信息**：
 
    .. code-block:: shell
 
@@ -415,17 +401,17 @@ If none of the above resolves your problem, collect the following information be
       pipower5 -fv
       pipower5 -c
 
-2. **Service logs**:
+2. **服务日志**：
 
    .. code-block:: shell
 
       cat /opt/pipower5/log
       sudo journalctl -u pipower5.service --no-pager -n 100
 
-3. **Hardware details**:
-   - Raspberry Pi model
-   - Power adapter model and rated wattage
-   - Battery type and age
-   - PiPower 5 DIP switch settings
-   - SDSIG and Default ON jumper positions
+3. **硬件详情**：
+   - Raspberry Pi 型号
+   - 电源适配器型号和额定功率
+   - 电池类型和使用时长
+   - PiPower 5 DIP 开关设置
+   - SDSIG 和默认 ON 跳线位置
 

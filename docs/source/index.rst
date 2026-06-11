@@ -1,35 +1,21 @@
-.. note::
-
-    Hello, welcome to the SunFounder Raspberry Pi & Arduino & ESP32 Enthusiasts Community on Facebook! Dive deeper into Raspberry Pi, Arduino, and ESP32 with fellow enthusiasts.
-
-    **Why Join?**
-
-    - **Expert Support**: Solve post-sale issues and technical challenges with help from our community and team.
-    - **Learn & Share**: Exchange tips and tutorials to enhance your skills.
-    - **Exclusive Previews**: Get early access to new product announcements and sneak peeks.
-    - **Special Discounts**: Enjoy exclusive discounts on our newest products.
-    - **Festive Promotions and Giveaways**: Take part in giveaways and holiday promotions.
-
-    👉 Ready to explore and create with us? Click [|link_sf_facebook|] and join today!
-
-SunFounder PiPower5 - Protect Your Device & Data
+SunFounder PiPower5 — 保护您的设备与数据
 ================================================================================
 
 .. * |link_PiPower_5_buy|
 
-.. Thank you for choosing our |link_PiPower_5|.
+.. 感谢您选择我们的 |link_PiPower_5|。
 
-Thank you for choosing our PiPower5.
+感谢您选择我们的 PiPower5。
 
 
 .. .. note::
-..     This document is available in the following languages.
+..     本文档提供以下语言版本。
 
 ..         * |link_german_tutorials|
 ..         * |link_jp_tutorials|
 ..         * |link_en_tutorials|
-    
-..     Please click on the respective links to access the document in your preferred language.
+
+..     请点击相应链接以您偏好的语言访问文档。
 
 .. todo: new pic
 
@@ -37,58 +23,58 @@ Thank you for choosing our PiPower5.
     :width: 400
     :align: center
 
-PiPower 5 is a versatile UPS solution designed for seamless integration with Raspberry Pi devices. It features robust power path management, dual lithium battery charging and discharging capabilities, and essential protections against reverse polarity, overcharging, and over-discharging.
+PiPower 5 是一款多功能 UPS 解决方案，专为与 Raspberry Pi 设备无缝集成而设计。它具有强大的电源路径管理、双锂电池充放电能力，以及防反接、过充和过放等基本保护功能。
 
-With an output of up to 5V/5A, PiPower 5 ensures stable performance for a wide range of devices. Its HAT+ configuration guarantees compatibility with Raspberry Pi 5, while additional outputs, including a USB-A port and a 4x2P header, provide support for various single-board computers (SBCs) and microcontroller platforms, such as Arduino, Pico, and ESP32.
+PiPower 5 输出高达 5V/5A，确保各种设备稳定运行。其 HAT+ 配置保证与 Raspberry Pi 5 兼容，而额外的输出（包括 USB-A 端口和 4x2P 排针）为各种单板计算机（SBC）和微控制器平台（如 Arduino、Pico 和 ESP32）提供支持。
 
-An onboard microcontroller efficiently manages power operations and enables real-time monitoring of key parameters via I2C communication. These parameters include input voltage, output voltage, battery voltage, battery capacity, external power connection status, charging status, and the current power source (battery or USB).
+板载微控制器高效管理电源操作，并通过 I2C 通信实现关键参数的实时监控。这些参数包括输入电压、输出电压、电池电压、电池容量、外部电源连接状态、充电状态以及当前电源（电池或 USB）。
 
-Combining advanced battery management with broad compatibility, PiPower 5 is an essential tool for tech enthusiasts and professionals looking to optimize their hardware setups.
+PiPower 5 结合先进的电池管理和广泛的兼容性，是技术爱好者和专业人士优化硬件配置的必备工具。
 
-**Features**
+**特点**
 
-* **Input**: 5-15V, 45W, USB Type-C PD, DC5.5-2.1
-* **Output**: 5V/5A via Raspberry Pi GPIO, USB Type-A, and 2x4P 2.54mm pin headers
-* **Charging Power**: Up to 20W
-* **Battery Specs**: 7.4V 2 Cell 18650 Li-ion, XH2.54 3P connector
-* **Configurable Settings via Jumpers**:
+* **输入**：5-15V，45W，USB Type-C PD，DC5.5-2.1
+* **输出**：通过 Raspberry Pi GPIO 5V/5A、USB Type-A 和 2x4P 2.54mm 排针输出
+* **充电功率**：高达 20W
+* **电池规格**：7.4V 2 节 18650 锂离子电池，XH2.54 3P 连接器
+* **通过跳线可配置的设置**：
 
-  * Default On Jumper: Configure whether the device powers on automatically when connected to power.
-  * Shutdown Signal Jumper: Enable detection of the device's shutdown status.
-  * External Power Button Pin Header: Connect an external power button for manual power control.
+  * 默认开机跳线：配置设备在接通电源时是否自动开机。
+  * 关机信号跳线：启用设备关机状态检测。
+  * 外部电源按钮排针：连接外部电源按钮以手动控制电源。
 
-* **Onboard Indicators and Buttons**:
-  
-  * Battery status indicator
-  * Input source indicator
-  * Power button
-  * Battery reverse connection indicator
-  * Output power indicator
+* **板载指示灯和按钮**：
 
-* **Onboard Microcontroller**: 32-bit ARM Cortex-M23, supporting I2C communication
+  * 电池状态指示灯
+  * 输入源指示灯
+  * 电源按钮
+  * 电池反接指示灯
+  * 输出电源指示灯
 
-* **I2C communication interfaces**: 
-  
+* **板载微控制器**：32 位 ARM Cortex-M23，支持 I2C 通信
+
+* **I2C 通信接口**：
+
   * Raspberry Pi GPIO
-  * SH1.0 4P (compatible with Qwiic and STEMMA QT)
-  * 1x4P 2.54mm pin header
+  * SH1.0 4P（兼容 Qwiic 和 STEMMA QT）
+  * 1x4P 2.54mm 排针
 
 
-.. **Table of Contents**
+.. **目录**
 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Getting Started
+   :caption: 入门
 
-   About PiPower 5 <self>
+   关于 PiPower 5 <self>
    assembly
    quick_guide
 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Hardware Overview
+   :caption: 硬件概述
 
    pipower_hat
    battery
@@ -96,7 +82,7 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Software Configuration
+   :caption: 软件配置
 
    pipower5_software
    update_firmware
@@ -106,14 +92,14 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Appendix
+   :caption: 附录
 
    compatible_sbc
    troubleshooting
    faq
 
 
-**Copyright Notice**
+**版权声明**
 
-All contents including but not limited to texts, images, and code in this manual are owned by the SunFounder Company. You should only use it for personal study,investigation, enjoyment, or other non-commercial or nonprofit purposes, under therelated regulations and copyrights laws, without infringing the legal rights of the author and relevant right holders. For any individual or organization that uses these for commercial profit without permission, the Company reserves the right to take legal action.
+本手册中的所有内容，包括但不限于文本、图片和代码，均归 SunFounder 公司所有。您只能在相关法规和版权法的规定下，将其用于个人学习、研究、欣赏或其他非商业或非营利目的，不得侵犯作者和相关权利人的合法权利。对于任何未经许可将这些内容用于商业盈利目的的个人或组织，本公司保留采取法律行动的权利。
 

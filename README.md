@@ -1,56 +1,56 @@
 # SunFounder PiPower 5
-This repository is for PiPower 5. you can buy it on [our website](https://www.sunfounder.com/), or search sunfounder in Amazon.
+本仓库用于 PiPower 5。您可以在[我们的网站](https://www.sunfounder.com/)上购买，或在亚马逊上搜索 sunfounder。
 
-Quick Links:
+快速链接：
 
- * [About this kit](#about_this_kit)
- * [Update](#update)
- * [Trouble Shootings](#trouble)
- * [About SunFounder](#about_sunfounder)
- * [License](#license)
- * [Contact us](#contact_us)
+ * [关于此套件](#about_this_kit)
+ * [更新](#update)
+ * [故障排除](#trouble)
+ * [关于 SunFounder](#about_sunfounder)
+ * [许可证](#license)
+ * [联系我们](#contact_us)
 
 <a id="about_this_kit"></a>
-## About this kit:
+## 关于此套件：
 
-Document: https://docs.sunfounder.com/projects/pipower5/en/latest/
+文档：https://docs.sunfounder.com/projects/pipower5/en/latest/
 
-PiPower 5 is a versatile UPS solution designed for seamless integration with Raspberry Pi devices. It features robust power path management, dual lithium battery charging and discharging capabilities, and essential protections against reverse polarity, overcharging, and over-discharging.
+PiPower 5 是一款多功能 UPS 解决方案，专为与 Raspberry Pi 设备无缝集成而设计。它具有强大的电源路径管理、双锂电池充放电能力，以及防反接、过充和过放等基本保护功能。
 
 <a id="update"></a>
-## Update:
+## 更新：
 
 <a id="trouble"></a>
-## Trouble Shootings:
+## 故障排除：
 
 <a id="about_sunfounder"></a>
-## About SunFounder
-SunFounder is a company focused on STEAM education with products like open source robots, development boards, STEAM kit, modules, tools and other smart devices distributed globally. In SunFounder, we strive to help elementary and middle school students as well as hobbyists, through STEAM education, strengthen their hands-on practices and problem-solving abilities. In this way, we hope to disseminate knowledge and provide skill training in a full-of-joy way, thus fostering your interest in programming and making, and exposing you to a fascinating world of science and engineering. To embrace the future of artificial intelligence, it is urgent and meaningful to learn abundant STEAM knowledge.
+## 关于 SunFounder
+SunFounder 是一家专注于 STEAM 教育的公司，产品包括开源机器人、开发板、STEAM 套件、模块、工具和其他智能设备，销往全球。在 SunFounder，我们致力于通过 STEAM 教育帮助中小学生及爱好者加强动手实践和解决问题的能力。通过这种方式，我们希望以充满乐趣的方式传播知识并提供技能培训，从而培养您对编程和制作的兴趣，带您进入一个迷人的科学和工程世界。拥抱人工智能的未来，学习丰富的 STEAM 知识迫在眉睫且意义深远。
 
 <a id="license"></a>
-## License
-This is the documentation for PiPower 5.
+## 许可证
+这是 PiPower 5 的文档。
 
-This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+本程序是自由软件；您可以根据自由软件基金会发布的 GNU 通用公共许可证的条款重新分发和/或修改它；可以使用许可证的第 2 版，或（由您选择）任何更高版本。
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied wa rranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+本程序的分发是希望它有用，但没有任何担保；甚至没有适销性或特定用途适用性的默示担保。有关更多详细信息，请参阅 GNU 通用公共许可证。
 
-You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+您应该已经随本程序收到了 GNU 通用公共许可证的副本；如果没有，请写信至 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA。
 
-This resposity comes with ABSOLUTELY NO WARRANTY; for details run ./show w. This is free software, and you are welcome to redistribute it under certain conditions; run ./show c for details.
+本仓库不提供任何担保；有关详细信息，请运行 ./show w。这是自由软件，欢迎您在特定条件下重新分发；有关详细信息，请运行 ./show c。
 
-SunFounder, Inc., hereby disclaims all copyright interest in the program 'PiPower 5' (which makes passes at compilers).
+SunFounder, Inc. 特此声明放弃对程序"PiPower 5"（对编译器进行检查）的所有版权利益。
 
-Mike Huang, 21 August 2015
+Mike Huang，2015 年 8 月 21 日
 
-Mike Huang, Chief Executive Officer
+Mike Huang，首席执行官
 
-Email: service@sunfounder.com
+电子邮件：service@sunfounder.com
 
 <a id="contact_us"></a>
-## Contact us:
-website:
+## 联系我们：
+网站：
     www.sunfounder.com
 
-E-mail:
+电子邮件：
     service@sunfounder.com

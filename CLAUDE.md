@@ -1,93 +1,97 @@
-# PiPower 5 Documentation Repository
+# PiPower 5 文档仓库
 
-## Project Identity
+> **从规范源同步。** 此 CLAUDE.md 从英文源仓库（`docs` 分支）同步。权威版本位于主工作区。当前分支：`docs-zh` — 中文翻译。
 
-| Field | Value |
+## 项目标识
+
+| 字段 | 值 |
 |---|---|
-| **Product** | SunFounder PiPower 5 — Raspberry Pi UPS HAT |
-| **Repository** | `https://github.com/sunfounder/pipower5` |
-| **Documentation** | Sphinx + ReadTheDocs (`sphinx_rtd_theme`) |
-| **Published at** | `https://docs.sunfounder.com/projects/pipower5/<lang>/latest/` |
-| **Company** | SunFounder (service@sunfounder.com) |
-| **License** | GPL v2 |
+| **产品** | SunFounder PiPower 5 — Raspberry Pi UPS HAT |
+| **仓库** | `https://github.com/sunfounder/pipower5` |
+| **文档** | Sphinx + ReadTheDocs（`sphinx_rtd_theme`） |
+| **发布地址** | `https://docs.sunfounder.com/projects/pipower5/<lang>/latest/` |
+| **公司** | SunFounder（service@sunfounder.com） |
+| **许可证** | GPL v2 |
 
-This repository's `docs` branch contains **only documentation** for the PiPower 5 UPS HAT. The Python library code (`pipower5`), kernel driver, and installer live on the `main` branch. The `docs` branch builds a Sphinx documentation site via ReadTheDocs.
+本仓库的 `docs` 分支**仅包含** PiPower 5 UPS HAT 的文档。Python 库代码（`pipower5`）、内核驱动程序和安装程序位于 `main` 分支。`docs` 分支通过 ReadTheDocs 构建 Sphinx 文档站点。
 
 ---
 
-## Branch Strategy
+## 分支策略
 
-| Branch | Role |
+| 分支 | 角色 |
 |---|---|
-| `main` | Python source code, kernel driver, installer, examples |
-| `docs` | **Documentation source** — Sphinx RST files, images, RTD config |
+| `main` | Python 源代码、内核驱动、安装程序、示例 |
+| `docs` | **文档源** — Sphinx RST 文件、图片、RTD 配置 |
 
-### Cardinal Rule
+### 基本规则
 
-> **`docs` is the documentation branch.** All documentation changes (content, structure, images, configuration) happen on `docs`. The `main` branch is for the Python library and driver code. These two branches serve different purposes and should not be confused.
+> **`docs` 是文档分支。** 所有文档更改（内容、结构、图片、配置）都在 `docs` 上进行。`main` 分支用于 Python 库和驱动程序代码。这两个分支服务于不同的目的，不应混淆。
 
 ---
 
-## Repository Layout (docs branch)
+## 仓库结构（docs 分支）
 
 ```
 pipower5/
-├── .readthedocs.yaml          # RTD build config (Sphinx 7.3.7, Python 3.11, Ubuntu 22.04)
-├── .gitignore                 # Ignores: .vscode, build/, secret files
+├── .readthedocs.yaml          # RTD 构建配置（Sphinx 7.3.7，Python 3.11，Ubuntu 22.04）
+├── .gitignore                 # 忽略：.vscode，build/，秘密文件
 ├── LICENSE                    # GPL v2
-├── README.md                  # Product overview + quick links
-├── show                       # License/warranty display script
-├── CLAUDE.md                  # This file — AI assistant guidance
+├── README.md                  # 产品概述 + 快速链接
+├── show                       # 许可证/保修显示脚本
+├── CLAUDE.md                  # 本文件 — AI 助手指南
 └── docs/
-    ├── requirements.txt       # sphinx==7.3.7, sphinx_rtd_theme==3.0.2, sphinx_copybutton
-    ├── Makefile / make.bat    # Sphinx build (SOURCEDIR=source, BUILDDIR=build)
+    ├── requirements.txt       # sphinx==7.3.7，sphinx_rtd_theme==3.0.2，sphinx_copybutton
+    ├── Makefile / make.bat    # Sphinx 构建（SOURCEDIR=source，BUILDDIR=build）
     └── source/
-        ├── conf.py            # Sphinx config: extensions, theme, JS/CSS, rst_epilog links
-        ├── index.rst          # Root toctree — Getting Started + Hardware + Software + Appendix
-        ├── assembly.rst       # Assembly instructions
-        ├── quick_guide.rst    # Quick user guide
-        ├── pipower_hat.rst    # HAT hardware overview (interface, specs, power, I2C registers)
-        ├── battery.rst        # Battery guide
-        ├── pipower5_software.rst  # Software tool (install, CLI ref, dashboard, shutdown, notifications)
-        ├── update_firmware.rst    # Firmware update guide
-        ├── use_with_python.rst    # Python usage (examples, API)
-        ├── use_with_arduino.rst   # Arduino library usage
-        ├── use_with_micropython.rst  # MicroPython library usage
-        ├── compatible_sbc.rst     # Compatible SBC list
+        ├── conf.py            # Sphinx 配置：扩展、主题、JS/CSS、rst_epilog 链接
+        ├── index.rst          # 根目录树 — 入门 + 硬件 + 软件 + 附录
+        ├── assembly.rst       # 组装说明
+        ├── quick_guide.rst    # 快速用户指南
+        ├── pipower_hat.rst    # HAT 硬件概述（接口、规格、电源、I2C 寄存器）
+        ├── battery.rst        # 电池指南
+        ├── pipower5_software.rst  # 软件工具（安装、CLI 参考、仪表板、关机、通知）
+        ├── update_firmware.rst    # 固件更新指南
+        ├── use_with_python.rst    # Python 使用（示例、API）
+        ├── use_with_arduino.rst   # Arduino 库使用
+        ├── use_with_micropython.rst  # MicroPython 库使用
+        ├── compatible_sbc.rst     # 兼容 SBC 列表
+        ├── faq.rst               # 常见问题
+        ├── troubleshooting.rst   # 故障排除指南
         ├── _static/
-        │   └── lang.js        # Multi-language redirect script
+        │   └── lang.js           # 多语言重定向脚本
         ├── _templates/
-        │   └── layout.html    # Sphinx HTML template (SunFounder nav bar)
-        └── img/               # All documentation images
+        │   └── layout.html       # Sphinx HTML 模板（SunFounder 导航栏）
+        └── img/                  # 所有文档图片
 ```
 
 ---
 
-## Documentation Conventions
+## 文档规范
 
-### RST Reference Labels
+### RST 参考标签
 
-Each `.rst` file may define a reference label for cross-document linking:
+每个 `.rst` 文件可以定义一个参考标签用于跨文档链接：
 
-| Label | File | Content |
+| 标签 | 文件 | 内容 |
 |---|---|---|
-| `pipower5_assembly` | `assembly.rst` | Assembly instructions |
-| `pipower5_tool` | `pipower5_software.rst` | Software tool reference |
-| `power_input` | `pipower_hat.rst` | Power input section |
-| `power_button` | `pipower_hat.rst` | Power button section |
-| `battery_indicators` | `pipower_hat.rst` | Battery indicators section |
-| `battery_connector` | `pipower_hat.rst` | Battery connector section |
-| `cap_btn` | `pipower_hat.rst` | External power button section |
-| `cap_sdsig` | `pipower_hat.rst` | SDSIG jumper section |
-| `cap_onoff` | `pipower_hat.rst` | Default ON/OFF jumper section |
-| `pin_header` | `pipower_hat.rst` | Pin headers for RPi section |
-| `pipower_software_python` | `use_with_python.rst` | Python usage section |
+| `pipower5_assembly` | `assembly.rst` | 组装说明 |
+| `pipower5_tool` | `pipower5_software.rst` | 软件工具参考 |
+| `power_input` | `pipower_hat.rst` | 电源输入部分 |
+| `power_button` | `pipower_hat.rst` | 电源按钮部分 |
+| `battery_indicators` | `pipower_hat.rst` | 电池指示灯部分 |
+| `battery_connector` | `pipower_hat.rst` | 电池连接器部分 |
+| `cap_btn` | `pipower_hat.rst` | 外部电源按钮部分 |
+| `cap_sdsig` | `pipower_hat.rst` | SDSIG 跳线部分 |
+| `cap_onoff` | `pipower_hat.rst` | 默认 ON/OFF 跳线部分 |
+| `pin_header` | `pipower_hat.rst` | RPi 排针部分 |
+| `pipower_software_python` | `use_with_python.rst` | Python 使用部分 |
 
-These labels **must remain consistent** — they are the cross-document linking mechanism.
+这些标签**必须保持一致** — 它们是跨文档链接机制。
 
-### Include Directives
+### Include 指令
 
-Some pages reuse content via Sphinx `include` directives with `start-after` / `end-before` markers:
+某些页面通过 Sphinx `include` 指令重用内容，使用 `start-after` / `end-before` 标记：
 
 ```rst
 .. include:: /pipower5_software.rst
@@ -95,37 +99,37 @@ Some pages reuse content via Sphinx `include` directives with `start-after` / `e
     :end-before: end_install_pipower5
 ```
 
-Markers in the source file use the format:
+源文件中的标记使用以下格式：
 ```rst
 .. start_install_pipower5
 
-# ... content to include ...
+# ... 要包含的内容 ...
 
 .. end_install_pipower5
 ```
 
-When modifying content between markers, ensure both the source file and all files that include it remain consistent.
+修改标记之间的内容时，确保源文件和所有包含它的文件保持一致。
 
-### Link Substitutions (`rst_epilog` in `conf.py`)
+### 链接替换（`conf.py` 中的 `rst_epilog`）
 
-All external links live as RST substitutions in `conf.py` under `rst_epilog`:
+所有外部链接作为 RST 替换放在 `conf.py` 的 `rst_epilog` 下：
 
-| Substitution | Purpose |
+| 替换 | 用途 |
 |---|---|
-| `\|link_sf_facebook\|` | SunFounder Facebook community |
-| `\|link_german_tutorials\|` | German tutorials (PiPower 3 — legacy) |
-| `\|link_jp_tutorials\|` | Japanese tutorials (PiPower 3 — legacy) |
-| `\|link_en_tutorials\|` | English tutorials (PiPower 3 — legacy) |
-| `\|link_PiPower_5_buy\|` | Purchase link |
-| `\|link_PiPower_5\|` | PiPower 5 product link |
-| `\|link_spc_lib\|` | SPC I2C library on GitHub |
-| `\|link_pipower_tool\|` | PiPower 5 tool GitHub repo |
+| `\|link_sf_facebook\|` | SunFounder Facebook 社区 |
+| `\|link_german_tutorials\|` | 德语教程（PiPower 3 — 旧版） |
+| `\|link_jp_tutorials\|` | 日语教程（PiPower 3 — 旧版） |
+| `\|link_en_tutorials\|` | 英语教程（PiPower 3 — 旧版） |
+| `\|link_PiPower_5_buy\|` | 购买链接 |
+| `\|link_PiPower_5\|` | PiPower 5 产品链接 |
+| `\|link_spc_lib\|` | GitHub 上的 SPC I2C 库 |
+| `\|link_pipower_tool\|` | PiPower 5 工具 GitHub 仓库 |
 
-When adding a new external link, add the `|link_xxx|` definition to `conf.py` `rst_epilog`.
+添加新的外部链接时，将 `|link_xxx|` 定义添加到 `conf.py` 的 `rst_epilog`。
 
-### Image Paths
+### 图片路径
 
-All images live under `docs/source/img/` and are referenced relative to the source directory or with absolute paths:
+所有图片位于 `docs/source/img/`，相对于源目录或使用绝对路径引用：
 ```rst
 .. image:: img/pipower5_ov.png
    :width: 100%
@@ -135,16 +139,16 @@ All images live under `docs/source/img/` and are referenced relative to the sour
    :align: center
 ```
 
-### File Naming
+### 文件命名
 
-- Hardware: `pipower_hat.rst`, `battery.rst` (snake_case)
-- Software: `pipower5_software.rst` (snake_case)
-- Guides: `quick_guide.rst`, `update_firmware.rst` (snake_case)
-- Integration: `use_with_python.rst`, `use_with_arduino.rst`, `use_with_micropython.rst`
+- 硬件：`pipower_hat.rst`、`battery.rst`（snake_case）
+- 软件：`pipower5_software.rst`（snake_case）
+- 指南：`quick_guide.rst`、`update_firmware.rst`（snake_case）
+- 集成：`use_with_python.rst`、`use_with_arduino.rst`、`use_with_micropython.rst`
 
-### RST File Boilerplate
+### RST 文件模板
 
-Every lesson/guide file starts with a Facebook community note, followed by the reference label (if any), then the title:
+每个课程/指南文件以 Facebook 社区说明开头，后跟参考标签（如有），然后是标题：
 
 ```rst
 .. note::
@@ -160,17 +164,17 @@ PiPower 5 Tool
 
 ---
 
-## Build & Preview
+## 构建与预览
 
-### Local Build (Sphinx)
+### 本地构建（Sphinx）
 
 ```bash
 cd docs
 pip install -r requirements.txt
-make html          # Output: docs/build/html/index.html
+make html          # 输出：docs/build/html/index.html
 ```
 
-On Windows:
+在 Windows 上：
 ```batch
 cd docs
 make.bat html
@@ -178,12 +182,12 @@ make.bat html
 
 ### ReadTheDocs
 
-Builds automatically on push to the `docs` branch. Configuration in `.readthedocs.yaml`:
-- OS: Ubuntu 22.04, Python 3.11
-- Sphinx config: `docs/source/conf.py`
-- Builds all formats (HTML, PDF, ePub)
+推送到 `docs` 分支时自动构建。配置在 `.readthedocs.yaml` 中：
+- 操作系统：Ubuntu 22.04，Python 3.11
+- Sphinx 配置：`docs/source/conf.py`
+- 构建所有格式（HTML、PDF、ePub）
 
-### Published URLs
+### 发布 URL
 
 ```
 https://docs.sunfounder.com/projects/pipower5/en/latest/
@@ -191,93 +195,137 @@ https://docs.sunfounder.com/projects/pipower5/en/latest/
 
 ---
 
-## Sphinx Configuration (conf.py)
+## Sphinx 配置（conf.py）
 
-### Extensions
+### 扩展
 
-| Extension | Purpose |
+| 扩展 | 用途 |
 |---|---|
-| `sphinx.ext.autosectionlabel` | Auto-generates section labels for cross-referencing |
-| `sphinx_copybutton` | Adds copy button to code blocks |
-| `sphinx_rtd_theme` | ReadTheDocs theme |
+| `sphinx.ext.autosectionlabel` | **已禁用** — 在 `conf.py` 中保持注释。会导致 CJK 章节标题出现重复标签警告 |
+| `sphinx_copybutton` | 为代码块添加复制按钮 |
+| `sphinx_rtd_theme` | ReadTheDocs 主题 |
 
-### Theme
+### 主题
 
-- **Theme**: `sphinx_rtd_theme`
-- **Options**: flyout attached, version/language selectors disabled
-- **GitHub integration**: Enabled, pointing to `sunfounder/pipower5` on the `docs` branch
+- **主题**：`sphinx_rtd_theme`
+- **选项**：附加弹出窗口，禁用版本/语言选择器
+- **GitHub 集成**：已启用，指向 `sunfounder/pipower5` 的 `docs` 分支
 
-### Custom Assets
+### 自定义资源
 
-- **JS**: `https://ezblock.cc/readDocFile/custom.js`, `./lang.js`
-- **CSS**: `https://ezblock.cc/readDocFile/custom.css`
-- **Template**: `_templates/layout.html` (SunFounder nav bar with logo)
+- **JS**：`https://ezblock.cc/readDocFile/custom.js`、`./lang.js`
+- **CSS**：`https://ezblock.cc/readDocFile/custom.css`
+- **模板**：`_templates/layout.html`（带 logo 的 SunFounder 导航栏）
 
-### Multi-Language
+### 多语言
 
-The `lang.js` script in `_static/` handles automatic language detection and redirect. It supports `en`, `de`, `ja` and presents a notification bar when the browser language differs from the current page language.
+`_static/` 中的 `lang.js` 脚本处理自动语言检测和重定向。支持 `en`、`de`、`ja`，当浏览器语言与当前页面语言不同时显示通知栏。
 
-The language variable in `conf.py` is set to `'en'` by default. When building for other languages:
-- Set `language = '<locale>'` in `conf.py`
-- Add `.po` translation files under `docs/source/locale/`
+`conf.py` 中的语言变量默认设置为 `'en'`。为其他语言构建时：
+- 在 `conf.py` 中设置 `language = '<locale>'`
+- 在 `docs/source/locale/` 下添加 `.po` 翻译文件
 
 ---
 
-## Common Maintenance Tasks
+## 常见维护任务
 
-### Adding a New Documentation Page
+### 添加新的文档页面
 
-1. Create the `.rst` file in `docs/source/`
-2. Define a `.. _ref_label:` at the top if the page will be cross-referenced
-3. Add the file to the appropriate `.. toctree::` directive in `index.rst`
-4. If new external links are needed, add `|link_xxx|` definitions to `conf.py` `rst_epilog`
-5. Build locally to verify: `cd docs && make html`
-6. Commit on `docs`
+1. 在 `docs/source/` 中创建 `.rst` 文件
+2. 如果页面将被交叉引用，在顶部定义 `.. _ref_label:`
+3. 将文件添加到 `index.rst` 中相应的 `.. toctree::` 指令
+4. 如果需要新的外部链接，将 `|link_xxx|` 定义添加到 `conf.py` 的 `rst_epilog`
+5. 本地构建验证：`cd docs && make html`
+6. 在 `docs` 上提交
 
-### Updating the toctree Structure
+### 更新 toctree 结构
 
-The root toctree is in `index.rst`. It has four chapter groups:
+根 toctree 在 `index.rst` 中。它有四个章节组：
 
-1. **Getting Started**: About PiPower 5, assembly, quick guide
-2. **Hardware Overview**: PiPower 5 HAT, battery
-3. **Software Configuration**: PiPower 5 tool, firmware update, Python usage
-4. **Appendix**: Compatible SBCs
+1. **入门**：关于 PiPower 5、组装、快速指南
+2. **硬件概述**：PiPower 5 HAT、电池
+3. **软件配置**：PiPower 5 工具、固件更新、Python 使用
+4. **附录**：兼容 SBC
 
-Currently missing from the toctree: `use_with_arduino.rst` and `use_with_micropython.rst` — these files exist but are not included in any toctree.
+目前 toctree 中缺少：`use_with_arduino.rst` 和 `use_with_micropython.rst` — 这些文件存在但未包含在任何 toctree 中。
 
-### Adding Content with Include Markers
+### 使用 Include 标记添加内容
 
-When content needs to be shared between pages:
+当内容需要在页面之间共享时：
 
-1. Add `.. start_<marker>` before and `.. end_<marker>` after the reusable block
-2. In the destination file, use:
+1. 在可重用块之前添加 `.. start_<marker>`，之后添加 `.. end_<marker>`
+2. 在目标文件中，使用：
    ```rst
    .. include:: /source_file.rst
        :start-after: start_<marker>
        :end-before: end_<marker>
    ```
 
-### Modifying the Register Table
+### 修改寄存器表
 
-The I2C register table in `pipower_hat.rst` uses raw HTML tables with custom CSS. When editing:
-- Keep the HTML structure intact
-- Ensure the custom CSS class names (`custom-register-table`) are preserved
-- The register addresses, data types, and descriptions must match the actual firmware
+`pipower_hat.rst` 中的 I2C 寄存器表使用带有自定义 CSS 的原始 HTML 表格。编辑时：
+- 保持 HTML 结构完整
+- 确保自定义 CSS 类名（`custom-register-table`）被保留
+- 寄存器地址、数据类型和描述必须与实际固件匹配
 
 ---
 
-## Notes for AI Assistants
+## 给 AI 助手的注意事项
 
-When working on this repository:
+在本仓库工作时：
 
-1. **The `docs` branch is documentation-only.** Source code lives on `main`. Do not add Python files, drivers, or installer scripts to `docs`.
-2. **The Facebook community note** at the top of each `.rst` file is part of SunFounder's documentation standard. It appears in `index.rst`, `pipower5_software.rst`, and other user-facing pages.
-3. **`conf.py` link substitutions** are the single source of external URLs. Never hardcode external links in `.rst` files — use `|link_xxx|` substitutions.
-4. **Reference labels** (`.. _label:`) are code identifiers, not human-readable text. Never translate them.
-5. **RST section underlines must match title length.** When translating section titles, the underline characters (`=`, `-`, `^`, `~`) must be at least as long as the title text. Translated titles are often longer — extend the underline accordingly.
-6. **Code blocks** (Python, bash, shell) are never translated. Command strings and file paths stay as-is.
-7. **The `_static` and `_templates` directories** contain custom assets. Changes here affect the global look and behavior of the published site.
-8. **Build output** goes to `docs/build/` and is gitignored — never commit build artifacts.
-9. **Images** are all under `docs/source/img/`. When adding new images, place them there and reference with relative paths.
-10. **Register tables** in `pipower_hat.rst` use raw HTML. When updating register values, edit both the "Register Table" (read) and "Register Settings Table" (write) sections.
-11. **The `show` script** at the repo root is a GPL license display utility — it is Python 2 syntax and should be considered legacy.
+1. **`docs` 分支仅用于文档。** 源代码位于 `main`。不要向 `docs` 添加 Python 文件、驱动程序或安装脚本。
+2. **每个 `.rst` 文件顶部的 Facebook 社区说明**是 SunFounder 文档标准的一部分。它出现在 `index.rst`、`pipower5_software.rst` 和其他面向用户的页面中。
+3. **`conf.py` 链接替换**是外部 URL 的唯一来源。永远不要在 `.rst` 文件中硬编码外部链接 — 使用 `|link_xxx|` 替换。
+4. **参考标签**（`.. _label:`）是代码标识符，不是人类可读文本。永远不要翻译它们。
+5. **RST 章节下划线（和上划线）必须与标题显示宽度匹配。**
+   
+   - 对于单下划线标题（标题后跟 `=` 或 `-`），下划线必须至少与标题文本一样长。
+   - 对于上划线+下划线标题（如标题上方和下方的 `----`），**两者**必须使用相同的字符，**长度完全相同**，并且至少与标题一样长。翻译标题时，始终同时更新这两行。
+   - **CJK 显示宽度**：docutils 将 CJK 字符计为每个 **2 个显示列**（ASCII = 1 列）。上划线/下划线必须匹配总显示宽度，而不是字符数。例如，`LED & ブザークイックリファレンス` = 6 个 ASCII 列 + 13 个 CJK × 2 = 32 列 → 需要 ≥ 32 个破折号。
+   
+   翻译后的标题通常比英文原文更长 — 相应地扩展上划线和下划线。当标题包含 CJK 字符时，下划线/上划线将明显长于字符数所暗示的长度。
+6. **行内强调标记（`**...**`）在与 CJK 字符相邻时会出错。** docutils 行内标记识别要求 `**` 分隔符与空白或 ASCII 标点符号（`- : / . , ; ! ? ' " ( ) [ ] { } < >`）相邻。CJK 字符（中文、日文、韩文）**不是**有效的分隔符。
+
+   当 `**text**` 紧邻 CJK 字符之前或之后时，docutils 会发出 `WARNING: Inline strong start-string without end-string.`，因为它找不到闭合的 `**`。
+
+   **解决方法**：在 `**` 分隔符和相邻的 CJK 字符之间插入 `\ `（反斜杠转义空格）：
+
+   .. code-block:: rst
+
+      # 错误 — 闭合 ** 后跟 CJK に，会发出警告：
+      **PI3V3**にブリッジすると
+
+      # 正确 — \  充当有效的分隔符：
+      **PI3V3**\ にブリッジすると
+
+      # 错误 — 开头 ** 前有 CJK は，会发出警告：
+      または**コマンドラインツール**
+
+      # 正确：
+      または\ **コマンドラインツール**
+
+   这同样适用于与 CJK 文本相邻的其他行内标记（`*强调*`、```文字```）。翻译包含行内标记的内容后，始终检查构建警告中的 "Inline ... start-string without end-string"。
+7. **RST 中嵌套列表需要空行和正确的缩进。** 当编号列表项或项目符号包含子项目符号时，嵌套列表前必须有空行，嵌套项必须缩进以与父项文本对齐（通常 3+ 个空格）。没有空行，RST 会将项目符号渲染为单一连续行。
+
+   **错误**（子项目符号没有空行）：
+   ```rst
+   3. **父项**：
+      - 第一个子项
+      - 第二个子项
+   ```
+
+   **正确**：
+   ```rst
+   3. **父项**：
+
+        - 第一个子项
+        - 第二个子项
+   ```
+
+8. **代码块**（Python、bash、shell）永远不翻译。命令字符串和文件路径保持原样。
+9. **`_static` 和 `_templates` 目录**包含自定义资源。此处的更改会影响发布站点的全局外观和行为。
+10. **构建输出**转到 `docs/build/` 并被 gitignore — 永远不要提交构建产物。
+11. **图片**全部位于 `docs/source/img/`。添加新图片时，将它们放在那里并使用相对路径引用。
+12. **`pipower_hat.rst` 中的寄存器表格**使用原始 HTML。更新寄存器值时，同时编辑"Register Table"（读取）和"Register Settings Table"（写入）部分。
+13. **仓库根目录的 `show` 脚本**是 GPL 许可证显示工具 — 它是 Python 2 语法，应视为旧版。

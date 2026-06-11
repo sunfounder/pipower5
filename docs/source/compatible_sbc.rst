@@ -1,11 +1,11 @@
-Compatible SBCs
+兼容 SBC
 =========================
 
-PiPower 5 is compatible with various Single Board Computers (SBCs). It is fully compatible with the Raspberry Pi series in terms of structural installation, power supply, and software configuration.
+PiPower 5 兼容各种单板计算机（SBC）。在结构安装、电源供应和软件配置方面，它与 Raspberry Pi 系列完全兼容。
 
-Some SBCs can be powered by PiPower 5 but may not be structurally compatible or only partially compatible. For example, Zero-type boards can only be fixed using two mounting holes.
+某些 SBC 可以由 PiPower 5 供电，但可能结构不兼容或仅部分兼容。例如，Zero 类型的板卡只能通过两个安装孔固定。
 
-.. In terms of software configuration, we provide support for programming languages such as Python, MicroPython, and Arduino. You will need to choose the appropriate language based on your specific SBC.
+.. 在软件配置方面，我们提供 Python、MicroPython 和 Arduino 等编程语言的支持。您需要根据具体的 SBC 选择合适的语言。
 
 
 .. image:: img/pipower5_compatible_sbc.jpg

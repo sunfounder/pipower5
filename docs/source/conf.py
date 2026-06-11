@@ -44,7 +44,7 @@ html_context = {
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autosectionlabel',
+    #'sphinx.ext.autosectionlabel',
     'sphinx_copybutton',
     'sphinx_rtd_theme'
 ]
@@ -102,7 +102,7 @@ html_css_files = [
 
 # Multi-language
 
-language = 'en' # Before running make html, set the language.
+language = 'zh' # Before running make html, set the language.
 locale_dirs = ['locale/'] # .po files for other languages are placed in the locale/ folder.
 
 gettext_compact = False # Support for generating the contents of the folders inside source/ into other languages.
@@ -114,8 +114,8 @@ rst_epilog = """
 
 .. |link_sf_facebook| raw:: html
 
-    <a href="https://bit.ly/raphaelkit" target="_blank">here</a>
-    
+    <a href="https://bit.ly/raphaelkit" target="_blank">这里</a>
+
 .. |link_german_tutorials| raw:: html
 
     <a href="https://docs.sunfounder.com/projects/pipower5/de/latest/" target="_blank">Deutsch Online-Kurs</a>
@@ -124,13 +124,17 @@ rst_epilog = """
 
     <a href="https://docs.sunfounder.com/projects/pipower5/ja/latest/" target="_blank">日本語オンライン教材</a>
 
+.. |link_zh_tutorials| raw:: html
+
+    <a href="https://docs.sunfounder.com/projects/pipower5/zh/latest/" target="_blank">中文在线教程</a>
+
 .. |link_en_tutorials| raw:: html
 
     <a href="https://docs.sunfounder.com/projects/pipower5/en/latest/" target="_blank">English Online-tutorials</a>
 
 .. |link_PiPower_5_buy| raw:: html
 
-    <a href="https://www.sunfounder.com" target="_blank">Purchase Link for PiPower 5</a>
+    <a href="https://www.sunfounder.com" target="_blank">PiPower 5 购买链接</a>
 
 .. |link_PiPower_5| raw:: html
 
@@ -142,6 +146,6 @@ rst_epilog = """
 
 .. |link_pipower_tool| raw:: html
 
-    <a href="https://github.com/sunfounder/pipower5" target="_blank">PiPower 5 tool</a>
+    <a href="https://github.com/sunfounder/pipower5" target="_blank">PiPower 5 工具</a>
 
 """

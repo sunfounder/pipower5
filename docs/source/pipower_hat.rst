@@ -3,7 +3,7 @@ PiPower 5 HAT
 
 .. interface:
 
-Interface Overview
+接口概览
 -------------------
 
 .. image:: img/pipower5_ov.png
@@ -11,155 +11,155 @@ Interface Overview
 
 
 
-1. **USB Type-C Power Input**  
+1. **USB Type-C 电源输入**
 
-   - External power input for supplying the Raspberry Pi and charging the battery simultaneously.  
-   - Supports **USB Power Delivery (PD) protocol**, input range **5V–15V**.
+   - 外部电源输入，用于为 Raspberry Pi 供电并同时给电池充电。
+   - 支持 **USB Power Delivery（PD）协议**，输入范围 **5V–15V**。
 
-2. **Power Input Selector (DIP Switch)**  
+2. **电源输入选择器（DIP 开关）**
 
-   - Allows selection of different input power profiles for flexible configuration.
+   - 允许选择不同的输入电源配置文件以实现灵活配置。
 
-3. **Default ON Jumper**  
+3. **默认 ON 跳线**
 
-   - Defines whether the system should automatically power on when external power is connected while the device is shut down.  
-   - ON = Auto power-on enabled, OFF = Manual start required.
+   - 定义系统在设备关机状态且连接外部电源时是否应自动开机。
+   - ON = 自动开机启用，OFF = 需要手动启动。
 
-4. **SDSIG (Shutdown Signal)**  
+4. **SDSIG（关机信号）**
 
-   - Provides shutdown detection for Raspberry Pi.  
-   - When bridged to **PI3V3**, it works with Raspberry Pi 4 and Pi 5.  
-   - When shorted to **Pin 26**, it supports Pi 3 and Pi Zero.  
-   - After proper configuration, PiPower5 will cut power automatically once the Raspberry Pi shuts down.
+   - 为 Raspberry Pi 提供关机检测。
+   - 当桥接到 **PI3V3** 时，与 Raspberry Pi 4 和 Pi 5 配合使用。
+   - 当短接到 **Pin 26** 时，支持 Pi 3 和 Pi Zero。
+   - 正确配置后，PiPower5 将在 Raspberry Pi 关机后自动切断电源。
 
-5. **PWR LED (Output Status Indicator)**  
+5. **PWR LED（输出状态指示灯）**
 
-   - Lights up when the system output is active.
+   - 系统输出激活时亮起。
 
-6. **BAT LED (Battery Status Indicator)**  
+6. **BAT LED（电池状态指示灯）**
 
-   - Lights up when the system is powered by the battery.  
-   - A reminder to monitor battery consumption when running without external power.
+   - 系统由电池供电时亮起。
+   - 在没有外部电源运行时提醒监控电池消耗。
 
-7. **Power Button**  
+7. **电源按钮**
 
-   - **Single press**: Enable output power.  
-   - **Long press (2 seconds)**: Sends a safe shutdown request via I²C.  
-   - **Long press (5 seconds)**: Forces an immediate power-off (hard shutdown).  
-   - **Customizable**: Single and double-press actions can be reconfigured by software.
+   - **按一次**：激活输出电源。
+   - **长按（2 秒）**：通过 I²C 发送安全关机请求。
+   - **长按（5 秒）**：强制立即断电（硬关机）。
+   - **可自定义**：单击和双击操作可通过软件重新配置。
 
-8. **External Power Button Terminal (ZH1.5 2P)**  
+8. **外部电源按钮端子（ZH1.5 2P）**
 
-   - Allows connection of an external physical power button.
+   - 允许连接外部物理电源按钮。
 
-9. **External Power Button Header (2.54mm)**  
+9. **外部电源按钮排针（2.54mm）**
 
-   - An alternative solderable header option for external power button connection.
+   - 用于外部电源按钮连接的替代可焊接排针选项。
 
-10. **Battery Indicator LEDs**  
+10. **电池指示灯 LED**
 
-    - Display remaining battery capacity and charging status.  
-    - Note: Even when the system is off, LEDs remain active during charging until the battery is fully charged.
+    - 显示剩余电池容量和充电状态。
+    - 注意：即使系统关闭，充电期间 LED 保持活动状态，直到电池充满。
 
-11. **I²C Interface (SH1.0 4P)**  
+11. **I²C 接口（SH1.0 4P）**
 
-    - Compatible with **Qwiic** and **STEMMA QT** ecosystems.  
-    - Used for communication with the onboard microcontroller and external peripherals.
+    - 兼容 **Qwiic** 和 **STEMMA QT** 生态系统。
+    - 用于与板载微控制器和外部外设通信。
 
-12. **I²C Interface (1x4P 2.54mm Header)**  
+12. **I²C 接口（1x4P 2.54mm 排针）**
 
-    - Alternative I²C breakout with **3V3 power output**, configurable as always-on or switched.
+    - 替代 I²C 分支，带 **3V3 电源输出**，可配置为常开或受控。
 
-13. **I²C Power Selection Jumper**  
+13. **I²C 电源选择跳线**
 
-    - **PERM**: 3V3 power is always on when external power is connected.  
-    - **SHUT (default)**: 3V3 power cuts off automatically when the system shuts down.
+    - **PERM**：连接外部电源时 3V3 电源始终开启。
+    - **SHUT（默认）**：系统关机时 3V3 电源自动切断。
 
-14. **USB Type-A Output Port**  
+14. **USB Type-A 输出端口**
 
-    - Provides **regulated 5V output**, suitable for powering peripherals or other devices.
-    - When powering a Raspberry Pi, you may encounter a non-PD power supply warning, which can be safely ignored.
+    - 提供**稳压 5V 输出**，适用于为外设或其他设备供电。
+    - 为 Raspberry Pi 供电时，可能会遇到非 PD 电源警告，可以安全忽略。
 
-15. **2x4P 2.54mm Power Output Header**  
+15. **2x4P 2.54mm 电源输出排针**
 
-    - Additional 5V output for external modules or SBCs.
+    - 为外部模块或 SBC 提供额外的 5V 输出。
 
-16. **Raspberry Pi GPIO Header (Female Connector)**  
+16. **Raspberry Pi GPIO 排针（母座连接器）**
 
-    - Direct interface for Raspberry Pi, passing through power, I²C, and other signals.  
-    - Fully compatible with Raspberry Pi pinout.
+    - Raspberry Pi 的直接接口，传输电源、I²C 和其他信号。
+    - 完全兼容 Raspberry Pi 引脚排列。
 
-17. **Raspberry Pi GPIO Header (Male Pin Breakout)** 
+17. **Raspberry Pi GPIO 排针（公针引出）**
 
-    - Brings Raspberry Pi GPIO pins out for stacking HATs or external expansion.  
-    - **Note**: I²C lines and Pin 26 are already occupied by PiPower5 functions.
-    - You can also connect a GPIO extension cable (from the bottom of the side panel) to experiment on a breadboard.
+    - 引出 Raspberry Pi GPIO 引脚，用于堆叠 HAT 或外部扩展。
+    - **注意**：I²C 线路和 Pin 26 已被 PiPower5 功能占用。
+    - 您也可以连接 GPIO 延长线（从侧板底部）在面包板上进行实验。
 
-18. **Battery Connector (XH2.54 3P)**  
+18. **电池连接器（XH2.54 3P）**
 
-    - Battery connection interface.  
-    - Pin order (left to right): Negative, Mid-point (between two cells), Positive.  
-    - Designed for **7.4V (2-cell) Li-ion/LiPo batteries**.
+    - 电池连接接口。
+    - 引脚顺序（从左到右）：负极、中点（两节电池之间）、正极。
+    - 专为\ **7.4V（2 节）锂离子/锂聚合物电池**\ 设计。
 
-19. **Reverse Battery Warning LEDs**  
+19. **电池反接警告 LED**
 
-    - Two red LEDs light up if the battery is connected in reverse polarity, warning of incorrect installation.
+    - 如果电池以反向极性连接，两个红色 LED 亮起，警告安装不正确。
 
-20. **Screw Terminals for Battery & Input Power**  
+20. **电池和输入电源螺丝端子**
 
-    - Alternative connection method for external batteries and power sources.  
-    - Supports **5V–15V external input** (recommended: >9V).  
-    - Battery support: **2 x 3.7V Li-ion / LiPo cells only** (NOT compatible with LiFePO₄ batteries).  
+    - 外部电池和电源的替代连接方法。
+    - 支持\ **5V–15V 外部输入**\ （建议：>9V）。
+    - 电池支持：\ **仅 2 x 3.7V 锂离子/锂聚合物电池**\ （不兼容 LiFePO₄ 电池）。
 
 
-Specification Table
+规格表
 -----------------------------
 
-.. list-table:: 
+.. list-table::
    :header-rows: 1
    :widths: 20 20 20 20 20
 
-   * - Parameter
-     - Minimum
-     - Typical
-     - Maximum
-     - Unit
-   * - Battery Shutdown Current
+   * - 参数
+     - 最小值
+     - 典型值
+     - 最大值
+     - 单位
+   * - 电池关断电流
      - \-
      - 60
      - \-
      - µA
-   * - Battery Quiescent Current
+   * - 电池静态电流
      - \-
      - 25
      - \-
      - mA
-   * - DC-DC Output Voltage
+   * - DC-DC 输出电压
      - 5.1957
      - 5.2855
      - 5.3766
      - V
-   * - DC-DC Over-Temperature Protection
+   * - DC-DC 过温保护
      - \-
      - 150
      - \-
      - ℃
-   * - Battery Charging Power
+   * - 电池充电功率
      - \-
      - \-
      - 20
      - W
-   * - Charging Over-Temperature Protection
+   * - 充电过温保护
      - \-
      - 125
      - \-
      - ℃
-   * - Balancing Resistor
+   * - 均衡电阻
      - \-
      - 60
      - \-
      - Ω
-   * - Balancing Activation Voltage
+   * - 均衡激活电压
      - \-
      - 4.2
      - \-
@@ -168,7 +168,7 @@ Specification Table
 
 .. _power_input:
 
-Power Input
+电源输入
 -------------
 
 .. image:: img/power_input.png
@@ -179,9 +179,9 @@ Power Input
 
    <br/>
 
-When using Raspberry Pi 5, it is recommended to use a USB PD power supply or a DC power supply with a minimum output of 32W. Otherwise, during periods of high power consumption, the battery may fail to charge properly or even deplete its charge due to insufficient power supply.
+使用 Raspberry Pi 5 时，建议使用 USB PD 电源或最低输出 32W 的 DC 电源。否则，在高功耗期间，由于电源不足，电池可能无法正常充电，甚至耗尽电量。
 
-You can monitor the **BAT LED** indicator to check the battery status. When external power is sufficient, the BAT LED should remain off, indicating that the battery is in standby mode and not being discharged. If the BAT LED lights up, it means the battery is supplying power to the device, possibly due to insufficient or disconnected external power. Prolonged illumination of the BAT LED may lead to excessive battery discharge, preventing it from functioning as an uninterrupted power supply (UPS) during power outages. Ensure you are using a power source that meets the required specifications to avoid such scenarios.
+您可以通过监控 **BAT LED** 指示灯来检查电池状态。当外部电源充足时，BAT LED 应保持熄灭，表示电池处于待机模式且未放电。如果 BAT LED 亮起，表示电池正在为设备供电，可能是因为外部电源不足或断开。BAT LED 长时间亮起可能导致电池过度放电，使其无法在停电期间充当不间断电源（UPS）。确保使用符合要求规格的电源以避免此类情况。
 
 
 
@@ -195,35 +195,35 @@ You can monitor the **BAT LED** indicator to check the battery status. When exte
    <br/>
 
 
-**Power Path**
+**电源路径**
 
-The PiPower 5 integrates power path management, enabling automatic power source switching to minimize battery wear and ensure uninterrupted power supply. The key functionalities include:
+PiPower 5 集成了电源路径管理，可以自动切换电源以减少电池损耗并确保不间断供电。主要功能包括：
 
-- When an external power source is connected, the 5V output is supplied via a step-down circuit from the external source. The output can be turned off using a switch. If conditions allow, the external power source can also charge the battery simultaneously (see the "Charging Current" section for details).
-- Upon disconnection of the external power source, the system immediately switches to battery power via a step-down circuit. This seamless transition ensures the system continues functioning normally during power interruptions.
+- 当外部电源连接时，5V 输出通过降压电路从外部电源供电。输出可以通过开关关闭。如果条件允许，外部电源也可以同时为电池充电（详情请参见"充电电流"部分）。
+- 当外部电源断开时，系统立即通过降压电路切换到电池供电。这种无缝过渡确保系统在电源中断期间继续正常工作。
 
-You can check the BAT LED indicator to confirm whether the battery is currently powering the system.
-
-
+您可以通过检查 BAT LED 指示灯来确认电池当前是否正在为系统供电。
 
 
-**Charging Current**
 
-The charging current is subject to two types of limitations:
+
+**充电电流**
+
+充电电流受两种限制的影响：
 
 .. note::
 
-   The charging current is determined by both the "Screw Terminal Power Charging Limitation" and the "Charge Power Selection Limitation" and is constrained by the smaller value between the two.
+   充电电流由"螺丝端子电源充电限制"和"充电功率选择限制"共同决定，并受两者中较小值的约束。
 
-1. Screw Terminal Power Charging Limitation
-   
-   When supplying power via screw terminal power input, the charging current is automatically adjusted based on the input voltage, as shown below:
+1. 螺丝端子电源充电限制
+
+   通过螺丝端子电源输入供电时，充电电流会根据输入电压自动调整，如下所示：
 
    .. list-table::
       :header-rows: 1
 
-      * - Input Voltage (VBUS)
-        - Maximum Charging Current
+      * - 输入电压（VBUS）
+        - 最大充电电流
       * - 4.5 < VBUS ≤ 6.5V
         - 3A
       * - 6.5 < VBUS ≤ 9.5V
@@ -233,9 +233,9 @@ The charging current is subject to two types of limitations:
       * - 13.5 < VBUS ≤ 16.5V
         - 2A
 
-2. Charge Power Selection Limitation
-   
-   A 2-position DIP switch on the board allows selection of different charge power levels. The corresponding allocation of charging power and output power for each setting is as follows:
+2. 充电功率选择限制
+
+   板上的 2 位 DIP 开关允许选择不同的充电功率级别。每种设置对应的充电功率和输出功率分配如下：
 
    .. image:: img/power_selector.png
      :width: 50%
@@ -244,9 +244,9 @@ The charging current is subject to two types of limitations:
    .. list-table::
       :header-rows: 1
 
-      * - Charge Sel 1
-        - Charge Sel 2
-        - Charging Power
+      * - 充电选择 1
+        - 充电选择 2
+        - 充电功率
       * - 0
         - 0
         - 5W
@@ -261,48 +261,50 @@ The charging current is subject to two types of limitations:
         - 20W
 
 
-**How to choose the charging power**
+**如何选择充电功率**
 
-The formula is:
+公式为：
 
-*Power supply capacity = Raspberry Pi required power + Charging power*
+*电源容量 = Raspberry Pi 所需功率 + 充电功率*
 
-We recommend estimating the Raspberry Pi’s power requirement at **20W to 25W**.
+我们建议将 Raspberry Pi 的功率需求估计为 **20W 至 25W**。
 
-- If you use a **30W power supply**, set charging power to **10W** or **5W**.  
-- If you use a **45W power supply**, you can safely set charging power to **20W**.  
+- 如果使用 **30W 电源**，将充电功率设置为 **10W** 或 **5W**。
+- 如果使用 **45W 电源**，可以安全地将充电功率设置为 **20W**。
 
-If you are familiar with your Raspberry Pi’s power needs, you may set a higher charging power as long as you reserve enough margin for occasional power spikes.  
+如果您熟悉 Raspberry Pi 的功率需求，只要为偶尔的功率峰值预留足够的余量，可以设置更高的充电功率。
 
-⚠️ Be cautious: insufficient power may cause the Raspberry Pi to shut down unexpectedly.
-
-
+⚠️ 请谨慎：功率不足可能导致 Raspberry Pi 意外关机。
 
 
-**Charging Process**
 
-- When the battery voltage ``VBAT <= 2.5V``, the system performs trickle charging at a low current, approximately 50 mA.
-- When ``2.5V < VBAT <= VTRKL``, trickle charging continues, and the battery charging current increases to approximately 200 mA.
-- When ``VTRKL < VBAT < VCV``, the system switches to constant current charging, supplying a preset constant current to the battery.
-- Once ``VBAT = VCV``, and the battery voltage approaches the fully charged level, the charging current gradually decreases, transitioning to constant voltage charging.
-- During constant voltage charging, when the charging current drops below ``ISTOP`` and the battery voltage is near the constant voltage threshold, charging stops, and the battery enters a fully charged state.- In the fully charged state, the system continuously monitors the battery voltage. If the voltage falls below ``VRCH``, charging resumes automatically.
 
-**Protection Features**
+**充电过程**
 
-The PiPower 5 offers comprehensive protection features, including input undervoltage and overvoltage protection, as well as overheating protection for both the charging chip and DC-DC converter. These features ensure stable and reliable system operation.
+- 当电池电压 ``VBAT <= 2.5V`` 时，系统以低电流（约 50 mA）进行涓流充电。
+- 当 ``2.5V < VBAT <= VTRKL`` 时，继续涓流充电，电池充电电流增加到约 200 mA。
+- 当 ``VTRKL < VBAT < VCV`` 时，系统切换到恒流充电，向电池提供预设的恒定电流。
+- 一旦 ``VBAT = VCV``，且电池电压接近充满电水平时，充电电流逐渐减小，过渡到恒压充电。
+- 在恒压充电期间，当充电电流降至 ``ISTOP`` 以下且电池电压接近恒压阈值时，充电停止，电池进入充满电状态。
+- 在充满电状态下，系统持续监控电池电压。如果电压降至 ``VRCH`` 以下，充电自动恢复。
 
-**Charge Balancing**
+**保护功能**
 
-The onboard charge-balancing chip activates a 60Ω resistor to discharge the battery at a low current when it detects that a single cell's voltage exceeds 4.2V. This feature helps maintain voltage balance across cells.
+PiPower 5 提供全面的保护功能，包括输入欠压和过压保护，以及充电芯片和 DC-DC 转换器的过热保护。这些功能确保系统稳定可靠运行。
 
-**Temperature Protection**
+**充电均衡**
 
-The charging process is automatically halted when the internal temperature of the charging chip exceeds 125°C. Similarly, the DC-DC chip disables output when its internal temperature surpasses 150°C.
+板载充电均衡芯片在检测到单节电池电压超过 4.2V 时，激活 60Ω 电阻以低电流对电池放电。此功能有助于保持电池之间的电压平衡。
+
+**温度保护**
+
+当充电芯片内部温度超过 125°C 时，充电过程自动停止。同样，当 DC-DC 芯片内部温度超过 150°C 时，输出被禁用。
 
 .. _power_button:
 
-Power Button
+电源按钮
 ----------------
+
 
 
 
@@ -315,23 +317,24 @@ Power Button
 
    <br/>
 
-Onboard power button for controlling the board's power:
+用于控制板子电源的板载电源按钮：
 
-* **Single press**: Activates output.
-* **Hold for 2 seconds until the middle two battery LEDs light up, then release**: Sends a shutdown request via I2C.
-* **Hold for more than 5 seconds**: Directly turns off output.
-  
+* **按一次**：激活输出。
+* **按住 2 秒直到中间两个电池 LED 亮起，然后松开**：通过 I2C 发送关机请求。
+* **按住超过 5 秒**：直接关闭输出。
+
 
 .. _battery_indicators:
 
-Battery Indicators
+电池指示灯
 --------------------------------
 
-Four onboard LEDs indicate the battery level and charging status.
+四个板载 LED 指示电池电量和充电状态。
 
 .. note::
 
-   If the device is charging during shutdown, the indicator light will continue to display the charging status until charging is complete.
+   如果设备在关机期间正在充电，指示灯将继续显示充电状态直到充电完成。
+
 
 
 
@@ -344,20 +347,20 @@ Four onboard LEDs indicate the battery level and charging status.
 
    <br/>
 
-* **4 LEDs lit**: Battery >80%
-* **3 LEDs lit**: 60%< Battery <80%
-* **2 LEDs lit**: 40%< Battery <60%
-* **1 LED lit**: 20%< Battery <40%
-* **First LED flashing**: Battery <20%
-* **LEDs light up sequentially in a cycle**: Charging in progress
-* **Middle two LEDs flashing**: Waiting shutdown signal
-* **All LEDs off**: Unpowered or in sleep mode
+* **4 个 LED 亮**：电池 >80%
+* **3 个 LED 亮**：60%< 电池 <80%
+* **2 个 LED 亮**：40%< 电池 <60%
+* **1 个 LED 亮**：20%< 电池 <40%
+* **第一个 LED 闪烁**：电池 <20%
+* **LED 循环顺序亮起**：正在充电
+* **中间两个 LED 闪烁**：等待关机信号
+* **所有 LED 灭**：未通电或处于休眠模式
 
 .. _battery_connector:
 
-Battery Connector
+电池连接器
 ------------------------
-VH3.96 2P battery connector and screw terminal battery connector.
+VH3.96 2P 电池连接器和螺丝端子电池连接器。
 
 .. image:: img/battery_pin.png
   :width: 50%
@@ -369,7 +372,7 @@ VH3.96 2P battery connector and screw terminal battery connector.
 
 .. _cap_btn:
 
-External Power Button Terminal & Header
+外部电源按钮端子和排针
 --------------------------------------------
 
 .. image:: img/btn_jumper.png
@@ -380,12 +383,13 @@ External Power Button Terminal & Header
 
    <br/>
 
-This terminal or header is designed for connecting an external power button. Connect a momentary switch, such as a tactile switch or a vintage-style metal button, to the jumper pins. The two leads of the button can be connected to the jumper's pins in any direction, as polarity is not required. Once connected, you can use the external button just like the onboard power button.
+此端子或排针设计用于连接外部电源按钮。将瞬时开关（如轻触开关或复古风格金属按钮）连接到跳线引脚。按钮的两根导线可以以任意方向连接到跳线引脚，因为不需要极性。连接后，您可以像使用板载电源按钮一样使用外部按钮。
 
 .. _cap_sdsig:
 
-SDSIG Jumper
+SDSIG 跳线
 ------------
+
 
 
 
@@ -398,17 +402,18 @@ SDSIG Jumper
 
    <br/>
 
-Provides shutdown detection for Raspberry Pi.
+为 Raspberry Pi 提供关机检测。
 
-* When bridged to PI3V3, it works with Raspberry Pi 4 and Pi 5.
-* When shorted to Pin 26, it supports Pi 3 and Pi Zero.
+* 当桥接到 PI3V3 时，与 Raspberry Pi 4 和 Pi 5 配合使用。
+* 当短接到 Pin 26 时，支持 Pi 3 和 Pi Zero。
 
-After proper configuration, PiPower5 will cut power automatically once the Raspberry Pi shuts down.
+正确配置后，PiPower5 将在 Raspberry Pi 关机后自动切断电源。
 
 .. _cap_onoff:
 
-Default ON/OFF Jumper
+默认 ON/OFF 跳线
 ----------------------
+
 
 
 
@@ -421,19 +426,20 @@ Default ON/OFF Jumper
 
    <br/>
 
-This jumper is used to select whether the USB power output is enabled by default after a shutdown. Use the jumper cap to connect the pins labeled ON or OFF to make the selection.
+此跳线用于选择关机后 USB 电源输出是否默认启用。使用跳线帽连接标记为 ON 或 OFF 的引脚进行选择。
 
-* If the jumper cap is positioned on the left and connected to OFF, inserting USB power after a shutdown will not activate the output.
-* If the jumper cap is positioned on the right and connected to ON, inserting USB power after a shutdown will activate the output.
+* 如果跳线帽位于左侧并连接到 OFF，关机后插入 USB 电源不会激活输出。
+* 如果跳线帽位于右侧并连接到 ON，关机后插入 USB 电源将激活输出。
 
-This feature is typically used for devices that need to start automatically, such as personal servers. For example, if there is a power outage, PiPower 5 will take over the Raspberry Pi's power supply, ensuring a safe shutdown. Once power is restored, PiPower 5 automatically powers on the Raspberry Pi, eliminating the need for manual intervention.
+此功能通常用于需要自动启动的设备，如个人服务器。例如，如果发生停电，PiPower 5 将接管 Raspberry Pi 的电源，确保安全关机。一旦电源恢复，PiPower 5 自动为 Raspberry Pi 通电，无需手动干预。
 
 .. _pin_header:
 
-Pin Headers for RPi
+RPi 排针
 ---------------------------
 
-The pin header is designed for direct connection to a Raspberry Pi, including both I2C communication and power supply. 
+排针设计用于直接连接到 Raspberry Pi，包括 I2C 通信和电源供应。
+
 
 
 
@@ -446,14 +452,14 @@ The pin header is designed for direct connection to a Raspberry Pi, including bo
 
    <br/>
 
-The header supports stacking additional HATs. However, note that the I2C pins and pin 26 are already connected and may need to be managed carefully to avoid conflicts.
+排针支持堆叠额外的 HAT。但是，请注意 I2C 引脚和引脚 26 已连接，可能需要小心管理以避免冲突。
 
-.. list-table:: 
+.. list-table::
    :widths: 15 15
    :header-rows: 1
 
    * - Raspberry Pi
-     - MCU On Board
+     - 板载 MCU
    * - SDA
      - SDA
    * - SCL
@@ -465,8 +471,9 @@ The header supports stacking additional HATs. However, note that the I2C pins an
    * - ID_SC
      - ID_EEPROM SCL
 
-I2C Communication
+I2C 通信
 -------------------------------
+
 
 
 
@@ -480,9 +487,9 @@ I2C Communication
 
    <br/>
 
-I2C address: 0x5C
+I2C 地址：0x5C
 
-The onboard microcontroller collects various signals from the board and stores them in registers. These signals can be accessed via I2C using the following register tables.
+板载微控制器收集板上的各种信号并将其存储在寄存器中。这些信号可以通过 I2C 使用以下寄存器表访问。
 
 .. raw:: html
 
@@ -517,20 +524,20 @@ The onboard microcontroller collects various signals from the board and stores t
    </style>
 
    <table class="custom-register-table">
-       <caption>Register Table</caption>
+       <caption>寄存器表</caption>
        <thead>
            <tr>
-               <th>Name</th>
-               <th>Address</th>
-               <th>Data Length</th>
-               <th>Data Type</th>
-               <th>Unit</th>
-               <th>Description</th>
+               <th>名称</th>
+               <th>地址</th>
+               <th>数据长度</th>
+               <th>数据类型</th>
+               <th>单位</th>
+               <th>描述</th>
            </tr>
        </thead>
        <tbody>
            <tr>
-               <td>Input Voltage</td>
+               <td>输入电压</td>
                <td>0</td>
                <td>2</td>
                <td>u16</td>
@@ -538,7 +545,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Input Current</td>
+               <td>输入电流</td>
                <td>2</td>
                <td>2</td>
                <td>u16</td>
@@ -546,7 +553,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Output Voltage</td>
+               <td>输出电压</td>
                <td>4</td>
                <td>2</td>
                <td>u16</td>
@@ -554,7 +561,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Output Current</td>
+               <td>输出电流</td>
                <td>6</td>
                <td>2</td>
                <td>u16</td>
@@ -562,7 +569,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Battery Voltage</td>
+               <td>电池电压</td>
                <td>8</td>
                <td>2</td>
                <td>u16</td>
@@ -570,7 +577,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Battery Current</td>
+               <td>电池电流</td>
                <td>10</td>
                <td>2</td>
                <td>i16</td>
@@ -578,7 +585,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Battery Percentage</td>
+               <td>电池百分比</td>
                <td>12</td>
                <td>1</td>
                <td>u8</td>
@@ -586,7 +593,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Battery Capacity</td>
+               <td>电池容量</td>
                <td>13</td>
                <td>2</td>
                <td>u16</td>
@@ -594,23 +601,23 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Power Source</td>
+               <td>电源</td>
                <td>15</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0: Battery not supplying power.<br> 1: Battery supplying power.</td>
+               <td>0：电池未供电。<br> 1：电池供电。</td>
            </tr>
            <tr>
-               <td>USB Connection Status</td>
+               <td>USB 连接状态</td>
                <td>16</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0: USB unplugged.<br> 1: USB plugged in.</td>
+               <td>0：USB 未插入。<br> 1：USB 已插入。</td>
            </tr>
            <tr>
-               <td>RESERVED</td>
+               <td>保留</td>
                <td>17</td>
                <td>1</td>
                <td>-</td>
@@ -618,31 +625,31 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Charging Status</td>
+               <td>充电状态</td>
                <td>18</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0: Not charging.<br> 1: Charging.</td>
+               <td>0：未充电。<br> 1：充电中。</td>
            </tr>
            <tr>
-               <td>Fan Power</td>
+               <td>风扇功率</td>
                <td>19</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Fan power level (0–100).</td>
+               <td>风扇功率级别（0–100）。</td>
            </tr>
            <tr>
-               <td>Shutdown Request</td>
+               <td>关机请求</td>
                <td>20</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>1: Triggered by low battery.<br>2: Triggered by pressing the power button.</td>
+               <td>1：低电量触发。<br>2：按下电源按钮触发。</td>
            </tr>
            <tr>
-               <td>Firmware Version (Major)</td>
+               <td>固件版本（主）</td>
                <td>128</td>
                <td>1</td>
                <td>u8</td>
@@ -650,7 +657,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Firmware Version (Minor)</td>
+               <td>固件版本（次）</td>
                <td>129</td>
                <td>1</td>
                <td>u8</td>
@@ -658,7 +665,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Firmware Version (Patch)</td>
+               <td>固件版本（补丁）</td>
                <td>130</td>
                <td>1</td>
                <td>u8</td>
@@ -666,15 +673,15 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Reset Code</td>
+               <td>复位代码</td>
                <td>131</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>MCU reset reason code.</td>
+               <td>MCU 复位原因代码。</td>
            </tr>
            <tr>
-               <td>RTC Year</td>
+               <td>RTC 年</td>
                <td>132</td>
                <td>1</td>
                <td>u8</td>
@@ -682,7 +689,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Month</td>
+               <td>RTC 月</td>
                <td>133</td>
                <td>1</td>
                <td>u8</td>
@@ -690,7 +697,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Day</td>
+               <td>RTC 日</td>
                <td>134</td>
                <td>1</td>
                <td>u8</td>
@@ -698,7 +705,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Hour</td>
+               <td>RTC 时</td>
                <td>135</td>
                <td>1</td>
                <td>u8</td>
@@ -706,7 +713,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Minute</td>
+               <td>RTC 分</td>
                <td>136</td>
                <td>1</td>
                <td>u8</td>
@@ -714,7 +721,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Second</td>
+               <td>RTC 秒</td>
                <td>137</td>
                <td>1</td>
                <td>u8</td>
@@ -722,31 +729,31 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RTC Sub-Second</td>
+               <td>RTC 亚秒</td>
                <td>138</td>
                <td>1</td>
                <td>u8</td>
                <td>1/128 s</td>
-               <td>RTC sub-second (1/128 second).</td>
+               <td>RTC 亚秒（1/128 秒）。</td>
            </tr>
            <tr>
-               <td>Always-On Feature</td>
+               <td>常开功能</td>
                <td>139</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>0: Enabled.<br> 1: Disabled.</td>
+               <td>0：启用。<br> 1：禁用。</td>
            </tr>
            <tr>
-               <td>Board ID</td>
+               <td>板 ID</td>
                <td>140</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Board identification: <br> 0: Pironman U1.<br> 1: Pironman 4.<br> 2: PiPower 3.<br>4: PiPower 5.</td>
+               <td>板识别：<br> 0：Pironman U1。<br> 1：Pironman 4。<br> 2：PiPower 3。<br>4：PiPower 5。</td>
            </tr>
            <tr>
-               <td>RESERVED</td>
+               <td>保留</td>
                <td>141</td>
                <td>1</td>
                <td>-</td>
@@ -754,7 +761,7 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>RESERVED</td>
+               <td>保留</td>
                <td>142</td>
                <td>1</td>
                <td>-</td>
@@ -762,15 +769,15 @@ The onboard microcontroller collects various signals from the board and stores t
                <td>-</td>
            </tr>
            <tr>
-               <td>Shutdown Percentage</td>
+               <td>关机百分比</td>
                <td>143</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Current low battery shutdown percentage threshold.</td>
+               <td>当前低电量关机百分比阈值。</td>
            </tr>
            <tr>
-               <td>RESERVED</td>
+               <td>保留</td>
                <td>144</td>
                <td>1</td>
                <td>-</td>
@@ -782,107 +789,106 @@ The onboard microcontroller collects various signals from the board and stores t
 
 
    <table class="custom-register-table">
-       <caption>Register Settings Table</caption>
+       <caption>寄存器设置表</caption>
        <thead>
            <tr>
-               <th>Name</th>
-               <th>Address</th>
-               <th>Data Length</th>
-               <th>Data Type</th>
-               <th>Unit</th>
-               <th>Description</th>
+               <th>名称</th>
+               <th>地址</th>
+               <th>数据长度</th>
+               <th>数据类型</th>
+               <th>单位</th>
+               <th>描述</th>
            </tr>
        </thead>
        <tbody>
            <tr>
-               <td>Fan Power</td>
+               <td>风扇功率</td>
                <td>0</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set fan speed (0–100).</td>
+               <td>设置风扇速度（0–100）。</td>
            </tr>
            <tr>
-               <td>RTC Year</td>
+               <td>RTC 年</td>
                <td>1</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC year.</td>
+               <td>设置 RTC 年。</td>
            </tr>
            <tr>
-               <td>RTC Month</td>
+               <td>RTC 月</td>
                <td>2</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC month.</td>
+               <td>设置 RTC 月。</td>
            </tr>
            <tr>
-               <td>RTC Day</td>
+               <td>RTC 日</td>
                <td>3</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC day.</td>
+               <td>设置 RTC 日。</td>
            </tr>
            <tr>
-               <td>RTC Hour</td>
+               <td>RTC 时</td>
                <td>4</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC hour.</td>
+               <td>设置 RTC 时。</td>
            </tr>
            <tr>
-               <td>RTC Minute</td>
+               <td>RTC 分</td>
                <td>5</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC minute.</td>
+               <td>设置 RTC 分。</td>
            </tr>
            <tr>
-               <td>RTC Second</td>
+               <td>RTC 秒</td>
                <td>6</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set RTC second.</td>
+               <td>设置 RTC 秒。</td>
            </tr>
            <tr>
-               <td>RTC Sub-Second</td>
+               <td>RTC 亚秒</td>
                <td>7</td>
                <td>1</td>
                <td>u8</td>
                <td>1/128 s</td>
-               <td>Set RTC sub-second.</td>
+               <td>设置 RTC 亚秒。</td>
            </tr>
            <tr>
-               <td>RTC Setting</td>
+               <td>RTC 设置</td>
                <td>8</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Enable RTC setting: <br> 1: Enabled.</td>
+               <td>启用 RTC 设置：<br> 1：启用。</td>
            </tr>
            <tr>
-               <td>Shutdown Percentage</td>
+               <td>关机百分比</td>
                <td>9</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set low battery shutdown percentage threshold (0–100).</td>
+               <td>设置低电量关机百分比阈值（0–100）。</td>
            </tr>
            <tr>
-               <td>Power Off Percentage</td>
+               <td>断电百分比</td>
                <td>10</td>
                <td>1</td>
                <td>u8</td>
                <td>-</td>
-               <td>Set low battery power-off percentage threshold (0–100).</td>
+               <td>设置低电量断电百分比阈值（0–100）。</td>
            </tr>
        </tbody>
    </table>
 
-   

@@ -1,9 +1,9 @@
 .. _pipower5_assembly:
 
-Assembly Instructions
+组装说明
 ------------------------
 
-Before assembling the PiPower 5, please verify that all parts and components are included. If any components are missing or damaged, please contact SunFounder at service@sunfounder.com for prompt assistance.
+在组装 PiPower 5 之前，请确认所有零件和组件齐全。如果有任何组件缺失或损坏，请联系 SunFounder（service@sunfounder.com）以获取及时帮助。
 
 
 
