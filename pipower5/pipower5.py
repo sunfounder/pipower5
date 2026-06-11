@@ -100,13 +100,11 @@ class PiPower5:
 
     def buzz_sequence(self, sequence):
         """Play a buzzer sequence via kernel sysfs.
-        Accepts old Python formats:
-          str:  "A4,50;pause,100;B4,50"
-          list: [["A4", 50], ["pause", 100], ["B4", 50]]
+        Old format: str "note,dur:note,dur:..." (colon-separated)
+                    or "freq,dur;freq,dur;..." (semicolon-separated, raw sysfs)
+           list: [[note_or_freq, dur_ms], ...]
         """
-        if isinstance(sequence, str):
-            s = sequence
-        elif isinstance(sequence, list):
+        if isinstance(sequence, list):
             parts = []
             for n in sequence:
                 note, dur = n[0], n[1]
@@ -118,6 +116,25 @@ class PiPower5:
                 else:
                     parts.append(f"{note},{dur}")
             s = ";".join(parts)
+        elif isinstance(sequence, str):
+            if ':' in sequence:
+                # Old format: "A4,50:p,100:B4,50"
+                parts = []
+                for item in sequence.split(':'):
+                    a, d = item.split(',')
+                    a = a.strip()
+                    d = d.strip()
+                    if a.lower() in ('pause', 'p'):
+                        parts.append(f"0,{d}")
+                    elif a[0] in 'ABCDEFG':
+                        freq = int(get_note_freq(a))
+                        parts.append(f"{freq},{d}")
+                    else:
+                        parts.append(f"{a},{d}")
+                s = ";".join(parts)
+            else:
+                # Raw format: "440,200;0,100;523,200" (passed to kernel as-is)
+                s = sequence
         else:
             raise TypeError(f"Expected str or list, got {type(sequence)}")
         self._write_sysfs("buzzer_play", s)
