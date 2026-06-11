@@ -303,7 +303,7 @@ static int pipower5_probe(struct i2c_client *client) {
         if (len > 0) {
           kbuf[len] = '\0';
           dev_info(dev, "Loading custom buzz sequences from /etc/pipower5/buzz_seq.conf\n");
-          buzz_seq_load(dev, kbuf, len);
+          pipower5_buzz_seq_load(kbuf, len);
         }
         kfree(kbuf);
       }
