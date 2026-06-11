@@ -95,14 +95,30 @@ class PiPower5:
 
     # ---- Backward compatibility stubs ----
 
+    _NOTE_FREQ = {
+        'C4': 262, 'D4': 294, 'E4': 330, 'F4': 349, 'G4': 392,
+        'A4': 440, 'B4': 494,
+        'C5': 523, 'D5': 587, 'E5': 659, 'F5': 698, 'G5': 784,
+        'A5': 880, 'B5': 988,
+        'C6': 1047, 'D6': 1175, 'E6': 1319, 'F6': 1397, 'G6': 1568,
+    }
+
     def buzz_sequence(self, sequence):
         """Play a buzzer sequence via kernel sysfs.
-        Accepts old Python format: [[freq,dur], ...] or "freq,dur;freq,dur;..."
+        Accepts old Python format: [[note_or_freq,dur], ...] or "freq,dur;freq,dur;..."
         """
         if isinstance(sequence, str):
             s = sequence
         elif isinstance(sequence, list):
-            s = ";".join(f"{n[0]},{n[1]}" for n in sequence)
+            parts = []
+            for n in sequence:
+                if n[0] == 'pause':
+                    parts.append(f"0,{n[1]}")
+                elif isinstance(n[0], str) and n[0] in self._NOTE_FREQ:
+                    parts.append(f"{self._NOTE_FREQ[n[0]]},{n[1]}")
+                else:
+                    parts.append(f"{n[0]},{n[1]}")
+            s = ";".join(parts)
         else:
             raise TypeError(f"Expected str or list, got {type(sequence)}")
         self._write_sysfs("buzzer_play", s)
