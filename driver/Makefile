@@ -119,31 +119,28 @@ remove-config:
 		sudo sed -i '/^dtoverlay=$(DTOVERLAY_NAME)/d' $(CONFIG_TXT) 2>/dev/null || true; \
 	fi
 
-# DKMS install
+# DKMS install — only removes current version before reinstalling
 dkms_install:
 	@echo "Installing PiPower5 driver via DKMS (v$(DRIVER_VERSION))..."
-	@# Check if DKMS is installed
 	@if ! command -v dkms >/dev/null 2>&1; then \
 		echo "DKMS not found. Installing dkms..."; \
-		sudo apt-get update && sudo apt-get install -y dkms || { \
+		sudo apt-get update -qq && sudo apt-get install -y dkms || { \
 			echo "Error: Failed to install DKMS."; exit 1; \
 		}; \
 	fi
-	@# Clean up old non-DKMS module files
-	@sudo rm -f /lib/modules/$(shell uname -r)/extra/pipower5.ko* /lib/modules/$(shell uname -r)/updates/pipower5.ko* 2>/dev/null || true
-	@# Remove previous DKMS registrations
-	-@for ver in $$(dkms status pipower5 2>/dev/null | sed -n 's/^pipower5\/\([^,]*\).*/\1/p' | sort -u); do \
-		sudo dkms remove -m pipower5 -v $$ver --all 2>/dev/null || true; \
-	done
-	@# Copy source files
+	@# Remove only the current version if already installed (not --all)
+	-@sudo dkms remove -m pipower5 -v $(DRIVER_VERSION) 2>/dev/null || true
+	@# Clean non-DKMS module files
+	@sudo rm -f /lib/modules/$(shell uname -r)/extra/pipower5.ko* 2>/dev/null || true
+	@sudo rm -f /etc/modules-load.d/pipower5.conf 2>/dev/null || true
+	@# Copy source to DKMS tree
 	@echo "Copying source to $(DKMS_SRC)..."
 	@sudo mkdir -p $(DKMS_SRC)/src $(DKMS_SRC)/include
 	@sudo cp -f Makefile dkms.conf $(DKMS_SRC)/
 	@sudo cp -f include/*.h $(DKMS_SRC)/include/
 	@sudo cp -f src/*.c $(DKMS_SRC)/src/
-	@# Update dkms.conf version
 	@sudo sed -i 's/^PACKAGE_VERSION=.*/PACKAGE_VERSION="$(DRIVER_VERSION)"/' $(DKMS_SRC)/dkms.conf
-	@# Register, build, install
+	@# Add, build, install
 	@sudo dkms add -m pipower5 -v $(DRIVER_VERSION)
 	@sudo dkms build -m pipower5 -v $(DRIVER_VERSION)
 	@sudo dkms install -m pipower5 -v $(DRIVER_VERSION)
@@ -157,19 +154,11 @@ dkms_uninstall:
 	fi
 	@echo "DKMS uninstall completed."
 
-# Full install: copy .ko + modules-load.d + overlay + config.txt + load
+# Full install: DKMS + overlay + config.txt + load
 install: module dtbo
-	@echo "Installing PiPower5 driver..."
-	@# Unload if loaded
+	@echo "Installing PiPower5 driver (DKMS)..."
 	-@sudo rmmod pipower5 2>/dev/null || true
-	@# Clean up any DKMS leftovers
-	-@sudo dkms remove -m pipower5 --all 2>/dev/null || true
-	@sudo rm -rf /usr/src/pipower5-* /var/lib/dkms/pipower5 2>/dev/null || true
-	@# Simple install: copy .ko, update deps, auto-load via modules-load.d
-	@sudo mkdir -p /lib/modules/$(shell uname -r)/extra
-	@sudo cp -f pipower5.ko /lib/modules/$(shell uname -r)/extra/
-	@echo "pipower5" | sudo tee /etc/modules-load.d/pipower5.conf > /dev/null
-	@sudo depmod -a
+	@$(MAKE) dkms_install
 	@$(MAKE) install-overlay
 	@$(MAKE) install-config
 	@echo "Loading pipower5 module..."
