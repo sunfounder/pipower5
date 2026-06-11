@@ -479,17 +479,26 @@ static void pipower5_buzzer_work_func(struct work_struct *work) {
 
 /* Event name -> buzzer sequence lookup table */
 /* Event name -> buzzer sequence lookup */
+/* Event buzzer sequences (frequencies matching original main branch constants.py)
+ *   battery_activated:             A4,50:p,100:B4,50
+ *   low_battery:                   A4,50:p,100:A4,50
+ *   power_disconnected:            D5,50:p,100:G4,50
+ *   power_restored:                G4,50:p,100:D5,50
+ *   power_insufficient:            B4,50:p,100:B4,50:p,100:B4,100
+ *   battery_critical_shutdown:     C6,50:p,60:C6,50:p,60:C6,100
+ *   battery_voltage_critical:      C6,50:p,60:C6,50:p,60:C6,100:p,60:C6,100
+ */
 static const struct {
   const char *name;
   const char *seq;
 } buzzer_events[] = {
-  {"battery_activated",                 "1046,50;0,100;1975,50"},
-  {"low_battery",                       "1046,50;0,100;1046,50"},
-  {"power_disconnected",                "1174,50;0,100;784,50"},
-  {"power_restored",                    "784,50;0,100;1174,50"},
-  {"power_insufficient",                "987,50;0,100;987,50;0,100;987,100"},
-  {"battery_critical_shutdown",         "2093,50;0,60;2093,50;0,60;2093,100"},
-  {"battery_voltage_critical_shutdown", "2093,50;0,60;2093,50;0,60;2093,100;0,60;2093,100"},
+  {"battery_activated",                 "440,50;0,100;494,50"},
+  {"low_battery",                       "440,50;0,100;440,50"},
+  {"power_disconnected",                "587,50;0,100;392,50"},
+  {"power_restored",                    "392,50;0,100;587,50"},
+  {"power_insufficient",                "494,50;0,100;494,50;0,100;494,100"},
+  {"battery_critical_shutdown",         "1047,50;0,60;1047,50;0,60;1047,100"},
+  {"battery_voltage_critical_shutdown", "1047,50;0,60;1047,50;0,60;1047,100;0,60;1047,100"},
 };
 
 static const char *buzzer_lookup_event(const char *name) {
