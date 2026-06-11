@@ -104,12 +104,18 @@ static void pipower5_button_poll_work(struct work_struct *work) {
   mutex_lock(&pi_dev->lock);
   ret = __pipower5_read_byte(pi_dev, REG_READ_POWER_BUTTON_STATE);
   if (ret >= 0) {
-    pi_dev->power_button_state = (u8)ret;
-    __pipower5_write_byte(pi_dev, REG_WRITE_POWER_BTN_STATE, 0);
+    if ((u8)ret != 0) {
+      /* Only update cached value on non-zero (press detected).
+       * Writing 0 to register 12 tells MCU to clear register 154.
+       * On next poll, MCU returns 0 which we ignore, so the last
+       * button event remains visible in sysfs until a new event. */
+      pi_dev->power_button_state = (u8)ret;
+      __pipower5_write_byte(pi_dev, REG_WRITE_POWER_BTN_STATE, 0);
+    }
   }
   mutex_unlock(&pi_dev->lock);
 
-  if (ret >= 0)
+  if (ret >= 0 && (u8)ret != 0)
     pipower5_button_check(pi_dev);
 
   queue_delayed_work(pi_dev->wq, &pi_dev->button_poll_work,
