@@ -1,13 +1,13 @@
 #!/bin/bash
-# pipower5 full test suite �� driver + sysfs + CLI
+# pipower5 full test suite -- driver + sysfs + CLI
 SYSFS=/sys/class/pipower5/pipower5
 PS=/sys/class/power_supply/pipower5
 G='\033[32m'; R='\033[31m'; Y='\033[33m'; B='\033[1m'; N='\033[0m'
 PASS=0; FAIL=0; SKIP=0
 
 _p() { echo -e "  $G PASS$N $1"; PASS=$((PASS+1)); }
-_f() { echo -e "  $R FAIL$N $1 �� $2"; FAIL=$((FAIL+1)); }
-_s() { echo -e "  $Y SKIP$N $1 �� $2"; SKIP=$((SKIP+1)); }
+_f() { echo -e "  $R FAIL$N $1 -- $2"; FAIL=$((FAIL+1)); }
+_s() { echo -e "  $Y SKIP$N $1 -- $2"; SKIP=$((SKIP+1)); }
 _sec() { echo ""; echo -e "$B[$1]$N $2"; }
 
 # Check if module is loaded, offer to fix if not

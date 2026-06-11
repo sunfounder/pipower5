@@ -123,6 +123,7 @@ struct pipower5_device {
   u16 battery_internal_resistor;
   u8 power_button_state;
   u8 last_power_button_state;
+  unsigned long button_event_jiffies;  /* timestamp for 2s hold */
   u8 charge_current_max;
   struct input_dev *input_dev;
 

@@ -105,12 +105,15 @@ static void pipower5_button_poll_work(struct work_struct *work) {
   ret = __pipower5_read_byte(pi_dev, REG_READ_POWER_BUTTON_STATE);
   if (ret >= 0) {
     if ((u8)ret != 0) {
-      /* Only update cached value on non-zero (press detected).
-       * Writing 0 to register 12 tells MCU to clear register 154.
-       * On next poll, MCU returns 0 which we ignore, so the last
-       * button event remains visible in sysfs until a new event. */
+      /* Button event detected: cache value, reset MCU register,
+       * and record timestamp so sysfs holds the value for 2s. */
       pi_dev->power_button_state = (u8)ret;
+      pi_dev->button_event_jiffies = jiffies;
       __pipower5_write_byte(pi_dev, REG_WRITE_POWER_BTN_STATE, 0);
+    } else if (pi_dev->power_button_state != 0 &&
+               time_after(jiffies, pi_dev->button_event_jiffies + 2 * HZ)) {
+      /* 2 seconds elapsed since last event, show RELEASED */
+      pi_dev->power_button_state = 0;
     }
   }
   mutex_unlock(&pi_dev->lock);
