@@ -224,6 +224,7 @@ static int pipower5_probe(struct i2c_client *client) {
 
   pi_dev->client = client;
   mutex_init(&pi_dev->lock);
+  pi_dev->vbus_enabled = true;  /* VBUS starts enabled */
 
   /* Create device under /sys/class/pipower5/ as virtual device.
    * Using NULL parent avoids I2C device directory permission issues
@@ -338,6 +339,10 @@ static void pipower5_remove(struct i2c_client *client) {
   cancel_delayed_work_sync(&pi_dev->poll_work);
   cancel_delayed_work_sync(&pi_dev->button_poll_work);
   destroy_workqueue(pi_dev->wq);
+
+  /* Ensure VBUS is re-enabled on unload */
+  if (!pi_dev->vbus_enabled)
+    pipower5_enable_vbus(pi_dev);
 
   /* Remove upower interface */
   pipower5_remove_upower(pi_dev);

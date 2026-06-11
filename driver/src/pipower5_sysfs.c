@@ -652,6 +652,27 @@ static ssize_t buzz_on_store(struct device *dev, struct device_attribute *attr,
 }
 static DEVICE_ATTR_RW(buzz_on);
 
+/* vbus_enable: control input power (for power failure simulation) */
+static ssize_t vbus_enable_show(struct device *dev,
+                                struct device_attribute *attr, char *buf) {
+  struct pipower5_device *pi_dev = dev_get_drvdata(dev);
+  return snprintf(buf, PAGE_SIZE, "%d\n", pi_dev->vbus_enabled ? 1 : 0);
+}
+static ssize_t vbus_enable_store(struct device *dev,
+                                 struct device_attribute *attr,
+                                 const char *buf, size_t count) {
+  struct pipower5_device *pi_dev = dev_get_drvdata(dev);
+  unsigned long val;
+  if (kstrtoul(buf, 10, &val) != 0)
+    return -EINVAL;
+  if (val)
+    pipower5_enable_vbus(pi_dev);
+  else
+    pipower5_disable_vbus(pi_dev);
+  return count;
+}
+static DEVICE_ATTR_RW(vbus_enable);
+
 /* Driver version attribute */
 static ssize_t driver_version_show(struct device *dev,
                                    struct device_attribute *attr, char *buf) {
@@ -759,6 +780,7 @@ static struct attribute *pipower5_attrs[] = {
     &dev_attr_power_button_state.attr,
     &dev_attr_charge_current_max.attr,
     &dev_attr_buzzer_volume.attr,
+    &dev_attr_vbus_enable.attr,
     &dev_attr_buzz_on.attr,
     &dev_attr_buzzer_play.attr,
     &dev_attr_events.attr,

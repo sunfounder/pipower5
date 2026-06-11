@@ -126,6 +126,9 @@ struct pipower5_device {
   u8 charge_current_max;
   struct input_dev *input_dev;
 
+  /* VBUS control (for power failure simulation) */
+  bool vbus_enabled;
+
   /* State tracking for event detection */
   u8 last_is_input_plugged_in;
   u8 last_power_source;
@@ -155,7 +158,11 @@ struct pipower5_device {
 int __pipower5_read_word(struct pipower5_device *pi_dev, u8 reg);
 int __pipower5_read_byte(struct pipower5_device *pi_dev, u8 reg);
 int __pipower5_write_byte(struct pipower5_device *pi_dev, u8 reg, u8 value);
+int __pipower5_write_block(struct pipower5_device *pi_dev, u8 cmd, u8 *data, u8 len);
+int __pipower5_read_raw_byte(struct pipower5_device *pi_dev);
 int pipower5_update_status(struct pipower5_device *pi_dev);
+int pipower5_enable_vbus(struct pipower5_device *pi_dev);
+int pipower5_disable_vbus(struct pipower5_device *pi_dev);
 
 /* Function prototypes for sysfs operations */
 int pipower5_create_sysfs(struct pipower5_device *pi_dev);

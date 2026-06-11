@@ -61,6 +61,22 @@ int __pipower5_write_byte(struct pipower5_device *pi_dev, u8 reg, u8 value) {
   return 0;
 }
 
+/* SMBus block write — caller holds lock */
+int __pipower5_write_block(struct pipower5_device *pi_dev, u8 cmd, u8 *data, u8 len) {
+  int ret = i2c_smbus_write_block_data(pi_dev->client, cmd, len, data);
+  if (ret < 0)
+    dev_err(&pi_dev->client->dev, "block write cmd=0x%02x failed: %d\n", cmd, ret);
+  return ret;
+}
+
+/* Raw SMBus byte read (no register) — caller holds lock */
+int __pipower5_read_raw_byte(struct pipower5_device *pi_dev) {
+  int ret = i2c_smbus_read_byte(pi_dev->client);
+  if (ret < 0)
+    dev_err(&pi_dev->client->dev, "raw byte read failed: %d\n", ret);
+  return ret;
+}
+
 /*
  * Read all registers in one pass, holding pi_dev->lock for the entire
  * I2C transaction batch.  This is more efficient than lock/unlock per
@@ -209,6 +225,61 @@ int pipower5_update_status(struct pipower5_device *pi_dev) {
 out:
   mutex_unlock(&pi_dev->lock);
   return ret;
+}
+
+/* ADV_CMD protocol for VBUS control (power failure simulation).
+ * Sends block command and waits for status byte.
+ *   ADV_CMD_START=0xAC, ADV_CMD_VBUS_EN=0x01, ADV_CMD_END=0xAE
+ *   OK=0xE0, ERR=0xEF
+ */
+#define ADV_CMD_START  0xAC
+#define ADV_CMD_VBUS_EN 0x01
+#define ADV_CMD_END    0xAE
+#define ADV_CMD_OK     0xE0
+#define ADV_CMD_TIMEOUT_MS 5000  /* 5s timeout for ADV_CMD response */
+
+int pipower5_enable_vbus(struct pipower5_device *pi_dev) {
+  u8 cmd[] = {ADV_CMD_VBUS_EN, 1, ADV_CMD_END};
+  int status, retries = 0;
+  unsigned long deadline = jiffies + msecs_to_jiffies(ADV_CMD_TIMEOUT_MS);
+
+  mutex_lock(&pi_dev->lock);
+  while (time_before(jiffies, deadline)) {
+    retries++;
+    __pipower5_write_block(pi_dev, ADV_CMD_START, cmd, sizeof(cmd));
+    status = __pipower5_read_raw_byte(pi_dev);
+    if (status == ADV_CMD_OK) {
+      mutex_unlock(&pi_dev->lock);
+      pi_dev->vbus_enabled = true;
+      dev_info(&pi_dev->client->dev, "VBUS enabled after %d retries\n", retries);
+      return 0;
+    }
+  }
+  mutex_unlock(&pi_dev->lock);
+  dev_err(&pi_dev->client->dev, "VBUS enable failed after %d retries\n", retries);
+  return -EIO;
+}
+
+int pipower5_disable_vbus(struct pipower5_device *pi_dev) {
+  u8 cmd[] = {ADV_CMD_VBUS_EN, 0, ADV_CMD_END};
+  int status, retries = 0;
+  unsigned long deadline = jiffies + msecs_to_jiffies(ADV_CMD_TIMEOUT_MS);
+
+  mutex_lock(&pi_dev->lock);
+  while (time_before(jiffies, deadline)) {
+    retries++;
+    __pipower5_write_block(pi_dev, ADV_CMD_START, cmd, sizeof(cmd));
+    status = __pipower5_read_raw_byte(pi_dev);
+    if (status == ADV_CMD_OK) {
+      mutex_unlock(&pi_dev->lock);
+      pi_dev->vbus_enabled = false;
+      dev_info(&pi_dev->client->dev, "VBUS disabled after %d retries\n", retries);
+      return 0;
+    }
+  }
+  mutex_unlock(&pi_dev->lock);
+  dev_err(&pi_dev->client->dev, "VBUS disable failed after %d retries\n", retries);
+  return -EIO;
 }
 
 MODULE_AUTHOR("SunFounder <service@sunfounder.com>");

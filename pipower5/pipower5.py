@@ -107,11 +107,115 @@ class PiPower5:
         self._write_sysfs("buzzer_play", s)
 
     def power_failure_simulation(self, test_time=60):
-        """Backward compat stub: kernel driver does not support VBUS control yet.
-        Use 'pipower5 --all' to monitor battery drain manually."""
-        print("Power failure simulation requires kernel driver ADV_CMD support.")
-        print("Monitor battery manually: watch -n 1 cat /sys/class/pipower5/pipower5/battery_percentage")
-        return None
+        """Simulate power outage by disabling VBUS via kernel driver.
+        Measures battery drain over <test_time> seconds and returns stats.
+        """
+        import signal, time
+
+        if test_time < 10:
+            test_time = 10
+        if test_time > 600:
+            test_time = 600
+
+        bat_pct = self.read_battery_percentage()
+        plugged = self.read_is_input_plugged_in()
+
+        if bat_pct < 80:
+            print("Battery must be >80%% for simulation (currently %d%%)" % bat_pct)
+            return None
+        if not plugged:
+            print("Input must be plugged in for simulation")
+            return None
+
+        orig_shutdown = self.read_shutdown_percentage()
+        self.write_shutdown_percentage(10)
+
+        # ensure VBUS is re-enabled on exit
+        def cleanup(sig=None, frame=None):
+            self._write_sysfs("vbus_enable", "1")
+            self.write_shutdown_percentage(orig_shutdown)
+            if sig:
+                print("\nCancelled by user, VBUS re-enabled.")
+                import sys; sys.exit(0)
+
+        for s in (signal.SIGINT, signal.SIGTERM, signal.SIGABRT):
+            signal.signal(s, cleanup)
+
+        print(f"Disabling VBUS for {test_time}s (battery: {bat_pct}%)...")
+        self._write_sysfs("vbus_enable", "0")
+
+        count = 0
+        interval = 0.5
+        bat_v_sum, bat_c_sum, bat_p_sum = 0.0, 0.0, 0.0
+        bat_v_max, bat_c_max, bat_p_max = 0.0, 0.0, 0.0
+        out_v_sum, out_c_sum, out_p_sum = 0.0, 0.0, 0.0
+        out_v_max, out_c_max, out_p_max = 0.0, 0.0, 0.0
+        mah_used = 0.0
+        last_ts = time.time()
+
+        t0 = time.time()
+        try:
+            while time.time() - t0 < test_time:
+                data = self.read_all()
+                bv = data["battery_voltage"]
+                bc = -data["battery_current"]
+                bp = bv * bc / 1e6
+                ov = data["output_voltage"]
+                oc = data["output_current"]
+                op = ov * oc / 1e6
+
+                dt = time.time() - last_ts
+                mah_used += bc * dt / 3600.0
+                last_ts = time.time()
+
+                bat_v_sum += bv; bat_c_sum += bc; bat_p_sum += bp
+                out_v_sum += ov; out_c_sum += oc; out_p_sum += op
+                bat_v_max = max(bat_v_max, bv)
+                bat_c_max = max(bat_c_max, bc)
+                bat_p_max = max(bat_p_max, bp)
+                out_v_max = max(out_v_max, ov)
+                out_c_max = max(out_c_max, oc)
+                out_p_max = max(out_p_max, op)
+                count += 1
+
+                elapsed = time.time() - t0
+                bar = int(elapsed / test_time * 20)
+                print(f"\r[{elapsed:.0f}s] {'#'*bar}{'.'*(20-bar)} {bv/1000:.2f}V {bc/1000:.2f}A {bp:.2f}W", end="", flush=True)
+                time.sleep(max(0, interval - (time.time() - t0 - elapsed)))
+        finally:
+            cleanup()
+
+        avg = lambda s, n: round(s / n, 3) if n else 0
+        bat_pct_end = self.read_battery_percentage()
+        available_pct = bat_pct_end - orig_shutdown
+        if available_pct < 0:
+            available_pct = 0
+        avail_cap = available_pct * self.BAT_MAX_CAPACITY / 100 * 0.9
+        avail_time = int(avail_cap / 1000 / max(avg(bat_c_sum, count) / 1000, 0.001) * 3600)
+
+        result = {
+            "bat_mah_used": round(mah_used, 3),
+            "bat_percent_used": round(bat_pct - bat_pct_end, 1),
+            "bat_voltage_avg": avg(bat_v_sum / 1000, count),
+            "bat_current_avg": avg(bat_c_sum / 1000, count),
+            "bat_power_avg": avg(bat_p_sum, count),
+            "bat_voltage_max": round(bat_v_max / 1000, 3),
+            "bat_current_max": round(bat_c_max / 1000, 3),
+            "bat_power_max": round(bat_p_max, 3),
+            "output_voltage_avg": avg(out_v_sum / 1000, count),
+            "output_current_avg": avg(out_c_sum / 1000, count),
+            "output_power_avg": avg(out_p_sum, count),
+            "output_voltage_max": round(out_v_max / 1000, 3),
+            "output_current_max": round(out_c_max / 1000, 3),
+            "output_power_max": round(out_p_max, 3),
+            "battery_percentage": bat_pct_end,
+            "shutdown_percentage": orig_shutdown,
+            "available_time": avail_time,
+            "available_time_str": f"{avail_time // 3600}h {(avail_time % 3600) // 60}m",
+            "available_bat_capacity": int(avail_cap),
+        }
+        print(f"\n\nResults: {mah_used:.1f}mAh used, {bat_pct_end}% remaining, ~{result['available_time_str']} runtime")
+        return result
     set_buzzer_volume         = lambda self, v: self._write_sysfs("buzzer_volume", v)
     write_buzzer_volume       = set_buzzer_volume
 
