@@ -99,12 +99,13 @@ class PiPower5:
     # ---- Backward compatibility stubs ----
 
     def buzz_sequence(self, sequence):
-        """Play a buzzer sequence via kernel sysfs.
-        Old format: str "note,dur:note,dur:..." (colon-separated)
-                    or "freq,dur;freq,dur;..." (semicolon-separated, raw sysfs)
-           list: [[note_or_freq, dur_ms], ...]
+        """Play buzzer by event name or raw sequence via kernel sysfs.
+        Event:  buzz_sequence('power_disconnected')
+        Raw:    buzz_sequence('440,200;0,100;523,200')
+        Old list format also supported for backward compat.
         """
         if isinstance(sequence, list):
+            # Old format: [[note_or_freq, dur_ms], ...]
             parts = []
             for n in sequence:
                 note, dur = n[0], n[1]
@@ -117,24 +118,8 @@ class PiPower5:
                     parts.append(f"{note},{dur}")
             s = ";".join(parts)
         elif isinstance(sequence, str):
-            if ':' in sequence:
-                # Old format: "A4,50:p,100:B4,50"
-                parts = []
-                for item in sequence.split(':'):
-                    a, d = item.split(',')
-                    a = a.strip()
-                    d = d.strip()
-                    if a.lower() in ('pause', 'p'):
-                        parts.append(f"0,{d}")
-                    elif a[0] in 'ABCDEFG':
-                        freq = int(get_note_freq(a))
-                        parts.append(f"{freq},{d}")
-                    else:
-                        parts.append(f"{a},{d}")
-                s = ";".join(parts)
-            else:
-                # Raw format: "440,200;0,100;523,200" (passed to kernel as-is)
-                s = sequence
+            # Write directly: event name or raw sequence
+            s = sequence
         else:
             raise TypeError(f"Expected str or list, got {type(sequence)}")
         self._write_sysfs("buzzer_play", s)

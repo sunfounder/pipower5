@@ -159,7 +159,7 @@ static void pipower5_poll_work(struct work_struct *work) {
         kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
         pipower5_buzzer_event(pi_dev,
           pi_dev->is_input_plugged_in ?
-          BUZZ_POWER_RESTORED : BUZZ_POWER_DISCONNECTED);
+          "power_restored" : "power_disconnected");
       }
 
       /* BATTERY_ACTIVATED: switched to battery power */
@@ -169,7 +169,7 @@ static void pipower5_poll_work(struct work_struct *work) {
         pipower5_log_event(pi_dev, "BATTERY_ACTIVATED bat=%d%%",
                            pi_dev->battery_percentage);
         kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
-        pipower5_buzzer_event(pi_dev, BUZZ_BATTERY_ACTIVATED);
+        pipower5_buzzer_event(pi_dev, "battery_activated");
       }
 
       /* POWER_INSUFFICIENT: input plugged in but battery still discharging.
@@ -183,7 +183,7 @@ static void pipower5_poll_work(struct work_struct *work) {
           pipower5_log_event(pi_dev, "POWER_INSUFFICIENT bat=%d%% cur=%dmA",
                              pi_dev->battery_percentage, batt_cur);
           kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
-          pipower5_buzzer_event(pi_dev, BUZZ_POWER_INSUFFICIENT);
+          pipower5_buzzer_event(pi_dev, "power_insufficient");
           last_pwr_insuf_log = jiffies;
         }
       }
@@ -197,7 +197,7 @@ static void pipower5_poll_work(struct work_struct *work) {
                              pi_dev->battery_percentage,
                              pi_dev->shutdown_percentage);
           kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
-          pipower5_buzzer_event(pi_dev, BUZZ_LOW_BATTERY);
+          pipower5_buzzer_event(pi_dev, "low_battery");
           last_low_bat_log = jiffies;
         }
       }

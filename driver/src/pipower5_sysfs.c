@@ -471,10 +471,36 @@ static void pipower5_buzzer_work_func(struct work_struct *work) {
 
 /*
  * buzzer_play write-only sysfs:
- *   Sequence:  "freq,dur;freq,dur;..."
- *   Single:    "freq"  → auto-stops after 5 s
- *   Stop:      "0"     → immediate silence
+ *   Event name: "power_disconnected" → plays built-in sequence
+ *   Sequence:   "freq,dur;freq,dur;..."
+ *   Single:     "freq"  → auto-stops after 5 s
+ *   Stop:       "0"     → immediate silence
  */
+
+/* Event name -> buzzer sequence lookup table */
+/* Event name -> buzzer sequence lookup */
+static const struct {
+  const char *name;
+  const char *seq;
+} buzzer_events[] = {
+  {"battery_activated",                 "1046,50;0,100;1975,50"},
+  {"low_battery",                       "1046,50;0,100;1046,50"},
+  {"power_disconnected",                "1174,50;0,100;784,50"},
+  {"power_restored",                    "784,50;0,100;1174,50"},
+  {"power_insufficient",                "987,50;0,100;987,50;0,100;987,100"},
+  {"battery_critical_shutdown",         "2093,50;0,60;2093,50;0,60;2093,100"},
+  {"battery_voltage_critical_shutdown", "2093,50;0,60;2093,50;0,60;2093,100;0,60;2093,100"},
+};
+
+static const char *buzzer_lookup_event(const char *name) {
+  int i;
+  for (i = 0; i < ARRAY_SIZE(buzzer_events); i++) {
+    if (strcmp(name, buzzer_events[i].name) == 0)
+      return buzzer_events[i].seq;
+  }
+  return NULL;
+}
+
 static ssize_t buzzer_play_store(struct device *dev,
                                  struct device_attribute *attr,
                                  const char *buf, size_t count) {
@@ -482,6 +508,8 @@ static ssize_t buzzer_play_store(struct device *dev,
   char *tmp, *pair, *token;
   int i = 0;
   unsigned int single_freq;
+  const char *seq;
+  char trimmed[64];
 
   /* Cancel any ongoing playback */
   cancel_delayed_work_sync(&pi_dev->buzzer_work);
@@ -490,27 +518,43 @@ static ssize_t buzzer_play_store(struct device *dev,
   pi_dev->buzzer_note_index = 0;
   pi_dev->buzzer_playing = false;
 
-  /* Check for single-frequency mode (no comma or semicolon) */
+  /* Trim trailing newline */
+  strscpy(trimmed, buf, sizeof(trimmed));
+  trimmed[strcspn(trimmed, "\n")] = '\0';
+
+  /* Check for event name (no comma/semicolon, not a number) */
+  if (!strpbrk(trimmed, ",;") && sscanf(trimmed, "%u", &single_freq) != 1) {
+    seq = buzzer_lookup_event(trimmed);
+    if (seq) {
+      /* Found event -> use built-in sequence, skip kstrndup */
+      tmp = kstrdup(seq, GFP_KERNEL);
+      if (!tmp) return count;
+      goto parse_loop;
+    }
+    /* Unknown name, treat as stop */
+    mutex_lock(&pi_dev->lock);
+    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
+    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+    mutex_unlock(&pi_dev->lock);
+    dev_warn(dev, "buzzer_play: unknown event '%s'\n", trimmed);
+    return count;
+  }
+
+  /* Single-frequency mode (no comma/semicolon, is a number) */
   if (!strpbrk(buf, ",;")) {
     if (sscanf(buf, "%u", &single_freq) == 1) {
       if (single_freq == 0 || single_freq > 65534) {
-        /* Immediate stop */
         mutex_lock(&pi_dev->lock);
         __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
         __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
         mutex_unlock(&pi_dev->lock);
       } else {
-        /*
-         * Single continuous tone — auto-stop after safety timeout.
-         * Treated as a 1-note sequence so the work func handles turn-off.
-         */
         mutex_lock(&pi_dev->lock);
         __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L,
                               single_freq & 0xFF);
         __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H,
                               (single_freq >> 8) & 0xFF);
         mutex_unlock(&pi_dev->lock);
-
         pi_dev->buzzer_notes[0].freq = (u16)single_freq;
         pi_dev->buzzer_notes[0].duration_ms = PIPOWER5_BUZZER_MAX_SINGLE_MS;
         pi_dev->buzzer_note_count = 1;
@@ -523,16 +567,18 @@ static ssize_t buzzer_play_store(struct device *dev,
     return count;
   }
 
-  /* Blank/newline only → stop */
+  /* Blank/newline only -> stop */
   if (count <= 1)
     return count;
 
   /* Make a writable copy for strsep */
+parse_sequence:
   tmp = kstrndup(buf, count, GFP_KERNEL);
   if (!tmp)
     return -ENOMEM;
 
   /* Parse "freq,dur;freq,dur;..." pairs */
+parse_loop:
   pair = tmp;
   while ((token = strsep(&pair, ";\n")) != NULL) {
     unsigned int freq, dur;
@@ -594,21 +640,17 @@ static const char *buzzer_default_seq[] = {
   "2093,50;0,60;2093,50;0,60;2093,100;0,60;2093,100", /* voltage_critical */
 };
 
-/* Trigger buzzer for event. Called from poll_work when events fire. */
-void pipower5_buzzer_event(struct pipower5_device *pi_dev, int event_id)
+/* Event-triggered buzzer: lookup event name in table and play sequence */
+void pipower5_buzzer_event(struct pipower5_device *pi_dev, const char *event_name)
 {
-  const char *seq;
+  const char *seq = buzzer_lookup_event(event_name);
   char *tmp, *pair, *token;
   int i = 0;
   unsigned int freq, dur;
 
-  if (event_id < 0 || event_id >= BUZZ_EVENT_COUNT)
+  if (!seq)
     return;
-  if (!(buzz_on & (1 << event_id)))
-    return;
-
-  seq = buzzer_default_seq[event_id];
-  if (!seq || !*seq)
+  if (!buzz_on)  /* bitmask 0 = all disabled */
     return;
 
   cancel_delayed_work_sync(&pi_dev->buzzer_work);
