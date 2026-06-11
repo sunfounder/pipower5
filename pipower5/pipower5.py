@@ -37,6 +37,20 @@ class Event(StrEnum):
     BATTERY_VOLTAGE_CRITICAL_SHUTDOWN = "battery_voltage_critical_shutdown"
 
 
+
+# Note name -> frequency (Hz) for buzzer sequences
+_NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
+def _note_freq(note_str):
+    import re
+    m = re.match(r'^([A-G]#?)(\d)$', note_str)
+    if not m:
+        return 0
+    name, octave = m.groups()
+    note_idx = _NOTE_NAMES.index(name)
+    midi = note_idx + (int(octave) + 1) * 12
+    return int(440 * (2 ** ((midi - 69) / 12)))
+
 class PiPower5:
     """PiPower5 hardware interface -  reads sensors via sysfs, writes via sysfs."""
 
@@ -112,10 +126,11 @@ class PiPower5:
         elif isinstance(sequence, list):
             parts = []
             for n in sequence:
-                if n[0] == 'pause':
+                if n[0] in ('pause', 'PAUSE', 'P', 'p'):
                     parts.append(f"0,{n[1]}")
-                elif isinstance(n[0], str) and n[0] in self._NOTE_FREQ:
-                    parts.append(f"{self._NOTE_FREQ[n[0]]},{n[1]}")
+                elif isinstance(n[0], str) and n[0][0] in 'ABCDEFG':
+                    freq = _note_freq(n[0])
+                    parts.append(f"{freq},{n[1]}")
                 else:
                     parts.append(f"{n[0]},{n[1]}")
             s = ";".join(parts)
