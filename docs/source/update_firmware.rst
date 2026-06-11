@@ -1,9 +1,9 @@
-Update PiPower5 Firmware Using Raspberry Pi
+Actualizar el Firmware de PiPower5 Usando Raspberry Pi
 ===================================================================
 
-This guide explains how to update the firmware of **PiPower5** on a Raspberry Pi.  
+Esta guía explica cómo actualizar el firmware de **PiPower5** en una Raspberry Pi.
 
-**1. Download** ``pipower5_update_tools`` **and install dependencies**
+**1. Descargar** ``pipower5_update_tools`` **e instalar dependencias**
 
 .. code-block:: shell
 
@@ -12,102 +12,102 @@ This guide explains how to update the firmware of **PiPower5** on a Raspberry Pi
    sudo pip3 install blessed --break
    sudo pip3 install smbus2 --break
 
-**2. Check for updates**
+**2. Comprobar actualizaciones**
 
 .. code-block:: shell
 
    cd pipower5_update_tools
    git pull
 
-**3. Run the update tool**
+**3. Ejecutar la herramienta de actualización**
 
 .. code-block:: shell
 
    python3 run.py
 
-**4. Stop the service if prompted**
+**4. Detener el servicio si se solicita**
 
-When running ``pipower5_update_tools``, you may be prompted to stop ``pipower5.service``.  Press ``Y`` to stop the service.  
+Al ejecutar ``pipower5_update_tools``, se le puede pedir que detenga ``pipower5.service``. Presione ``Y`` para detener el servicio.
 
 .. image:: img/upd_frw_1.png
 
-**5. Select** ``Update Firmware``
+**5. Seleccionar** ``Update Firmware``
 
-Choose **Update Firmware**. The Raspberry Pi will send a command that switches PiPower5 into **BOOT mode**.  
+Elija **Update Firmware**. La Raspberry Pi enviará un comando que cambia PiPower5 al **modo BOOT**.
 
 .. image:: img/upd_frw_2.png
 
-**6. Verify BOOT mode**
+**6. Verificar el modo BOOT**
 
-Once successfully in BOOT mode, the **two middle LEDs** on the PiPower5 will flash alternately, indicating BOOT mode is active.  
+Una vez en modo BOOT con éxito, los **dos LEDs centrales** en el PiPower5 parpadearán alternativamente, indicando que el modo BOOT está activo.
 
 .. image:: img/upd_frw_3.png
 
-**7. Choose the firmware file**
+**7. Elegir el archivo de firmware**
 
-Select a firmware file in ``.bin`` format and press ``Enter`` to start writing.  
+Seleccione un archivo de firmware en formato ``.bin`` y presione ``Enter`` para comenzar la escritura.
 
 .. image:: img/upd_frw_4.png
 
-**8. Complete the update**
+**8. Completar la actualización**
 
-After flashing is complete, select **Restart**.  
-PiPower5 will reboot and start running the new firmware.  
+Después de completar el flasheo, seleccione **Restart**.
+PiPower5 se reiniciará y comenzará a ejecutar el nuevo firmware.
 
 .. image:: img/upd_frw_5.png
 
 ----------------------------------------------------------------
 
-**Restore Factory Firmware**
+**Restaurar Firmware de Fábrica**
 
-If you need to roll back to the factory firmware, use the **Restore Factory Firmware** option in ``pipower5_update_tools``.  
-This will reload the firmware stored in the factory partition and revert to the original version.  
+Si necesita volver al firmware de fábrica, use la opción **Restore Factory Firmware** en ``pipower5_update_tools``.
+Esto recargará el firmware almacenado en la partición de fábrica y volverá a la versión original.
 
 .. image:: img/upd_frw_6.png
 
 
 ----------------------------------------------------------------
 
-**Force BOOT Mode**
+**Forzar Modo BOOT**
 
-If you cannot enter BOOT mode normally, you can force it:
+Si no puede entrar en modo BOOT normalmente, puede forzarlo:
 
-1. Power off PiPower5.  
-2. Short the **Boot 1 pin**.  
-3. Power on the device.  
+1. Apague PiPower5.
+2. Cortocircuite el **pin Boot 1**.
+3. Encienda el dispositivo.
 
-PiPower5 will start directly in BOOT mode.  
+PiPower5 se iniciará directamente en modo BOOT.
 
 .. image:: img/upd_frw_7.png
 
-To exit BOOT mode, press and hold the power button for two seconds.  
-PiPower5 will then reboot into normal mode.  
+Para salir del modo BOOT, mantenga presionado el botón de encendido durante dos segundos.
+PiPower5 se reiniciará en modo normal.
 
 .. image:: img/upd_frw_8.png
 
 ----------------------------------------------------------------
 
-**Troubleshooting**
+**Solución de Problemas**
 
 
-Here are some common issues you may encounter during the update process and their solutions:
+Aquí hay algunos problemas comunes que puede encontrar durante el proceso de actualización y sus soluciones:
 
-- **Device not detected**  
+- **Dispositivo no detectado**
 
-  - Try rebooting both the Raspberry Pi and PiPower5, then re-run the update tool.  
+  - Intente reiniciar tanto la Raspberry Pi como PiPower5, luego vuelva a ejecutar la herramienta de actualización.
 
-- **Failed to enter BOOT mode**  
+- **Fallo al entrar en modo BOOT**
 
-  - Ensure that ``pipower5.service`` is stopped before updating.  
-  - If automatic BOOT mode fails, use the **Force BOOT Mode** method (shorting the Boot 1 pin).  
+  - Asegúrese de que ``pipower5.service`` esté detenido antes de actualizar.
+  - Si el modo BOOT automático falla, use el método de **Forzar Modo BOOT** (cortocircuitando el pin Boot 1).
 
-- **Update process stuck or flashing failed**  
+- **Proceso de actualización atascado o flasheo fallido**
 
-  - Double-check that the firmware file is in ``.bin`` format.  
-  - Re-run the update tool and try again.  
-  - Use a stable power supply to prevent interruptions during flashing.  
+  - Verifique que el archivo de firmware esté en formato ``.bin``.
+  - Vuelva a ejecutar la herramienta de actualización e intente de nuevo.
+  - Use una fuente de alimentación estable para prevenir interrupciones durante el flasheo.
 
-- **Firmware update completed, but device not working properly**  
+- **Actualización de firmware completada, pero el dispositivo no funciona correctamente**
 
-  - Restore the factory firmware using the built-in tool.  
-  - If the problem persists, verify that the firmware file matches your PiPower5 version.  
+  - Restaure el firmware de fábrica usando la herramienta integrada.
+  - Si el problema persiste, verifique que el archivo de firmware coincida con su versión de PiPower5.

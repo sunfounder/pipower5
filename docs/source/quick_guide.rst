@@ -1,63 +1,63 @@
-Quick User Guide
+Guía Rápida de Usuario
 ===============================
 
-This guide helps you quickly get started with PiPower 5 after hardware assembly.
+Esta guía le ayuda a comenzar rápidamente con PiPower 5 después del montaje del hardware.
 
-Charge the Battery
+Cargar la Batería
 ----------------------------------------------------
 
-Before first use, fully charge the battery.
+Antes del primer uso, cargue completamente la batería.
 
-Recommendations:
+Recomendaciones:
 
-- Use a high-quality USB-C power adapter
-- A 5V 5A power supply is recommended for Raspberry Pi 5
-- Higher-power adapters are recommended when using SSDs or other high-power peripherals
+- Use un adaptador de corriente USB-C de alta calidad
+- Se recomienda una fuente de alimentación de 5V 5A para Raspberry Pi 5
+- Se recomiendan adaptadores de mayor potencia al usar SSD u otros periféricos de alto consumo
 
-While Charging:
+Durante la Carga:
 
-- Use a high-quality USB-C power supply to charge PiPower 5.
+- Use una fuente de alimentación USB-C de alta calidad para cargar PiPower 5.
 
   .. image:: img/power_input.png
      :width: 50%
      :align: center
 
-- During charging, the battery indicator LEDs light up progressively in sequence. 
+- Durante la carga, los LEDs indicadores de batería se encienden progresivamente en secuencia.
 
   .. image:: img/battery_indicator.png
      :width: 50%
      :align: center
 
-  Battery status is indicated by the number of lit LEDs:
-  
-  * **4 LEDs lit**: Battery >80%
-  * **3 LEDs lit**: 60%< Battery <80%
-  * **2 LEDs lit**: 40%< Battery <60%
-  * **1 LED lit**: 20%< Battery <40%
-  * **First LED flashing**: Battery <20%
-  * **LEDs incrementally light up in a cycle**: Charging
-  * **Middle two LEDs flashing**: Waiting for shutdown signal
-  * **All LEDs off**: Unpowered or in sleep mode
-  * During charging, the indicator remains lit **even in the off state** until fully charged.
-  
-Power On
+  El estado de la batería se indica por el número de LEDs encendidos:
+
+  * **4 LEDs encendidos**: Batería >80%
+  * **3 LEDs encendidos**: 60%< Batería <80%
+  * **2 LEDs encendidos**: 40%< Batería <60%
+  * **1 LED encendido**: 20%< Batería <40%
+  * **Primer LED parpadeando**: Batería <20%
+  * **LEDs se encienden incrementalmente en un ciclo**: Cargando
+  * **Dos LEDs centrales parpadeando**: Esperando señal de apagado
+  * **Todos los LEDs apagados**: Sin alimentación o en modo reposo
+  * Durante la carga, el indicador permanece encendido **incluso en estado apagado** hasta que esté completamente cargado.
+
+Encender
 ----------------------------------------------------
 
-For Raspberry Pi devices, no additional power wiring is required. PiPower 5 supplies power directly through the GPIO header.
+Para dispositivos Raspberry Pi, no se requiere cableado de alimentación adicional. PiPower 5 suministra alimentación directamente a través del conector GPIO.
 
-For other devices, you can power them using:
+Para otros dispositivos, puede alimentarlos usando:
 
-- The USB-A output port
-- The 5V/GND pins next to the USB-A port
+- El puerto de salida USB-A
+- Los pines 5V/GND junto al puerto USB-A
 
 .. image:: img/power_output.png
    :width: 50%
    :align: center
 
-Press the power button once to turn on PiPower 5. When powered on:
+Presione el botón de encendido una vez para encender PiPower 5. Cuando está encendido:
 
-- The **PWR LED** lights up
-- The connected device begins receiving power from PiPower 5
+- El **LED PWR** se enciende
+- El dispositivo conectado comienza a recibir alimentación de PiPower 5
 
 .. image:: img/pwr_led.png
    :width: 50%
@@ -67,29 +67,29 @@ Press the power button once to turn on PiPower 5. When powered on:
     :start-after: start_install_pipower5
     :end-before: end_install_pipower5
 
-Open the Web Dashboard
+Abrir el Panel de Control Web
 ----------------------------------------------------
 
-After installation, open the dashboard in your browser:
+Después de la instalación, abra el panel de control en su navegador:
 
 .. code-block:: text
 
-   http://<raspberry-pi-ip>:34001
+   http://<dirección-ip-raspberry-pi>:34001
 
-The dashboard allows you to:
+El panel de control le permite:
 
-- View battery percentage
-- Monitor charging status
-- Check voltage and current
-- Configure shutdown percentage
-- Manage notifications
+- Ver el porcentaje de batería
+- Monitorear el estado de carga
+- Verificar voltaje y corriente
+- Configurar el porcentaje de apagado
+- Gestionar notificaciones
 
 .. image:: img/web_dashboard.png
    :width: 100%
    :align: center
 
 
-Safe Shutdown
+Apagado Seguro
 ----------------------------------------------------
 
 .. include:: /pipower5_software.rst
@@ -98,14 +98,14 @@ Safe Shutdown
 
 .. note::
 
-   For advanced features and detailed configuration options, including:
+   Para funciones avanzadas y opciones de configuración detalladas, incluyendo:
 
-   - Power monitoring commands
-   - Notification settings
-   - Buzzer alerts
-   - Email alerts
-   - Advanced configuration
+   - Comandos de monitoreo de alimentación
+   - Configuración de notificaciones
+   - Alertas de zumbador
+   - Alertas de correo electrónico
+   - Configuración avanzada
 
-   Please refer to:
+   Consulte:
 
    * :ref:`pipower5_tool`

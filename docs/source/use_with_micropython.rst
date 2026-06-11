@@ -1,19 +1,19 @@
 MicroPython
 ==========================================================
 
-We provide a library that allows you to monitor input and output voltages, battery voltage and percentage, power source, charging status, and other internal data.
+Proporcionamos una biblioteca que le permite monitorear voltajes de entrada y salida, voltaje y porcentaje de batería, fuente de alimentación, estado de carga y otros datos internos.
 
-If you are using the PiPower 5 to power your Raspberry Pi Pico or ESP32 board, you can connect the board to the PiPower 5 via the Type-A output port or two jumper wires.
+Si está usando el PiPower 5 para alimentar su placa Raspberry Pi Pico o ESP32, puede conectar la placa al PiPower 5 a través del puerto de salida Tipo-A o dos cables jumper.
 
-To connect the PiPower 5's I2C interface, use a jumper. 
+Para conectar la interfaz I2C del PiPower 5, use un jumper.
 
-.. If no operations are needed before shutting down, connect the SDSIG jumper cap directly to the GND pin. If operations are required before shutdown, remove the jumper cap and connect the intermediate wire to an I/O pin on the Raspberry Pi Pico or ESP32 board. This setup notifies the PiPower 5 that the shutdown process is complete and it can safely power off.
+.. Si no se necesitan operaciones antes de apagar, conecte el jumper SDSIG directamente al pin GND. Si se requieren operaciones antes del apagado, retire el jumper y conecte el cable intermedio a un pin I/O en la placa Raspberry Pi Pico o ESP32. Esta configuración notifica al PiPower 5 que el proceso de apagado está completo y puede apagarse de forma segura.
 
-#. Download the library from GitHub. You can quickly download it using the link below or visit: https://github.com/sunfounder/micropython_spc.
+#. Descargue la biblioteca desde GitHub. Puede descargarla rápidamente usando el enlace de abajo o visite: https://github.com/sunfounder/micropython_spc.
 
    * :download:`micropython_spc <https://github.com/sunfounder/micropython_spc/archive/refs/heads/main.zip>`
 
-#. After downloading and unzipping, upload the ``spc`` folder to your Raspberry Pi Pico or ESP32 Board. Thonny is recommended for this purpose.
+#. Después de descargar y descomprimir, suba la carpeta ``spc`` a su placa Raspberry Pi Pico o ESP32. Se recomienda Thonny para este propósito.
 
    .. image:: img/micropython_upload.png
        :width: 100%
@@ -23,17 +23,17 @@ To connect the PiPower 5's I2C interface, use a jumper.
 
       <br/>
 
-#. Once the library is uploaded, you can test it using examples provided in the ``micropython_spc-main/examples/pipower5`` folder:
+#. Una vez que la biblioteca esté cargada, puede probarla usando los ejemplos proporcionados en la carpeta ``micropython_spc-main/examples/pipower5``:
 
-   * ``pipower_5_read_all.py``: Use this example if you need to read all data. It demonstrates how to read all available data at once and process them individually.
-   
-   * ``pipower_5_read_individual.py``: This example provides instructions for reading specific data individually. Use it if you only need to access certain data.
-   
-   * ``pipower_5_set_shutdown_percentage.py``: This example explains how to set the shutdown battery percentage. When the battery is not charging and its level drops below the specified percentage, the PiPower 5 sends a shutdown signal to the host. It powers off only after the host has completed shutdown and sent back a power-off signal.
-   
-     * For SBCs (e.g., Raspberry Pi): No additional configuration is required.
-     * For microcontrollers: Remove the **SDSIG** jumper cap and connect the intermediate wire to a pin. After receiving the shutdown signal and safely shutting down, pull this pin high to notify the PiPower 5 to power off.
-     
-   * ``pipower_5_shutdown_when_request.py``: This example demonstrates how to handle operations after receiving a shutdown signal. You need to remove the **SDSIG** jumper cap and connect the intermediate wire to a pin.
+   * ``pipower_5_read_all.py``: Use este ejemplo si necesita leer todos los datos. Demuestra cómo leer todos los datos disponibles a la vez y procesarlos individualmente.
 
-Micropython Library API Documentation: https://github.com/sunfounder/micropython_spc?tab=readme-ov-file#api
+   * ``pipower_5_read_individual.py``: Este ejemplo proporciona instrucciones para leer datos específicos individualmente. Úselo si solo necesita acceder a ciertos datos.
+
+   * ``pipower_5_set_shutdown_percentage.py``: Este ejemplo explica cómo establecer el porcentaje de batería para apagado. Cuando la batería no se está cargando y su nivel cae por debajo del porcentaje especificado, el PiPower 5 envía una señal de apagado al host. Se apaga solo después de que el host haya completado el apagado y enviado una señal de corte de alimentación.
+
+     * Para SBCs (ej., Raspberry Pi): No se requiere configuración adicional.
+     * Para microcontroladores: Retire el jumper **SDSIG** y conecte el cable intermedio a un pin. Después de recibir la señal de apagado y apagarse de forma segura, ponga este pin en alto para notificar al PiPower 5 que se apague.
+
+   * ``pipower_5_shutdown_when_request.py``: Este ejemplo demuestra cómo manejar operaciones después de recibir una señal de apagado. Necesita retirar el jumper **SDSIG** y conectar el cable intermedio a un pin.
+
+Documentación de la API de la Biblioteca Micropython: https://github.com/sunfounder/micropython_spc?tab=readme-ov-file#api

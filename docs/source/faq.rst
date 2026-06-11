@@ -1,35 +1,35 @@
 .. note::
 
-    Hello, welcome to the SunFounder Raspberry Pi & Arduino & ESP32 Enthusiasts Community on Facebook! Dive deeper into Raspberry Pi, Arduino, and ESP32 with fellow enthusiasts.
+    ¡Hola, bienvenido a la Comunidad de Entusiastas de Raspberry Pi & Arduino & ESP32 de SunFounder en Facebook! Profundice en Raspberry Pi, Arduino y ESP32 con otros entusiastas.
 
-    **Why Join?**
+    **¿Por qué unirse?**
 
-    - **Expert Support**: Solve post-sale issues and technical challenges with help from our community and team.
-    - **Learn & Share**: Exchange tips and tutorials to enhance your skills.
-    - **Exclusive Previews**: Get early access to new product announcements and sneak peeks.
-    - **Special Discounts**: Enjoy exclusive discounts on our newest products.
-    - **Festive Promotions and Giveaways**: Take part in giveaways and holiday promotions.
+    - **Soporte Experto**: Resuelva problemas posventa y desafíos técnicos con la ayuda de nuestra comunidad y equipo.
+    - **Aprenda y Comparta**: Intercambie consejos y tutoriales para mejorar sus habilidades.
+    - **Avances Exclusivos**: Obtenga acceso anticipado a anuncios de nuevos productos y adelantos.
+    - **Descuentos Especiales**: Disfrute de descuentos exclusivos en nuestros productos más nuevos.
+    - **Promociones Festivas y Sorteos**: Participe en sorteos y promociones navideñas.
 
-    👉 Ready to explore and create with us? Click [|link_sf_facebook|] and join today!
+    👉 ¿Listo para explorar y crear con nosotros? ¡Haga clic [|link_sf_facebook|] y únase hoy!
 
 .. _faq:
 
-FAQ
+Preguntas Frecuentes
 ===
 
-How to Reinstall PiPower 5
+Cómo Reinstalar PiPower 5
 --------------------------
 
-If PiPower 5 is not working correctly and you want to perform a clean reinstall, follow these steps:
+Si PiPower 5 no funciona correctamente y desea realizar una reinstalación limpia, siga estos pasos:
 
-**1. Uninstall the current installation:**
+**1. Desinstalar la instalación actual:**
 
 .. code-block:: shell
 
    cd ~/pipower5
    sudo python3 install.py --uninstall
 
-**2. Reinstall from source:**
+**2. Reinstalar desde la fuente:**
 
 .. code-block:: shell
 
@@ -37,9 +37,9 @@ If PiPower 5 is not working correctly and you want to perform a clean reinstall,
    cd pipower5
    sudo python3 install.py
 
-**3. Reboot the Raspberry Pi when prompted.**
+**3. Reinicie la Raspberry Pi cuando se le solicite.**
 
-After reboot, verify the installation:
+Después de reiniciar, verifique la instalación:
 
 .. code-block:: shell
 
@@ -48,51 +48,51 @@ After reboot, verify the installation:
 
 .. tip::
 
-   If the ``~/pipower5`` directory no longer exists from the original installation, skip the uninstall step and go directly to the reinstall step.
+   Si el directorio ``~/pipower5`` ya no existe de la instalación original, omita el paso de desinstalación y vaya directamente al paso de reinstalación.
 
 
-Dashboard Shows "Database Required" or No Data
-----------------------------------------------
+El Panel Muestra "Base de Datos Requerida" o No Hay Datos
+---------------------------------------------------------
 
-**What you see**: The Web Dashboard opens normally in your browser, but all data panels are empty or show "database required".
+**Lo que ve**: El Panel de Control Web se abre normalmente en su navegador, pero todos los paneles de datos están vacíos o muestran "base de datos requerida".
 
-**What this usually means**: This is rarely a hardware problem. In most cases, the InfluxDB backend has a configuration issue — a corrupted database, a missing bucket, or an expired token.
+**Lo que esto significa generalmente**: Rara vez es un problema de hardware. En la mayoría de los casos, el backend InfluxDB tiene un problema de configuración — una base de datos corrupta, un bucket faltante o un token expirado.
 
-**Check these, in order:**
+**Compruebe esto, en orden:**
 
-1. **Check that the PiPower 5 service is running:**
+1. **Compruebe que el servicio PiPower 5 esté en ejecución:**
 
    .. code-block:: shell
 
       sudo systemctl status pipower5
 
-   If the service is not active, start it:
+   Si el servicio no está activo, inícielo:
 
    .. code-block:: shell
 
       sudo systemctl start pipower5
 
-2. **Check whether the InfluxDB bucket exists:**
+2. **Compruebe si el bucket de InfluxDB existe:**
 
    .. code-block:: shell
 
       sudo influx bucket list
 
-   Look for a bucket named ``pipower5`` in the output. If it is missing, the database needs to be recreated.
+   Busque un bucket llamado ``pipower5`` en la salida. Si falta, la base de datos necesita ser recreada.
 
-3. **Check the service logs for errors:**
+3. **Compruebe los registros del servicio en busca de errores:**
 
    .. code-block:: shell
 
       journalctl -u pipower5 -n 50
 
-   Look for error messages related to InfluxDB, such as:
+   Busque mensajes de error relacionados con InfluxDB, como:
 
-   - ``unauthorized`` or ``token`` — indicates an authentication token issue.
-   - ``bucket not found`` — the database bucket is missing.
-   - ``connection refused`` — InfluxDB is not running.
+   - ``unauthorized`` o ``token`` — indica un problema de token de autenticación.
+   - ``bucket not found`` — el bucket de la base de datos no existe.
+   - ``connection refused`` — InfluxDB no está en ejecución.
 
-4. **If InfluxDB itself is down**, restart it:
+4. **Si InfluxDB mismo está caído**, reinícielo:
 
    .. code-block:: shell
 
@@ -101,4 +101,4 @@ Dashboard Shows "Database Required" or No Data
 
 .. note::
 
-   If InfluxDB was installed manually or migrated from an older version, configuration paths or authentication tokens may have changed. In that case, a clean reinstall of PiPower 5 (see above) will also reinitialize the InfluxDB setup.
+   Si InfluxDB se instaló manualmente o se migró desde una versión anterior, las rutas de configuración o los tokens de autenticación pueden haber cambiado. En ese caso, una reinstalación limpia de PiPower 5 (ver arriba) también reinicializará la configuración de InfluxDB.

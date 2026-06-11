@@ -3,21 +3,21 @@
 Python
 ------------------------------------------------------
 
-You can also interact with PiPower using Python.
+También puede interactuar con PiPower usando Python.
 
 .. code-block:: shell
 
    source /opt/pipower5/venv/bin/activate
 
-We provide several Python examples to demonstrate different use cases. Navigate to the examples directory to explore them:
+Proporcionamos varios ejemplos de Python para demostrar diferentes casos de uso. Navegue al directorio de ejemplos para explorarlos:
 
 .. code-block:: shell
 
    cd ~/pipower5/examples
 
-Here are the available scripts and their functions:
+Aquí están los scripts disponibles y sus funciones:
 
-- ``read_all.py``: Reads all PiPower 5 status information at once and processes each item individually.
-- ``read_individual.py``: Demonstrates how to read specific PiPower 5 data items individually.
-- ``set_shutdown_percentage.py``: Configures the shutdown percentage. When the battery level falls below the configured threshold, PiPower 5 sends a shutdown request to the host and cuts power after shutdown completes.
-- ``read_power_btn.py``: Reads the current state of the PiPower 5 power button.
+- ``read_all.py``: Lee toda la información de estado de PiPower 5 de una vez y procesa cada elemento individualmente.
+- ``read_individual.py``: Demuestra cómo leer elementos de datos específicos de PiPower 5 individualmente.
+- ``set_shutdown_percentage.py``: Configura el porcentaje de apagado. Cuando el nivel de batería cae por debajo del umbral configurado, PiPower 5 envía una solicitud de apagado al host y corta la alimentación después de completar el apagado.
+- ``read_power_btn.py``: Lee el estado actual del botón de encendido de PiPower 5.

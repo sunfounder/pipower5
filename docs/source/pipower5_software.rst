@@ -1,68 +1,68 @@
 .. _pipower5_tool:
 
-PiPower 5 Tool
+Herramienta PiPower 5
 ===============================
 
-The PiPower 5 Tool is the companion software for PiPower 5.
+La Herramienta PiPower 5 es el software complementario para PiPower 5.
 
-It provides:
+Proporciona:
 
-- Safe shutdown support
-- Battery and charging management
-- Power monitoring
-- Web Dashboard access
-- Event notifications
+- Soporte de apagado seguro
+- Gestión de batería y carga
+- Monitoreo de alimentación
+- Acceso al Panel de Control Web
+- Notificaciones de eventos
 
-PiPower 5 can send shutdown requests to the Raspberry Pi in the following situations:
+PiPower 5 puede enviar solicitudes de apagado al Raspberry Pi en las siguientes situaciones:
 
-- The PiPower button is held for 2 seconds
-- Battery level falls below the configured shutdown percentage
+- El botón PiPower se mantiene presionado durante 2 segundos
+- El nivel de batería cae por debajo del porcentaje de apagado configurado
 
-After the Raspberry Pi completes shutdown, PiPower 5 can automatically disconnect power to help prevent SD card corruption and unexpected power loss issues.
+Después de que el Raspberry Pi complete el apagado, PiPower 5 puede desconectar automáticamente la alimentación para ayudar a prevenir la corrupción de la tarjeta SD y problemas de pérdida inesperada de alimentación.
 
 .. start_install_pipower5
 
-Install ``pipower5`` Tool
+Instalar la Herramienta ``pipower5``
 ----------------------------------------------------
 
-Install the PiPower 5 Tool:
+Instale la Herramienta PiPower 5:
 
-1. Clone the repository:
+1. Clonar el repositorio:
 
    .. code-block:: shell
 
       git clone https://github.com/sunfounder/pipower5
 
-2. Enter the directory:
+2. Entrar en el directorio:
 
    .. code-block:: shell
 
       cd pipower5
 
-3. Run the installer:
+3. Ejecutar el instalador:
 
    .. code-block:: shell
 
       sudo python3 install.py
 
-4. Reboot the Raspberry Pi when prompted.
+4. Reinicie el Raspberry Pi cuando se le solicite.
 
 .. end_install_pipower5
 
-Command Reference
+Referencia de Comandos
 ---------------------------------------
 
-The ``pipower5`` tool provides access to PiPower 5 status information and configuration options.
+La herramienta ``pipower5`` proporciona acceso a la información de estado y opciones de configuración de PiPower 5.
 
-For example, the following command displays the current PiPower 5 status:
+Por ejemplo, el siguiente comando muestra el estado actual de PiPower 5:
 
 .. code-block:: shell
 
    pipower5 -a
 
-Example output:
+Ejemplo de salida:
 
-.. code-block:: 
+.. code-block::
 
    Input:
       voltage: 0 mV
@@ -88,9 +88,9 @@ Example output:
       default on: on
       shutdown percentage: 10 %
 
-You can customize these settings to fit your needs.
+Puede personalizar estas configuraciones según sus necesidades.
 
-Use ``pipower5`` or ``pipower5 -h`` for instructions.
+Use ``pipower5`` o ``pipower5 -h`` para instrucciones.
 
 .. code-block:: text
 
@@ -109,118 +109,118 @@ Use ``pipower5`` or ``pipower5 -h`` for instructions.
   PiPower 5
 
   positional arguments:
-    {start,stop}          Command
+    {start,stop}          Comando
 
   options:
-    -h, --help            show this help message and exit
-    -v, --version         Show version
-    -c, --config          Show config
+    -h, --help            mostrar este mensaje de ayuda y salir
+    -v, --version         Mostrar versión
+    -c, --config          Mostrar configuración
     -drd [DATABASE_RETENTION_DAYS], --database-retention-days [DATABASE_RETENTION_DAYS]
-                          Database retention days
+                          Días de retención de la base de datos
     -dl [{debug,info,warning,error,critical}], --debug-level [{debug,info,warning,error,critical}]
-                          Debug level
+                          Nivel de depuración
     -rd, --remove-dashboard
-                          Remove dashboard
+                          Eliminar panel de control
     -cp [CONFIG_PATH], --config-path [CONFIG_PATH]
-                          Config path
+                          Ruta de configuración
     -sp [SHUTDOWN_PERCENTAGE], --shutdown-percentage [SHUTDOWN_PERCENTAGE]
-                          Set shutdown percentage, leave empty to read
-    -iv, --input-voltage  Read input voltage
-    -ic, --input-current  Read input current
+                          Establecer porcentaje de apagado, dejar vacío para leer
+    -iv, --input-voltage  Leer voltaje de entrada
+    -ic, --input-current  Leer corriente de entrada
     -ov, --output-voltage
-                          Read output voltage
+                          Leer voltaje de salida
     -oc, --output-current
-                          Read output current
+                          Leer corriente de salida
     -bv, --battery-voltage
-                          Read battery voltage
+                          Leer voltaje de batería
     -bc, --battery-current
-                          Read battery current
+                          Leer corriente de batería
     -bp, --battery-percentage
-                          Read battery percentage
+                          Leer porcentaje de batería
     -bs, --battery-source
-                          Read battery source
+                          Leer fuente de batería
     -ii, --is-input-plugged_in
-                          Read is input plugged in
-    -ichg, --is-charging  Read is charging
-    -do, --default-on     Read default on
+                          Leer si la entrada está conectada
+    -ichg, --is-charging  Leer si está cargando
+    -do, --default-on     Leer encendido predeterminado
     -sr, --shutdown-request
-                          Read shutdown request
-    -pb, --power-btn      Read power button
+                          Leer solicitud de apagado
+    -pb, --power-btn      Leer botón de encendido
     -cc, --charging-current
-                          Max charging current
-    -a, --all             Show all status
-    -fv, --firmware       PiPower5 firmware version
+                          Corriente máxima de carga
+    -a, --all             Mostrar todo el estado
+    -fv, --firmware       Versión de firmware de PiPower5
     -pfs [POWER_FAILURE_SIMULATION], --power-failure-simulation [POWER_FAILURE_SIMULATION]
-                          Power failure simulation
+                          Simulación de fallo de alimentación
     -seo [SEND_EMAIL_ON], --send-email-on [SEND_EMAIL_ON]
-                          Send email on: ['battery_activated', 'low_battery',
+                          Enviar correo en: ['battery_activated', 'low_battery',
                           'power_disconnected', 'power_restored',
                           'power_insufficient', 'battery_critical_shutdown',
                           'battery_voltage_critical_shutdown']
     -set [SEND_EMAIL_TO], --send-email-to [SEND_EMAIL_TO]
-                          Email address to send email to
+                          Dirección de correo para enviar
     -ss [SMTP_SERVER], --smtp-server [SMTP_SERVER]
-                          SMTP server
+                          Servidor SMTP
     -smp [SMTP_PORT], --smtp-port [SMTP_PORT]
-                          SMTP port
+                          Puerto SMTP
     -se [SMTP_EMAIL], --smtp-email [SMTP_EMAIL]
-                          SMTP email
+                          Correo SMTP
     -spw [SMTP_PASSWORD], --smtp-password [SMTP_PASSWORD]
-                          SMTP password
+                          Contraseña SMTP
     -ssc [SMTP_SECURITY], --smtp-security [SMTP_SECURITY]
-                          SMTP security, 'none', 'ssl' or 'tls'
+                          Seguridad SMTP, 'none', 'ssl' o 'tls'
     -bzo [BUZZ_ON], --buzz-on [BUZZ_ON]
-                          Buzz on: ['battery_activated', 'low_battery',
+                          Zumbador en: ['battery_activated', 'low_battery',
                           'power_disconnected', 'power_restored',
                           'power_insufficient', 'battery_critical_shutdown',
                           'battery_voltage_critical_shutdown']
     -bzv [BUZZER_VOLUME], --buzzer-volume [BUZZER_VOLUME]
-                          Buzz volume
+                          Volumen del zumbador
     -bzt [BUZZER_TEST], --buzzer-test [BUZZER_TEST]
-                          Test buzzer on selected event.
+                          Probar zumbador en evento seleccionado.
     -u [{C,F}], --temperature-unit [{C,F}]
-                          Temperature unit
+                          Unidad de temperatura
 
 .. note::
 
-   Each time you modify the status of ``pipower5.service``, you need to use the following command to make the configuration changes take effect.
+   Cada vez que modifique el estado de ``pipower5.service``, necesita usar el siguiente comando para que los cambios de configuración surtan efecto.
 
    .. code-block:: shell
 
       sudo systemctl restart pipower5.service
 
-   Verify the pipower5 program status using the systemctl tool.
+   Verifique el estado del programa pipower5 usando la herramienta systemctl.
 
    .. code-block:: shell
 
       sudo systemctl status pipower5.service
 
-   Alternatively, inspect the program-generated log files.
+   Alternativamente, inspeccione los archivos de registro generados por el programa.
 
    .. code-block:: shell
 
       cat /opt/pipower5/log
 
-Web Dashboard
+Panel de Control Web
 ----------------------------------------------------
 
-The PiPower 5 Tool includes a built-in Web Dashboard for monitoring and configuration.
+La Herramienta PiPower 5 incluye un Panel de Control Web integrado para monitoreo y configuración.
 
-Access the dashboard from your browser:
+Acceda al panel de control desde su navegador:
 
 .. code-block:: text
 
-   http://<raspberry-pi-ip>:34001
+   http://<dirección-ip-raspberry-pi>:34001
 
-Dashboard features include:
+Las funciones del panel incluyen:
 
-- Battery percentage monitoring
-- Charging status monitoring
-- Input and output voltage monitoring
-- Current monitoring
-- Shutdown percentage configuration
-- Notification management
-- Raspberry Pi device information
+- Monitoreo del porcentaje de batería
+- Monitoreo del estado de carga
+- Monitoreo de voltaje de entrada y salida
+- Monitoreo de corriente
+- Configuración del porcentaje de apagado
+- Gestión de notificaciones
+- Información del dispositivo Raspberry Pi
 
 .. image:: img/web_dashboard.png
    :width: 100%
@@ -230,131 +230,131 @@ Dashboard features include:
    :width: 100%
    :align: center
 
-You can also configure the shutdown percentage directly from the dashboard:
+También puede configurar el porcentaje de apagado directamente desde el panel de control:
 
 .. image:: img/web_dashboard_3.png
    :width: 100%
    :align: center
 
-If you do not need the dashboard, remove it with:
+Si no necesita el panel de control, elimínelo con:
 
 .. code-block:: shell
 
    pipower5 --remove-dashboard
 
-Safe Shutdown
+Apagado Seguro
 ----------------------------------------------------
 
-PiPower 5 supports automatic safe shutdown protection for Raspberry Pi systems.
+PiPower 5 soporta protección de apagado seguro automático para sistemas Raspberry Pi.
 
-Shutdown workflow:
+Flujo de trabajo de apagado:
 
 .. code-block:: text
 
-   Shutdown triggered
-   -> Raspberry Pi performs safe shutdown
-   -> PiPower 5 detects shutdown completion
-   -> PiPower 5 automatically cuts power
+   Apagado activado
+   -> El Raspberry Pi realiza un apagado seguro
+   -> PiPower 5 detecta la finalización del apagado
+   -> PiPower 5 corta automáticamente la alimentación
 
-This helps prevent:
+Esto ayuda a prevenir:
 
-- SD card corruption
-- File system damage
-- Unexpected power loss issues
+- Corrupción de la tarjeta SD
+- Daños en el sistema de archivos
+- Problemas de pérdida inesperada de alimentación
 
 
-Power-Off After Raspberry Pi Shutdown
-++++++++++++++++++++++++++++++++++++++
+Corte de Alimentación Después del Apagado del Raspberry Pi
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 .. start_power_off_after_shutdown
 
-To allow PiPower 5 to automatically cut power after the Raspberry Pi shuts down, some additional configuration is required.
+Para permitir que PiPower 5 corte automáticamente la alimentación después de que el Raspberry Pi se apague, se requiere cierta configuración adicional.
 
-1. If you are using a **Raspberry Pi 4 or 5**:
+1. Si está usando un **Raspberry Pi 4 o 5**:
 
-   * Ensure the ``SDSIG`` jumper on PiPower 5 is connected to ``PI3V3``.
+   * Asegúrese de que el jumper ``SDSIG`` en PiPower 5 esté conectado a ``PI3V3``.
 
      .. image:: img/safe_shutdown_3v3.png
         :width: 400
 
-   * Open Raspberry Pi Configuration:
+   * Abra la Configuración de Raspberry Pi:
 
      .. code-block:: shell
-  
+
         sudo raspi-config
 
-   * Navigate to:
+   * Navegue a:
 
      .. code-block:: text
-  
+
         6 Advanced Options
         -> A11 Shutdown Behaviour
         -> B1 Full power off Switch off Pi ...
 
-   * Reboot the Raspberry Pi when prompted.
+   * Reinicie el Raspberry Pi cuando se le solicite.
 
-2. If you are using a **Raspberry Pi 3** or earlier:
+2. Si está usando un **Raspberry Pi 3** o anterior:
 
-   * Set the ``SDSIG`` jumper on PiPower 5 to ``GPIO26``.
+   * Configure el jumper ``SDSIG`` en PiPower 5 a ``GPIO26``.
 
      .. image:: img/safe_shutdown_io26.png
         :width: 400
-        
-   * Open ``/boot/firmware/config.txt``:
+
+   * Abra ``/boot/firmware/config.txt``:
 
      .. code-block:: shell
-  
+
         sudo nano /boot/firmware/config.txt
 
-   * Add the following lines:
+   * Agregue las siguientes líneas:
 
      .. code-block:: shell
-  
+
         dtoverlay=gpio-poweroff,gpio_pin=26,active_low=1
         gpio=26=op,dh
 
-   * Press ``Ctrl+X``, then ``Y``, and press ``Enter`` to save the file and exit.
-   
-   * Reboot the Raspberry Pi.
+   * Presione ``Ctrl+X``, luego ``Y``, y presione ``Enter`` para guardar el archivo y salir.
+
+   * Reinicie el Raspberry Pi.
 
      .. code-block:: shell
-  
+
         sudo reboot
 
-After configuration, PiPower 5 can automatically detect Raspberry Pi shutdown and safely disconnect power.
+Después de la configuración, PiPower 5 puede detectar automáticamente el apagado del Raspberry Pi y desconectar la alimentación de forma segura.
 
-Supported safe shutdown methods include:
+Los métodos de apagado seguro soportados incluyen:
 
-- Hold the PiPower button for 2 seconds
-- Shut down from the Raspberry Pi desktop menu
-- Run ``sudo shutdown now``
-- Automatic shutdown when battery level falls below the configured shutdown percentage
+- Mantener presionado el botón PiPower durante 2 segundos
+- Apagar desde el menú de escritorio del Raspberry Pi
+- Ejecutar ``sudo shutdown now``
+- Apagado automático cuando el nivel de batería cae por debajo del porcentaje de apagado configurado
 
 .. end_power_off_after_shutdown
 
-Configure Shutdown Percentage
+Configurar el Porcentaje de Apagado
 ++++++++++++++++++++++++++++++++++++++
 
-You can configure the battery percentage that triggers automatic shutdown.
+Puede configurar el porcentaje de batería que activa el apagado automático.
 
-Example:
+Ejemplo:
 
 .. code-block:: shell
 
    pipower5 -sp 30
 
-This sets the shutdown threshold to 30%.
+Esto establece el umbral de apagado al 30%.
 
-Then use the following command to make the configuration changes take effect.
+Luego use el siguiente comando para que los cambios de configuración surtan efecto.
 
 .. code-block:: shell
 
    sudo systemctl restart pipower5.service
 
-When the battery level falls below 30%, PiPower 5 will notify the Raspberry Pi to shut down and disconnect power automatically.
+Cuando el nivel de batería cae por debajo del 30%, PiPower 5 notificará al Raspberry Pi para que se apague y desconectará la alimentación automáticamente.
 
 
-You can also read the current shutdown percentage:
+También puede leer el porcentaje de apagado actual:
 
 .. code-block:: shell
 
@@ -362,67 +362,67 @@ You can also read the current shutdown percentage:
 
 .. tip::
 
-   For Raspberry Pi 5 systems with high power consumption (>3A), it is recommended to set the shutdown percentage to ``100%``.
+   Para sistemas Raspberry Pi 5 con alto consumo de energía (>3A), se recomienda establecer el porcentaje de apagado al ``100%``.
 
-   This ensures the Raspberry Pi shuts down immediately when external power is disconnected, helping protect the system and storage devices.
+   Esto asegura que el Raspberry Pi se apague inmediatamente cuando se desconecta la alimentación externa, ayudando a proteger el sistema y los dispositivos de almacenamiento.
 
 
-Power Monitoring
+Monitoreo de Alimentación
 ----------------------------------------------------
 
-PiPower 5 provides real-time monitoring for:
+PiPower 5 proporciona monitoreo en tiempo real de:
 
-- Battery percentage
-- Charging status
-- Input voltage
-- Output voltage
-- Input current
-- Output current
-- Battery voltage
-- Battery current
+- Porcentaje de batería
+- Estado de carga
+- Voltaje de entrada
+- Voltaje de salida
+- Corriente de entrada
+- Corriente de salida
+- Voltaje de batería
+- Corriente de batería
 
-Useful commands:
+Comandos útiles:
 
-Show battery percentage:
+Mostrar porcentaje de batería:
 
 .. code-block:: shell
 
    pipower5 -bp
 
-Show charging status:
+Mostrar estado de carga:
 
 .. code-block:: shell
 
    pipower5 -ichg
 
-Show input voltage:
+Mostrar voltaje de entrada:
 
 .. code-block:: shell
 
    pipower5 -iv
 
-Show all status information:
+Mostrar toda la información de estado:
 
 .. code-block:: shell
 
    pipower5 -a
 
-For the full command list:
+Para la lista completa de comandos:
 
 .. code-block:: shell
 
    pipower5 --help
 
 
-Notifications
+Notificaciones
 ----------------------------------------------------
 
-PiPower5 supports event-driven notifications through:
+PiPower5 soporta notificaciones basadas en eventos a través de:
 
-- Buzzer alerts
-- Email notifications
+- Alertas de zumbador
+- Notificaciones por correo electrónico
 
-Supported events include:
+Los eventos soportados incluyen:
 
 - ``battery_activated``
 - ``low_battery``
@@ -434,143 +434,143 @@ Supported events include:
 
 .. note::
 
-   Each time you modify the status of ``pipower5.service``, you need to use the following command to make the configuration changes take effect.
+   Cada vez que modifique el estado de ``pipower5.service``, necesita usar el siguiente comando para que los cambios de configuración surtan efecto.
 
    .. code-block:: shell
 
       sudo systemctl restart pipower5.service
 
-Event Descriptions
+Descripciones de Eventos
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
 1. ``battery_activated``
 
-   Triggered when the battery begins supplying power. This typically occurs if the external power source is disconnected or unable to provide sufficient power.
+   Se activa cuando la batería comienza a suministrar alimentación. Esto ocurre típicamente si la fuente de alimentación externa está desconectada o no puede proporcionar suficiente potencia.
 
-   * **Reset Condition**: Resets automatically after external power is disconnected.
+   * **Condición de Restablecimiento**: Se restablece automáticamente después de que la alimentación externa se desconecta.
 
 2. ``low_battery``
 
-   Activated when the battery charge level falls below the **configured shutdown threshold**.
+   Se activa cuando el nivel de carga de la batería cae por debajo del **umbral de apagado configurado**.
 
-   * **Repetition**: If the battery remains below this threshold, the event is triggered every 10 minutes.
-   * **Reset Condition**: Resets once the battery charge rises above **shutdown threshold + 5%**.
+   * **Repetición**: Si la batería permanece por debajo de este umbral, el evento se activa cada 10 minutos.
+   * **Condición de Restablecimiento**: Se restablece una vez que la carga de la batería sube por encima del **umbral de apagado + 5%**.
 
 3. ``power_disconnected``
 
-   Triggered when the external power source is disconnected.
+   Se activa cuando la fuente de alimentación externa se desconecta.
 
-   * **Reset Condition**: Resets once the external power supply is restored.
+   * **Condición de Restablecimiento**: Se restablece una vez que la alimentación externa se restaura.
 
 4. ``power_restored``
 
-   Triggered when the external power source is restored.
+   Se activa cuando la fuente de alimentación externa se restaura.
 
-   * **Reset Condition**: Resets if the external power is disconnected again.
+   * **Condición de Restablecimiento**: Se restablece si la alimentación externa se desconecta de nuevo.
 
 5. ``power_insufficient``
 
-   Occurs when the external power supply is insufficient, requiring the battery to provide supplemental power.
+   Ocurre cuando la alimentación externa es insuficiente, requiriendo que la batería proporcione energía suplementaria.
 
-   * **Recommended Action**: Check the rated output of the power source, or verify the configured charging power settings.
-   * **Reset Condition**: Resets when the external power source is disconnected.
+   * **Acción Recomendada**: Verifique la potencia nominal de la fuente de alimentación, o compruebe la configuración de potencia de carga.
+   * **Condición de Restablecimiento**: Se restablece cuando la fuente de alimentación externa se desconecta.
 
 6. ``battery_critical_shutdown``
 
-   Triggered just before the system shuts down due to **critically low battery capacity**.
+   Se activa justo antes de que el sistema se apague debido a una **capacidad de batería críticamente baja**.
 
 7. ``battery_voltage_critical_shutdown``
 
-   Triggered when the **battery voltage** drops below the critical threshold, leading to shutdown.
+   Se activa cuando el **voltaje de la batería** cae por debajo del umbral crítico, llevando al apagado.
 
-   * **Note**: This event is rarely triggered in normal use. Typically, the ``low_battery`` event will initiate a shutdown sequence before the voltage drops this far. This serves as a **failsafe shutdown mechanism**.
+   * **Nota**: Este evento rara vez se activa en uso normal. Típicamente, el evento ``low_battery`` iniciará una secuencia de apagado antes de que el voltaje caiga tanto. Esto sirve como un **mecanismo de apagado de seguridad**.
 
-With these events, PiPower5 provides both proactive warnings (e.g., low battery, insufficient power) and critical safeguards (e.g., shutdown triggers), ensuring stable operation and data protection.
+Con estos eventos, PiPower5 proporciona tanto advertencias proactivas (ej., batería baja, potencia insuficiente) como salvaguardas críticas (ej., activadores de apagado), asegurando un funcionamiento estable y protección de datos.
 
 
 
-Buzzer Alerts
+Alertas de Zumbador
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
-PiPower5 supports buzzer notifications for different system events.
+PiPower5 soporta notificaciones de zumbador para diferentes eventos del sistema.
 
-You can configure buzzer alerts through the **Web Dashboard** or the **command-line tool**.  
-When a configured event occurs, PiPower5 will play the corresponding buzzer sound.
+Puede configurar las alertas de zumbador a través del **Panel de Control Web** o la **herramienta de línea de comandos**.
+Cuando ocurre un evento configurado, PiPower5 reproducirá el sonido de zumbador correspondiente.
 
-Features include:
+Las características incluyen:
 
-- Event-based buzzer notifications
-- Adjustable buzzer volume (1–10)
-- Event sound preview
-- Custom sound effect support
+- Notificaciones de zumbador basadas en eventos
+- Volumen de zumbador ajustable (1–10)
+- Vista previa de sonido de eventos
+- Soporte para efectos de sonido personalizados
 
-Advanced users can also create custom buzzer sound effects.
+Los usuarios avanzados también pueden crear efectos de sonido de zumbador personalizados.
 
-1. Open the configuration file:
+1. Abra el archivo de configuración:
 
    .. code-block:: shell
 
       /opt/pipower5/venv/lib/python3.11/site-packages/pipower5/config.json
 
-2. Locate the ``pipower5_buzz_sequence`` section.
+2. Localice la sección ``pipower5_buzz_sequence``.
 
-3. Each sound effect is defined using the following format:
+3. Cada efecto de sonido se define usando el siguiente formato:
 
    .. code-block:: text
 
       [action, duration]
 
-   Where:
+   Donde:
 
-   - ``action`` can be:
+   - ``action`` puede ser:
 
-     - A musical note, such as ``"A4"``, ``"D3"``, or ``"C#4"``
-     - A frequency value (integer)
-     - ``"pause"`` for silence
+     - Una nota musical, como ``"A4"``, ``"D3"`` o ``"C#4"``
+     - Un valor de frecuencia (entero)
+     - ``"pause"`` para silencio
 
-   - ``duration`` is the playback time in milliseconds (ms)
+   - ``duration`` es el tiempo de reproducción en milisegundos (ms)
 
 
-Email Alerts
+Alertas de Correo Electrónico
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
-PiPower5 supports email notifications for important system events, such as:
+PiPower5 soporta notificaciones por correo electrónico para eventos importantes del sistema, como:
 
-- Low battery
-- Power disconnected
-- Power restored
-- Critical shutdown events
+- Batería baja
+- Alimentación desconectada
+- Alimentación restaurada
+- Eventos de apagado crítico
 
-Email notifications can be configured through the **Web Dashboard** or the **command-line tool**.
+Las notificaciones por correo electrónico se pueden configurar a través del **Panel de Control Web** o la **herramienta de línea de comandos**.
 
-To use email alerts, an SMTP server is required. Most email providers support SMTP services.
+Para usar alertas de correo electrónico, se requiere un servidor SMTP. La mayoría de los proveedores de correo electrónico soportan servicios SMTP.
 
-- For Gmail, simply create an **App Password**
-- For other providers, enable SMTP access and generate a dedicated SMTP password if required
+- Para Gmail, simplemente cree una **Contraseña de Aplicación**
+- Para otros proveedores, habilite el acceso SMTP y genere una contraseña SMTP dedicada si es necesario
 
-Before configuration, prepare the following information:
+Antes de la configuración, prepare la siguiente información:
 
-- SMTP server address  
-  (Example: ``smtp.gmail.com``)
+- Dirección del servidor SMTP
+  (Ejemplo: ``smtp.gmail.com``)
 
-- SMTP port  
-  (Example: ``465`` or ``25``)
+- Puerto SMTP
+  (Ejemplo: ``465`` o ``25``)
 
-- Encryption type  
+- Tipo de cifrado
   (``None`` / ``SSL`` / ``TLS``)
 
-- SMTP account  
-  (Usually your email address)
+- Cuenta SMTP
+  (Generalmente su dirección de correo electrónico)
 
-- SMTP password  
-  (App Password or SMTP password)
+- Contraseña SMTP
+  (Contraseña de Aplicación o contraseña SMTP)
 
-After entering the SMTP information, configure the recipient email address.
+Después de ingresar la información SMTP, configure la dirección de correo electrónico del destinatario.
 
 .. note::
 
-   PiPower5 uses the SMTP server to log into your email account and send notifications.
+   PiPower5 usa el servidor SMTP para iniciar sesión en su cuenta de correo electrónico y enviar notificaciones.
 
-   You may use the same email address as both the sender and recipient.
+   Puede usar la misma dirección de correo electrónico como remitente y destinatario.
 
-After setup, use the test command to verify the SMTP connection and email delivery.
+Después de la configuración, use el comando de prueba para verificar la conexión SMTP y la entrega de correo electrónico.

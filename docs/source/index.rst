@@ -1,35 +1,35 @@
 .. note::
 
-    Hello, welcome to the SunFounder Raspberry Pi & Arduino & ESP32 Enthusiasts Community on Facebook! Dive deeper into Raspberry Pi, Arduino, and ESP32 with fellow enthusiasts.
+    ¡Hola, bienvenido a la Comunidad de Entusiastas de Raspberry Pi & Arduino & ESP32 de SunFounder en Facebook! Profundice en Raspberry Pi, Arduino y ESP32 con otros entusiastas.
 
-    **Why Join?**
+    **¿Por qué unirse?**
 
-    - **Expert Support**: Solve post-sale issues and technical challenges with help from our community and team.
-    - **Learn & Share**: Exchange tips and tutorials to enhance your skills.
-    - **Exclusive Previews**: Get early access to new product announcements and sneak peeks.
-    - **Special Discounts**: Enjoy exclusive discounts on our newest products.
-    - **Festive Promotions and Giveaways**: Take part in giveaways and holiday promotions.
+    - **Soporte Experto**: Resuelva problemas posventa y desafíos técnicos con la ayuda de nuestra comunidad y equipo.
+    - **Aprenda y Comparta**: Intercambie consejos y tutoriales para mejorar sus habilidades.
+    - **Avances Exclusivos**: Obtenga acceso anticipado a anuncios de nuevos productos y adelantos.
+    - **Descuentos Especiales**: Disfrute de descuentos exclusivos en nuestros productos más nuevos.
+    - **Promociones Festivas y Sorteos**: Participe en sorteos y promociones navideñas.
 
-    👉 Ready to explore and create with us? Click [|link_sf_facebook|] and join today!
+    👉 ¿Listo para explorar y crear con nosotros? ¡Haga clic [|link_sf_facebook|] y únase hoy!
 
-SunFounder PiPower5 - Protect Your Device & Data
+SunFounder PiPower5 - Proteja Su Dispositivo y Sus Datos
 ================================================================================
 
 .. * |link_PiPower_5_buy|
 
-.. Thank you for choosing our |link_PiPower_5|.
+.. Gracias por elegir nuestro |link_PiPower_5|.
 
-Thank you for choosing our PiPower5.
+Gracias por elegir nuestro PiPower5.
 
 
 .. .. note::
-..     This document is available in the following languages.
+..     Este documento está disponible en los siguientes idiomas.
 
 ..         * |link_german_tutorials|
 ..         * |link_jp_tutorials|
 ..         * |link_en_tutorials|
-    
-..     Please click on the respective links to access the document in your preferred language.
+
+..     Haga clic en los enlaces respectivos para acceder al documento en su idioma preferido.
 
 .. todo: new pic
 
@@ -37,58 +37,58 @@ Thank you for choosing our PiPower5.
     :width: 400
     :align: center
 
-PiPower 5 is a versatile UPS solution designed for seamless integration with Raspberry Pi devices. It features robust power path management, dual lithium battery charging and discharging capabilities, and essential protections against reverse polarity, overcharging, and over-discharging.
+PiPower 5 es una solución UPS versátil diseñada para una integración perfecta con dispositivos Raspberry Pi. Cuenta con una robusta gestión de rutas de alimentación, capacidades de carga y descarga de baterías de litio duales, y protecciones esenciales contra polaridad inversa, sobrecarga y sobredescarga.
 
-With an output of up to 5V/5A, PiPower 5 ensures stable performance for a wide range of devices. Its HAT+ configuration guarantees compatibility with Raspberry Pi 5, while additional outputs, including a USB-A port and a 4x2P header, provide support for various single-board computers (SBCs) and microcontroller platforms, such as Arduino, Pico, and ESP32.
+Con una salida de hasta 5V/5A, PiPower 5 garantiza un rendimiento estable para una amplia gama de dispositivos. Su configuración HAT+ garantiza compatibilidad con Raspberry Pi 5, mientras que las salidas adicionales, incluyendo un puerto USB-A y un conector 4x2P, proporcionan soporte para varios ordenadores de placa única (SBCs) y plataformas de microcontroladores, como Arduino, Pico y ESP32.
 
-An onboard microcontroller efficiently manages power operations and enables real-time monitoring of key parameters via I2C communication. These parameters include input voltage, output voltage, battery voltage, battery capacity, external power connection status, charging status, and the current power source (battery or USB).
+Un microcontrolador integrado gestiona eficientemente las operaciones de alimentación y permite el monitoreo en tiempo real de parámetros clave a través de comunicación I2C. Estos parámetros incluyen voltaje de entrada, voltaje de salida, voltaje de batería, capacidad de batería, estado de conexión de alimentación externa, estado de carga y la fuente de alimentación actual (batería o USB).
 
-Combining advanced battery management with broad compatibility, PiPower 5 is an essential tool for tech enthusiasts and professionals looking to optimize their hardware setups.
+Combinando una gestión avanzada de batería con amplia compatibilidad, PiPower 5 es una herramienta esencial para entusiastas de la tecnología y profesionales que buscan optimizar sus configuraciones de hardware.
 
-**Features**
+**Características**
 
-* **Input**: 5-15V, 45W, USB Type-C PD, DC5.5-2.1
-* **Output**: 5V/5A via Raspberry Pi GPIO, USB Type-A, and 2x4P 2.54mm pin headers
-* **Charging Power**: Up to 20W
-* **Battery Specs**: 7.4V 2 Cell 18650 Li-ion, XH2.54 3P connector
-* **Configurable Settings via Jumpers**:
+* **Entrada**: 5-15V, 45W, USB Type-C PD, DC5.5-2.1
+* **Salida**: 5V/5A a través de GPIO de Raspberry Pi, USB Type-A y pines de 2x4P 2.54mm
+* **Potencia de Carga**: Hasta 20W
+* **Especificaciones de Batería**: 7.4V 2 Celdas 18650 Ion de litio, conector XH2.54 3P
+* **Ajustes Configurables mediante Jumpers**:
 
-  * Default On Jumper: Configure whether the device powers on automatically when connected to power.
-  * Shutdown Signal Jumper: Enable detection of the device's shutdown status.
-  * External Power Button Pin Header: Connect an external power button for manual power control.
+  * Jumper de Encendido Predeterminado: Configure si el dispositivo se enciende automáticamente al conectar la alimentación.
+  * Jumper de Señal de Apagado: Habilite la detección del estado de apagado del dispositivo.
+  * Conector de Botón de Encendido Externo: Conecte un botón de encendido externo para control manual de alimentación.
 
-* **Onboard Indicators and Buttons**:
-  
-  * Battery status indicator
-  * Input source indicator
-  * Power button
-  * Battery reverse connection indicator
-  * Output power indicator
+* **Indicadores y Botones Integrados**:
 
-* **Onboard Microcontroller**: 32-bit ARM Cortex-M23, supporting I2C communication
+  * Indicador de estado de batería
+  * Indicador de fuente de entrada
+  * Botón de encendido
+  * Indicador de conexión inversa de batería
+  * Indicador de alimentación de salida
 
-* **I2C communication interfaces**: 
-  
-  * Raspberry Pi GPIO
-  * SH1.0 4P (compatible with Qwiic and STEMMA QT)
-  * 1x4P 2.54mm pin header
+* **Microcontrolador Integrado**: ARM Cortex-M23 de 32 bits, compatible con comunicación I2C
+
+* **Interfaces de comunicación I2C**:
+
+  * GPIO de Raspberry Pi
+  * SH1.0 4P (compatible con Qwiic y STEMMA QT)
+  * Conector de pines 1x4P 2.54mm
 
 
-.. **Table of Contents**
+.. **Tabla de Contenidos**
 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Getting Started
+   :caption: Primeros Pasos
 
-   About PiPower 5 <self>
+   Acerca de PiPower 5 <self>
    assembly
    quick_guide
 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Hardware Overview
+   :caption: Descripción General del Hardware
 
    pipower_hat
    battery
@@ -96,7 +96,7 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Software Configuration
+   :caption: Configuración de Software
 
    pipower5_software
    update_firmware
@@ -106,14 +106,14 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Appendix
+   :caption: Apéndice
 
    compatible_sbc
    troubleshooting
    faq
 
 
-**Copyright Notice**
+**Aviso de Derechos de Autor**
 
-All contents including but not limited to texts, images, and code in this manual are owned by the SunFounder Company. You should only use it for personal study,investigation, enjoyment, or other non-commercial or nonprofit purposes, under therelated regulations and copyrights laws, without infringing the legal rights of the author and relevant right holders. For any individual or organization that uses these for commercial profit without permission, the Company reserves the right to take legal action.
+Todos los contenidos, incluidos pero no limitados a textos, imágenes y código en este manual, son propiedad de SunFounder Company. Solo debe usarlos para estudio personal, investigación, disfrute u otros fines no comerciales o sin ánimo de lucro, bajo las regulaciones y leyes de derechos de autor correspondientes, sin infringir los derechos legales del autor y los titulares de derechos pertinentes. Para cualquier individuo u organización que utilice estos contenidos con fines comerciales sin permiso, la Compañía se reserva el derecho de emprender acciones legales.
 
