@@ -94,24 +94,29 @@ static struct i2c_driver pipower5_driver = {
 
 
 
-/* Fast button poll — reads only the power button register at 50 Hz */
+/* Fast button poll — reads button register at 50 Hz with proper locking */
 static void pipower5_button_poll_work(struct work_struct *work) {
   struct delayed_work *dwork = to_delayed_work(work);
   struct pipower5_device *pi_dev =
       container_of(dwork, struct pipower5_device, button_poll_work);
   int ret;
 
+  mutex_lock(&pi_dev->lock);
   ret = __pipower5_read_byte(pi_dev, REG_READ_POWER_BUTTON_STATE);
   if (ret >= 0) {
     pi_dev->power_button_state = (u8)ret;
     __pipower5_write_byte(pi_dev, REG_WRITE_POWER_BTN_STATE, 0);
-    pipower5_button_check(pi_dev);
   }
+  mutex_unlock(&pi_dev->lock);
+
+  if (ret >= 0)
+    pipower5_button_check(pi_dev);
 
   queue_delayed_work(pi_dev->wq, &pi_dev->button_poll_work,
                      msecs_to_jiffies(PIPOWER5_BUTTON_POLL_INTERVAL));
 }
 
+/* Main poll work — reads all data + events + notifies UPower at 1 Hz */
 static void pipower5_poll_work(struct work_struct *work) {
   struct delayed_work *dwork = to_delayed_work(work);
   struct pipower5_device *pi_dev =

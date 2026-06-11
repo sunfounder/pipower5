@@ -13,7 +13,7 @@ _sec() { echo ""; echo -e "$B[$1]$N $2"; }
 # Check if module is loaded, offer to fix if not
 if [ ! -d "$SYSFS" ]; then
   echo ""
-  echo -e "  $R Module NOT loaded ¡ª fix with:$N"
+  echo -e "  $R Module NOT loaded -- fix with:$N"
   echo "    cd ~/pipower5/driver && sudo make install"
   echo "    or: sudo modprobe pipower5"
   echo ""
@@ -58,10 +58,12 @@ _sec 3 "sysfs Read-Write (5 attrs + vbus_enable read)"
 _rw() {
   local a=$1 o=$2 t=$3
   [ ! -f "$SYSFS/$a" ] && { _f "$a" "file missing"; return; }
+  local before=$(cat "$SYSFS/$a" 2>/dev/null)
   echo "$t" > "$SYSFS/$a" 2>/dev/null || { _f "$a write" "permission"; return; }
-  local n=$(cat "$SYSFS/$a" 2>/dev/null)
-  echo "$o" > "$SYSFS/$a" 2>/dev/null
-  _p "$a: write($t) read($n) restore($o)"
+  local after=$(cat "$SYSFS/$a" 2>/dev/null)
+  echo "$o" > "$SYSFS/$a" 2>/dev/null || { _f "$a restore" "permission"; return; }
+  local restored=$(cat "$SYSFS/$a" 2>/dev/null)
+  _p "$a: read($before) -> write($t) -> read($after) -> restore($o) -> read($restored)"
 }
 
 ov=$(cat $SYSFS/buzzer_volume 2>/dev/null || echo 3)
