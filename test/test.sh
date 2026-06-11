@@ -33,7 +33,7 @@ RO_ATTRS=(
   power_source is_input_plugged_in is_charging
   firmware_version default_on board_id
   charge_current_max driver_version power_button_state
-  battery_internal_resistor events
+  battery_internal_resistor events vbus_enable
 )
 for attr in "${RO_ATTRS[@]}"; do
   if   [ ! -f "$SYSFS/$attr" ]; then _f "$attr" "file missing"
@@ -43,7 +43,7 @@ for attr in "${RO_ATTRS[@]}"; do
 done
 
 #=== 3. sysfs RW Attributes ===
-_sec 3 "sysfs Read-Write (5 attrs)"
+_sec 3 "sysfs Read-Write (5 attrs + vbus_enable read)"
 
 _rw() {
   local a=$1 o=$2 t=$3
