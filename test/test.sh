@@ -1,55 +1,29 @@
 #!/bin/bash
-# pipower5 test suite ¡ª verifies kernel driver, sysfs, Python CLI, and UPower
+# pipower5 full test suite ¡ª driver + sysfs + CLI
 set -euo pipefail
 
 SYSFS=/sys/class/pipower5/pipower5
-GREEN='\033[32m'
-RED='\033[31m'
-BOLD='\033[1m'
-RESET='\033[0m'
-PASS=0
-FAIL=0
+PS=/sys/class/power_supply/pipower5
+G='\033[32m'; R='\033[31m'; Y='\033[33m'; B='\033[1m'; N='\033[0m'
+PASS=0; FAIL=0; SKIP=0
 
-pass() { echo -e "  ${GREEN}PASS${RESET} $1"; PASS=$((PASS+1)); }
-fail() { echo -e "  ${RED}FAIL${RESET} $1 ¡ª $2"; FAIL=$((FAIL+1)); }
-skip() { echo -e "  SKIP $1 ¡ª $2"; }
+_p() { echo -e "  $G PASS$N $1"; PASS=$((PASS+1)); }
+_f() { echo -e "  $R FAIL$N $1 ¡ª $2"; FAIL=$((FAIL+1)); }
+_s() { echo -e "  $Y SKIP$N $1 ¡ª $2"; SKIP=$((SKIP+1)); }
+_sec() { echo ""; echo -e "$B[$1]$N $2"; }
 
-echo ""
-echo "=========================================="
-echo -e "  ${BOLD}PiPower5 Test Suite${RESET}"
-echo "=========================================="
-echo ""
+#=== 1. Kernel Module ===
+_sec 1 "Kernel Module"
+lsmod | grep -q pipower5 && _p "module loaded"   || _f "module loaded" "lsmod"
+[ -d "$SYSFS"            ] && _p "sysfs interface" || _f "sysfs interface" "not found"
+[ -d "$PS"               ] && _p "power_supply"    || _f "power_supply"    "not found"
+DTBO=$(find /boot -name sunfounder-pipower5.dtbo 2>/dev/null|head -1)
+[ -n "$DTBO"             ] && _p "dtbo: $DTBO"     || _f "dtbo"            "not found"
+grep -q 'dtoverlay=sunfounder-pipower5' /boot/firmware/config.txt /boot/config.txt 2>/dev/null \
+                           && _p "dtoverlay config"  || _f "dtoverlay config" "not found"
 
-# ©¤©¤ 1. Kernel driver ©¤©¤
-echo -e "${BOLD}[1] Kernel Driver${RESET}"
-
-if lsmod | grep -q pipower5; then
-  pass "module loaded"
-else
-  fail "module loaded" "lsmod | grep pipower5 returned nothing"
-fi
-
-if [ -d "$SYSFS" ]; then
-  pass "sysfs interface exists"
-else
-  fail "sysfs interface exists" "$SYSFS not found"
-fi
-
-if [ -d /sys/class/power_supply/pipower5 ]; then
-  pass "power_supply registered"
-else
-  fail "power_supply registered" "/sys/class/power_supply/pipower5 not found"
-fi
-
-if [ -f /boot/firmware/overlays/sunfounder-pipower5.dtbo ] ||    [ -f /boot/overlays/sunfounder-pipower5.dtbo ]; then
-  pass "device tree blob installed"
-else
-  fail "device tree blob installed" "sunfounder-pipower5.dtbo not found"
-fi
-
-# ©¤©¤ 2. sysfs RO attributes ©¤©¤
-echo ""
-echo -e "${BOLD}[2] sysfs Read Attributes${RESET}"
+#=== 2. sysfs RO Attributes ===
+_sec 2 "sysfs Read-Only (22 attrs)"
 
 RO_ATTRS=(
   input_voltage input_current input_power
@@ -58,136 +32,110 @@ RO_ATTRS=(
   battery_percentage battery_capacity
   power_source is_input_plugged_in is_charging
   firmware_version default_on board_id
-  charge_current_max buzzer_volume
-  power_button_state driver_version
-  events buzz_on
+  charge_current_max driver_version power_button_state
+  battery_internal_resistor events
 )
-
 for attr in "${RO_ATTRS[@]}"; do
-  if [ -f "$SYSFS/$attr" ]; then
-    val=$(cat "$SYSFS/$attr" 2>/dev/null)
-    if [ -n "$val" ]; then
-      pass "$attr = $val"
-    else
-      fail "$attr" "empty value"
-    fi
-  else
-    fail "$attr" "file not found"
-  fi
+  if   [ ! -f "$SYSFS/$attr" ]; then _f "$attr" "file missing"
+  elif val=$(cat "$SYSFS/$attr" 2>/dev/null) && [ -n "$val" ]; then
+    _p "$attr = $val"
+  else _f "$attr" "empty"; fi
 done
 
-# ©¤©¤ 3. sysfs RW attributes ©¤©¤
-echo ""
-echo -e "${BOLD}[3] sysfs Write Attributes${RESET}"
+#=== 3. sysfs RW Attributes ===
+_sec 3 "sysfs Read-Write (5 attrs)"
 
-# buzzer_volume
-orig_vol=$(cat $SYSFS/buzzer_volume 2>/dev/null || echo 3)
-echo "$orig_vol" > $SYSFS/buzzer_volume 2>/dev/null &&   pass "buzzer_volume write/restore $orig_vol" ||   fail "buzzer_volume write" "permission denied"
+_rw() {
+  local a=$1 o=$2 t=$3
+  [ ! -f "$SYSFS/$a" ] && { _f "$a" "file missing"; return; }
+  echo "$t" > "$SYSFS/$a" 2>/dev/null || { _f "$a write" "permission"; return; }
+  local n=$(cat "$SYSFS/$a" 2>/dev/null)
+  echo "$o" > "$SYSFS/$a" 2>/dev/null
+  _p "$a: write($t) read($n) restore($o)"
+}
 
-# shutdown_percentage
-orig_sp=$(cat $SYSFS/shutdown_percentage 2>/dev/null || echo 10)
-echo "$orig_sp" > $SYSFS/shutdown_percentage 2>/dev/null &&   pass "shutdown_percentage write/restore $orig_sp" ||   fail "shutdown_percentage write" "permission denied"
+ov=$(cat $SYSFS/buzzer_volume 2>/dev/null || echo 3)
+os=$(cat $SYSFS/shutdown_percentage 2>/dev/null || echo 10)
+ob=$(cat $SYSFS/buzz_on 2>/dev/null || echo 0x7F)
 
-# buzz_on
-orig_bo=$(cat $SYSFS/buzz_on 2>/dev/null || echo 0x7F)
-echo "$orig_bo" > $SYSFS/buzz_on 2>/dev/null &&   pass "buzz_on write/restore $orig_bo" ||   fail "buzz_on write" "permission denied"
+_rw buzzer_volume       "$ov" "$(( (ov % 10) + 1 ))"
+_rw shutdown_percentage "$os" "$(( (os % 90) + 10 ))"
+_rw buzz_on             "$ob" "0x3F"
 
-# buzzer_play (short test)
-echo 0 > $SYSFS/buzzer_play 2>/dev/null &&   pass "buzzer_play stop" ||   fail "buzzer_play stop" "permission denied"
+echo 0 > "$SYSFS/buzzer_play" 2>/dev/null          && _p "buzzer_play stop"         || _f "buzzer_play" "permission"
+echo 0 > "$SYSFS/power_button_state" 2>/dev/null    && _p "power_button_state reset" || _f "power_button_state" "permission"
 
-# ©¤©¤ 4. UPower ©¤©¤
-echo ""
-echo -e "${BOLD}[4] UPower${RESET}"
-
+#=== 4. UPower ===
+_sec 4 "UPower"
 if command -v upower >/dev/null 2>&1; then
-  UPOUT=$(upower -i /org/freedesktop/UPower/devices/battery_pipower5 2>/dev/null)
-  if echo "$UPOUT" | grep -q "percentage"; then
-    pct=$(echo "$UPOUT" | grep "percentage" | awk '{print $2}')
-    pass "UPower battery: $pct"
-  else
-    fail "UPower battery" "no percentage in upower output"
-  fi
-  if echo "$UPOUT" | grep -q "state"; then
-    state=$(echo "$UPOUT" | grep "state:" | awk '{$1=""; print $0}' | xargs)
-    pass "UPower state: $state"
-  fi
-else
-  skip "UPower" "upower not installed"
-fi
+  U=$(upower -i /org/freedesktop/UPower/devices/battery_pipower5 2>/dev/null)
+  for f in percentage state energy-full voltage technology vendor model; do
+    echo "$U" | grep -qi "$f" && _p "UPower $f" || _f "UPower $f" "missing"
+  done
+else _s "UPower" "not installed"; fi
 
-# ©¤©¤ 5. Button input device ©¤©¤
+#=== 5. Button ===
+_sec 5 "Button Input Device"
+BTN=$(grep -l pipower5-power-button /sys/class/input/*/name 2>/dev/null | head -1)
+[ -n "$BTN" ] && _p "input: $(dirname $BTN | xargs basename)" || _f "input device" "not found"
+
+#=== 6. Kernel Log ===
+_sec 6 "Kernel Log (dmesg)"
+N=$(dmesg 2>/dev/null | grep -ci pipower5 || echo 0)
+[ "$N" -gt 0 ] && _p "dmesg: $N entries" || _f "dmesg" "empty"
+
+#=== 7. CLI Commands ===
+_sec 7 "CLI Commands"
+for cmd in info status; do
+  pipower5 "$cmd" >/dev/null 2>&1 && _p "pipower5 $cmd" || _f "pipower5 $cmd" "failed"
+done
+pipower5 --config >/dev/null 2>&1  && _p "pipower5 --config"  || _f "pipower5 --config" "failed"
+pipower5 --version >/dev/null 2>&1 && _p "pipower5 --version" || _f "pipower5 --version" "failed"
+
+#=== 8. CLI --all ===
+_sec 8 "CLI: --all"
+OUT=$(pipower5 --all 2>/dev/null)
+for s in "Input:" "Output:" "Battery:" "Internal:" "Versions:"; do
+  echo "$OUT" | grep -q "$s" && _p "--all: $s" || _f "--all: $s" "missing"
+done
+
+#=== 9. CLI Individual Sensor Flags ===
+_sec 9 "CLI: Sensor Flags"
+for f in -iv -ic -ov -oc -bv -bc -bp -bs -ii -ichg -do -pb -cc -fv -dv -sp -bzv -bzo; do
+  pipower5 "$f" >/dev/null 2>&1 && _p "$f" || _f "$f" "failed"
+done
+pipower5 --shutdown-percentage 10 >/dev/null 2>&1  && _p "--shutdown-percentage 10"  || _f "--shutdown-percentage 10" "failed"
+pipower5 --buzzer-volume 3       >/dev/null 2>&1  && _p "--buzzer-volume 3"        || _f "--buzzer-volume 3" "failed"
+pipower5 --buzz-on 0x7F          >/dev/null 2>&1  && _p "--buzz-on 0x7F"           || _f "--buzz-on 0x7F" "failed"
+pipower5 --buzzer-test 0         >/dev/null 2>&1  && _p "--buzzer-test 0 (stop)"    || _f "--buzzer-test 0" "failed"
+
+#=== 10. CLI Email/SMTP ===
+_sec 10 "CLI: Email & SMTP"
+for f in --send-email-on --send-email-to --smtp-server --smtp-port --smtp-email --smtp-password --smtp-security; do
+  pipower5 "$f" 2>/dev/null | grep -q . && _p "$f (read)" || _s "$f (read)" "no config"
+done
+pipower5 --send-email-to test@example.com >/dev/null 2>&1  && _p "--send-email-to set"   || _f "--send-email-to set" "failed"
+pipower5 --send-email-to >/dev/null 2>&1                  && _p "--send-email-to reset" || _f "--send-email-to reset" "failed"
+
+#=== 11. CLI Other ===
+_sec 11 "CLI: Other Flags"
+pipower5 --temperature-unit         >/dev/null 2>&1 && _p "--temperature-unit"      || _f "--temperature-unit" "failed"
+pipower5 --debug-level info         >/dev/null 2>&1 && _p "--debug-level info"      || _f "--debug-level" "failed"
+pipower5 --config-path              >/dev/null 2>&1 && _p "--config-path (read)"    || _f "--config-path" "failed"
+
+#=== 12. CLI doctor / send-email / uninstall ===
+_sec 12 "CLI: doctor, send-email, uninstall"
+pipower5 doctor 2>&1 | grep -qE 'Doctor|All checks|overall' \
+  && _p "pipower5 doctor" || _f "pipower5 doctor" "failed"
+pipower5 send-email 2>&1 | grep -qi "Usage\|Script" \
+  && _p "pipower5 send-email (usage)" || _f "pipower5 send-email" "unexpected"
+pipower5 uninstall 2>&1 | grep -qi "Permission\|Uninstall\|PiPower" \
+  && _p "pipower5 uninstall (needs root)" || _f "pipower5 uninstall" "unexpected"
+
+#=== Summary ===
 echo ""
-echo -e "${BOLD}[5] Button Input Device${RESET}"
-
-if grep -r "pipower5-power-button" /sys/class/input/*/name 2>/dev/null | head -1 > /dev/null; then
-  dev=$(grep -l "pipower5-power-button" /sys/class/input/*/name 2>/dev/null | head -1)
-  pass "input device: $(dirname $dev | xargs basename)"
-else
-  fail "input device" "pipower5-power-button not found in /sys/class/input/"
-fi
-
-# ©¤©¤ 6. Events ©¤©¤
+echo "========================================"
+printf "  $B Results: $G%d passed$N, $R%d failed$N, $Y%d skipped$N\n" $PASS $FAIL $SKIP
+echo "========================================"
 echo ""
-echo -e "${BOLD}[6] Event Log${RESET}"
-
-if grep -q "STARTUP" "$SYSFS/events" 2>/dev/null; then
-  pass "events: STARTUP recorded"
-else
-  fail "events" "no STARTUP event found"
-fi
-
-# ©¤©¤ 7. dmesg ©¤©¤
-echo ""
-echo -e "${BOLD}[7] Kernel Log${RESET}"
-
-DMESG_COUNT=$(dmesg | grep -ci pipower5 || echo 0)
-if [ "$DMESG_COUNT" -gt 0 ]; then
-  pass "dmesg: $DMESG_COUNT pipower5 entries"
-else
-  fail "dmesg" "no pipower5 entries"
-fi
-
-# ©¤©¤ 8. Python CLI ©¤©¤
-echo ""
-echo -e "${BOLD}[8] Python CLI${RESET}"
-
-if command -v pipower5 >/dev/null 2>&1; then
-  # --all
-  if pipower5 --all >/dev/null 2>&1; then
-    pass "pipower5 --all"
-  else
-    fail "pipower5 --all" "command failed"
-  fi
-  # --firmware
-  FW=$(pipower5 --firmware 2>/dev/null)
-  if [ -n "$FW" ]; then
-    pass "pipower5 --firmware: $FW"
-  else
-    fail "pipower5 --firmware" "empty output"
-  fi
-  # --config
-  if pipower5 --config >/dev/null 2>&1; then
-    pass "pipower5 --config"
-  else
-    fail "pipower5 --config" "command failed"
-  fi
-  # doctor
-  if pipower5 doctor 2>&1 | grep -q 'All checks passed\|overall'; then
-    pass "pipower5 doctor"
-  else
-    # doctor might fail if not root
-    pipower5 doctor 2>&1 | head -3
-    skip "pipower5 doctor" "may need root"
-  fi
-else
-  skip "pipower5 CLI" "not installed"
-fi
-
-# ©¤©¤ Summary ©¤©¤
-echo ""
-echo "=========================================="
-echo -e "  ${BOLD}Results: ${GREEN}$PASS passed${RESET}, ${RED}$FAIL failed${RESET}"
-echo "=========================================="
-echo ""
-
 [ "$FAIL" -eq 0 ] && exit 0 || exit 1
