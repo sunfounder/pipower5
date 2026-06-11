@@ -78,6 +78,7 @@ class PiPower5:
     read_power_source        = lambda self: PowerSource(self._read_sysfs_int("power_source"))
     read_shutdown_percentage = lambda self: self._read_sysfs_int("shutdown_percentage")
     read_firmware_version    = lambda self: self._read_sysfs("firmware_version")
+    read_driver_version      = lambda self: self._read_sysfs("driver_version")
     read_default_on          = lambda self: bool(self._read_sysfs_int("default_on"))
     get_max_charge_current   = lambda self: self._read_sysfs_int("charge_current_max") * 100
     read_buzzer_volume       = lambda self: self._read_sysfs_int("buzzer_volume")
