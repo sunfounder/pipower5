@@ -61,20 +61,42 @@ int __pipower5_write_byte(struct pipower5_device *pi_dev, u8 reg, u8 value) {
   return 0;
 }
 
-/* SMBus block write — caller holds lock */
+/* Raw I2C write (no SMBus protocol, just i2c_master_send) — caller holds lock */
 int __pipower5_write_block(struct pipower5_device *pi_dev, u8 cmd, u8 *data, u8 len) {
-  int ret = i2c_smbus_write_block_data(pi_dev->client, cmd, len, data);
-  if (ret < 0)
-    dev_err(&pi_dev->client->dev, "block write cmd=0x%02x failed: %d\n", cmd, ret);
-  return ret;
+  u8 buf[8];  /* cmd + up to 7 data bytes */
+  struct i2c_msg msg = {
+    .addr = pi_dev->client->addr,
+    .flags = 0,
+    .len = len + 1,
+    .buf = buf,
+  };
+  if (len + 1 > sizeof(buf))
+    return -EINVAL;
+  buf[0] = cmd;
+  memcpy(buf + 1, data, len);
+  int ret = i2c_transfer(pi_dev->client->adapter, &msg, 1);
+  if (ret < 0) {
+    dev_err(&pi_dev->client->dev, "raw i2c write cmd=0x%02x failed: %d\n", cmd, ret);
+    return ret;
+  }
+  return 0;
 }
 
-/* Raw SMBus byte read (no register) — caller holds lock */
+/* Raw I2C read (no register address, just i2c_master_recv) — caller holds lock */
 int __pipower5_read_raw_byte(struct pipower5_device *pi_dev) {
-  int ret = i2c_smbus_read_byte(pi_dev->client);
-  if (ret < 0)
-    dev_err(&pi_dev->client->dev, "raw byte read failed: %d\n", ret);
-  return ret;
+  u8 val;
+  struct i2c_msg msg = {
+    .addr = pi_dev->client->addr,
+    .flags = I2C_M_RD,
+    .len = 1,
+    .buf = &val,
+  };
+  int ret = i2c_transfer(pi_dev->client->adapter, &msg, 1);
+  if (ret < 0) {
+    dev_err(&pi_dev->client->dev, "raw i2c read failed: %d\n", ret);
+    return ret;
+  }
+  return val;
 }
 
 /*
