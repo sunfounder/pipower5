@@ -6,10 +6,10 @@ G='\033[32m'; R='\033[31m'; Y='\033[33m'; B='\033[1m'; N='\033[0m'
 PASS=0; FAIL=0; SKIP=0
 INT=0; [ "${1:-}" = "--full" ] && INT=1
 
-_p() { echo -e "  ${G}PASS${N} $1"; PASS=$((PASS+1)); }
-_f() { echo -e "  ${R}FAIL${N} $1 - $2"; FAIL=$((FAIL+1)); }
-_s() { echo -e "  ${Y}SKIP${N} $1 - $2"; SKIP=$((SKIP+1)); }
-_sec() { echo; echo -e "${B}[$1]${N} $2"; }
+_p() { printf '  \033[32mPASS\033[0m %s\n' "$1"; PASS=$((PASS+1)); }
+_f() { printf '  \033[31mFAIL\033[0m %s - %s\n' "$1" "$2"; FAIL=$((FAIL+1)); }
+_s() { printf '  \033[33mSKIP\033[0m %s - %s\n' "$1" "$2"; SKIP=$((SKIP+1)); }
+_sec() { printf '\n\033[1m[%s]\033[0m %s\n' "$1" "$2"; }
 
 if [ ! -d "$SYSFS" ]; then
   echo; echo -e "  ${R}Module NOT loaded - fix:${N}"
@@ -120,7 +120,7 @@ if [ $INT -eq 1 ]; then
   echo; echo "=== Interactive Tests ==="
   echo; echo ">>> TEST 1: Buzzer"
   echo "    Playing 440Hz for 1s..."
-  echo 440 > "$SYSFS/buzzer_play" 2>/dev/null
+  echo "440,1000" > "$SYSFS/buzzer_play" 2>/dev/null
   read -r -p "    Did you hear a beep? (y/n): " ans
   [ "$ans" = "y" ] && _p "buzzer: audible" || _f "buzzer: no sound" "check HW"
 
