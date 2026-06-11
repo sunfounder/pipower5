@@ -83,7 +83,15 @@ class PiPower5:
     read_estimated_runtime   = lambda self: self._read_sysfs_int("estimated_runtime")
     read_buzzer_volume       = lambda self: self._read_sysfs_int("buzzer_volume")
     read_power_btn           = lambda self: ButtonState(self._read_sysfs_int("power_button_state"))
-    read_shutdown_request    = lambda self: ShutdownRequest(self._read_sysfs_int("shutdown_request"))
+    @classmethod
+    def _try_read_sysfs_int(cls, name, default=0):
+        try:
+            return int(cls._read_sysfs(name))
+        except (FileNotFoundError, ValueError):
+            return default
+
+    read_shutdown_request    = lambda self: ShutdownRequest(
+        self._try_read_sysfs_int("shutdown_request", 0))
 
     # ---- Write operations ----
 
