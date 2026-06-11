@@ -488,9 +488,13 @@ static void pipower5_buzzer_work_func(struct work_struct *work) {
  *   battery_critical_shutdown:     C6,50:p,60:C6,50:p,60:C6,100
  *   battery_voltage_critical:      C6,50:p,60:C6,50:p,60:C6,100:p,60:C6,100
  */
+/* Maximum sequence string length per event */
+#define BUZZER_MAX_SEQ_LEN 256
+static char buzzer_event_seqs[7][BUZZER_MAX_SEQ_LEN];
+
 static const struct {
   const char *name;
-  const char *seq;
+  const char *default_seq;
 } buzzer_events[] = {
   {"battery_activated",                 "440,50;0,100;494,50"},
   {"low_battery",                       "440,50;0,100;440,50"},
@@ -505,10 +509,57 @@ static const char *buzzer_lookup_event(const char *name) {
   int i;
   for (i = 0; i < ARRAY_SIZE(buzzer_events); i++) {
     if (strcmp(name, buzzer_events[i].name) == 0)
-      return buzzer_events[i].seq;
+      return buzzer_event_seqs[i][0] ? buzzer_event_seqs[i]
+                                     : buzzer_events[i].default_seq;
   }
   return NULL;
 }
+
+static int buzzer_event_index(const char *name) {
+  int i;
+  for (i = 0; i < ARRAY_SIZE(buzzer_events); i++)
+    if (strcmp(name, buzzer_events[i].name) == 0) return i;
+  return -1;
+}
+
+/* buzz_seq sysfs: show/set all event sequences (key=value per line) */
+static ssize_t buzz_seq_show(struct device *dev,
+                             struct device_attribute *attr, char *buf) {
+  int i, len = 0;
+  for (i = 0; i < ARRAY_SIZE(buzzer_events); i++) {
+    const char *s = buzzer_event_seqs[i][0] ? buzzer_event_seqs[i]
+                                            : buzzer_events[i].default_seq;
+    len += snprintf(buf + len, PAGE_SIZE - len, "%s=%s\n",
+                    buzzer_events[i].name, s);
+  }
+  return len;
+}
+
+static ssize_t buzz_seq_store(struct device *dev,
+                              struct device_attribute *attr,
+                              const char *buf, size_t count) {
+  char *line, *tmp, *orig, *eq;
+  orig = kstrndup(buf, count, GFP_KERNEL);
+  if (!orig) return -ENOMEM;
+  tmp = orig;
+  while ((line = strsep(&tmp, "\n")) != NULL) {
+    while (*line == ' ' || *line == '\t') line++;
+    if (!*line) continue;
+    eq = strchr(line, '=');
+    if (!eq) continue;
+    *eq = '\0';
+    int idx = buzzer_event_index(line);
+    if (idx >= 0) {
+      char *val = eq + 1;
+      while (*val == ' ') val++;
+      strscpy(buzzer_event_seqs[idx], val, BUZZER_MAX_SEQ_LEN);
+      dev_info(dev, "buzz_seq: %s updated\n", buzzer_events[idx].name);
+    }
+  }
+  kfree(orig);
+  return count;
+}
+static DEVICE_ATTR_RW(buzz_seq);
 
 static ssize_t buzzer_play_store(struct device *dev,
                                  struct device_attribute *attr,
@@ -832,6 +883,7 @@ static struct attribute *pipower5_attrs[] = {
     &dev_attr_charge_current_max.attr,
     &dev_attr_buzzer_volume.attr,
     &dev_attr_vbus_enable.attr,
+    &dev_attr_buzz_seq.attr,
     &dev_attr_buzz_on.attr,
     &dev_attr_buzzer_play.attr,
     &dev_attr_events.attr,
