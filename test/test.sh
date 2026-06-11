@@ -1,7 +1,5 @@
 #!/bin/bash
 # pipower5 full test suite ï¿½ï¿½ driver + sysfs + CLI
-set -euo pipefail
-
 SYSFS=/sys/class/pipower5/pipower5
 PS=/sys/class/power_supply/pipower5
 G='\033[32m'; R='\033[31m'; Y='\033[33m'; B='\033[1m'; N='\033[0m'
@@ -11,6 +9,18 @@ _p() { echo -e "  $G PASS$N $1"; PASS=$((PASS+1)); }
 _f() { echo -e "  $R FAIL$N $1 ï¿½ï¿½ $2"; FAIL=$((FAIL+1)); }
 _s() { echo -e "  $Y SKIP$N $1 ï¿½ï¿½ $2"; SKIP=$((SKIP+1)); }
 _sec() { echo ""; echo -e "$B[$1]$N $2"; }
+
+# Check if module is loaded, offer to fix if not
+if [ ! -d "$SYSFS" ]; then
+  echo ""
+  echo -e "  $R Module NOT loaded ¡ª fix with:$N"
+  echo "    cd ~/pipower5/driver && sudo make install"
+  echo "    or: sudo modprobe pipower5"
+  echo ""
+  echo "  Continue with degraded tests? (y/n, 5s timeout, default=n)"
+  read -t 5 -r ans 2>/dev/null || ans=n
+  [ "$ans" != "y" ] && { echo "  Aborted."; exit 1; }
+fi
 
 #=== 1. Kernel Module ===
 _sec 1 "Kernel Module"
@@ -134,8 +144,8 @@ pipower5 uninstall 2>&1 | grep -qi "Permission\|Uninstall\|PiPower" \
 
 
 #=== Interactive Tests (requires human verification) ===
-INTERACTIVE=1
-if [ "${1:-}" = "--full" ] || [ "${1:-}" = "-f" ]; then
+if [ $INTERACTIVE -eq 1 ]; then INTERACTIVE=1; fi
+if [ $INTERACTIVE -eq 1 ]; then
   echo ""
   echo "========================================"
   echo "  Interactive Tests"
