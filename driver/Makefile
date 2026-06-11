@@ -143,7 +143,7 @@ dkms_install:
 	@# Add, build, install
 	@sudo dkms add -m pipower5 -v $(DRIVER_VERSION)
 	@sudo dkms build -m pipower5 -v $(DRIVER_VERSION)
-	@sudo dkms install -m pipower5 -v $(DRIVER_VERSION)
+	@sudo dkms install -m pipower5 -v $(DRIVER_VERSION) --force
 	@echo "DKMS installation completed. Driver will auto-rebuild on kernel updates."
 
 dkms_uninstall:
