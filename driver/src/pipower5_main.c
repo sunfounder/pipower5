@@ -12,6 +12,8 @@
  */
 
 #include <linux/device.h>
+#include <linux/file.h>
+#include <linux/fs.h>
 #include <linux/hwmon-sysfs.h>
 #include <linux/hwmon.h>
 #include <linux/i2c.h>
@@ -288,6 +290,25 @@ static int pipower5_probe(struct i2c_client *client) {
     destroy_workqueue(pi_dev->wq);
     device_destroy(pipower5_class, MKDEV(0, 0));
     return ret;
+  }
+
+  /* Load user-custom buzzer sequences from /etc/pipower5/buzz_seq.conf */
+  {
+    struct file *f = filp_open("/etc/pipower5/buzz_seq.conf", O_RDONLY, 0);
+    if (!IS_ERR(f)) {
+      loff_t pos = 0;
+      char *kbuf = kmalloc(4096, GFP_KERNEL);
+      if (kbuf) {
+        ssize_t len = kernel_read(f, kbuf, 4095, &pos);
+        if (len > 0) {
+          kbuf[len] = '\0';
+          dev_info(dev, "Loading custom buzz sequences from /etc/pipower5/buzz_seq.conf\n");
+          buzz_seq_load(dev, kbuf, len);
+        }
+        kfree(kbuf);
+      }
+      filp_close(f, NULL);
+    }
   }
 
   /* Apply module parameters to hardware */

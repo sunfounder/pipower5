@@ -561,6 +561,27 @@ static ssize_t buzz_seq_store(struct device *dev,
 }
 static DEVICE_ATTR_RW(buzz_seq);
 
+/* Load sequences from config file (called at probe) */
+void pipower5_buzz_seq_load(const char *buf, size_t len) {
+  char *tmp, *orig, *line, *eq;
+  orig = kmalloc(len + 1, GFP_KERNEL);
+  if (!orig) return;
+  memcpy(orig, buf, len);
+  orig[len] = '\0';
+  tmp = orig;
+  while ((line = strsep(&tmp, "\n")) != NULL) {
+    while (*line == ' ' || *line == '\t') line++;
+    if (!*line || *line == '#') continue;
+    eq = strchr(line, '=');
+    if (!eq) continue;
+    *eq = '\0';
+    int idx = buzzer_event_index(line);
+    if (idx >= 0)
+      strscpy(buzzer_event_seqs[idx], eq + 1, BUZZER_MAX_SEQ_LEN);
+  }
+  kfree(orig);
+}
+
 static ssize_t buzzer_play_store(struct device *dev,
                                  struct device_attribute *attr,
                                  const char *buf, size_t count) {

@@ -170,6 +170,7 @@ int pipower5_create_sysfs(struct pipower5_device *pi_dev);
 void pipower5_remove_sysfs(struct pipower5_device *pi_dev);
 void pipower5_buzzer_init(struct pipower5_device *pi_dev);
 void pipower5_buzzer_event(struct pipower5_device *pi_dev, const char *event_name);
+void pipower5_buzz_seq_load(const char *buf, size_t len);
 
 /* Module parameters (extern for sysfs access) */
 extern unsigned int buzz_on;
