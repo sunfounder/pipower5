@@ -1,6 +1,7 @@
 import json
 from enum import IntEnum, StrEnum
 from .device import check_pipower5_connected, DEVICE_PATH
+from .note import get_note_freq
 
 BAT_MAX_CAPACITY = 2000  # mAh
 
@@ -38,18 +39,6 @@ class Event(StrEnum):
 
 
 
-# Note name -> frequency (Hz) for buzzer sequences
-_NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-
-def _note_freq(note_str):
-    import re
-    m = re.match(r'^([A-G]#?)(\d)$', note_str)
-    if not m:
-        return 0
-    name, octave = m.groups()
-    note_idx = _NOTE_NAMES.index(name)
-    midi = note_idx + (int(octave) + 1) * 12
-    return int(440 * (2 ** ((midi - 69) / 12)))
 
 class PiPower5:
     """PiPower5 hardware interface -  reads sensors via sysfs, writes via sysfs."""
@@ -109,30 +98,25 @@ class PiPower5:
 
     # ---- Backward compatibility stubs ----
 
-    _NOTE_FREQ = {
-        'C4': 262, 'D4': 294, 'E4': 330, 'F4': 349, 'G4': 392,
-        'A4': 440, 'B4': 494,
-        'C5': 523, 'D5': 587, 'E5': 659, 'F5': 698, 'G5': 784,
-        'A5': 880, 'B5': 988,
-        'C6': 1047, 'D6': 1175, 'E6': 1319, 'F6': 1397, 'G6': 1568,
-    }
-
     def buzz_sequence(self, sequence):
         """Play a buzzer sequence via kernel sysfs.
-        Accepts old Python format: [[note_or_freq,dur], ...] or "freq,dur;freq,dur;..."
+        Accepts old Python formats:
+          str:  "A4,50;pause,100;B4,50"
+          list: [["A4", 50], ["pause", 100], ["B4", 50]]
         """
         if isinstance(sequence, str):
             s = sequence
         elif isinstance(sequence, list):
             parts = []
             for n in sequence:
-                if n[0] in ('pause', 'PAUSE', 'P', 'p'):
-                    parts.append(f"0,{n[1]}")
-                elif isinstance(n[0], str) and n[0][0] in 'ABCDEFG':
-                    freq = _note_freq(n[0])
-                    parts.append(f"{freq},{n[1]}")
+                note, dur = n[0], n[1]
+                if str(note).lower() in ('pause', 'p'):
+                    parts.append(f"0,{dur}")
+                elif isinstance(note, str) and note[0] in 'ABCDEFG':
+                    freq = int(get_note_freq(note))
+                    parts.append(f"{freq},{dur}")
                 else:
-                    parts.append(f"{n[0]},{n[1]}")
+                    parts.append(f"{note},{dur}")
             s = ";".join(parts)
         else:
             raise TypeError(f"Expected str or list, got {type(sequence)}")
