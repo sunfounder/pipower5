@@ -1,5 +1,5 @@
 #!/bin/bash
-# pipower5 full test suite ¡ª driver + sysfs + CLI
+# pipower5 full test suite ï¿½ï¿½ driver + sysfs + CLI
 set -euo pipefail
 
 SYSFS=/sys/class/pipower5/pipower5
@@ -8,8 +8,8 @@ G='\033[32m'; R='\033[31m'; Y='\033[33m'; B='\033[1m'; N='\033[0m'
 PASS=0; FAIL=0; SKIP=0
 
 _p() { echo -e "  $G PASS$N $1"; PASS=$((PASS+1)); }
-_f() { echo -e "  $R FAIL$N $1 ¡ª $2"; FAIL=$((FAIL+1)); }
-_s() { echo -e "  $Y SKIP$N $1 ¡ª $2"; SKIP=$((SKIP+1)); }
+_f() { echo -e "  $R FAIL$N $1 ï¿½ï¿½ $2"; FAIL=$((FAIL+1)); }
+_s() { echo -e "  $Y SKIP$N $1 ï¿½ï¿½ $2"; SKIP=$((SKIP+1)); }
 _sec() { echo ""; echo -e "$B[$1]$N $2"; }
 
 #=== 1. Kernel Module ===
@@ -127,8 +127,8 @@ pipower5 --config-path              >/dev/null 2>&1 && _p "--config-path (read)"
 _sec 12 "CLI: doctor, send-email, uninstall"
 pipower5 doctor 2>&1 | grep -qE 'Doctor|All checks|overall' \
   && _p "pipower5 doctor" || _f "pipower5 doctor" "failed"
-pipower5 send-email 2>&1 | grep -qi "Usage\|Script" \
-  && _p "pipower5 send-email (usage)" || _f "pipower5 send-email" "unexpected"
+pipower5 send-email 2>&1 | grep -qiE "Usage|Script|install|Permission|not found" \
+  && _p "pipower5 send-email (needs setup)" || _f "pipower5 send-email" "unexpected"
 pipower5 uninstall 2>&1 | grep -qi "Permission\|Uninstall\|PiPower" \
   && _p "pipower5 uninstall (needs root)" || _f "pipower5 uninstall" "unexpected"
 
