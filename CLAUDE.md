@@ -219,7 +219,9 @@ https://docs.sunfounder.com/projects/pipower5/en/latest/
 
 ### Multi-Language
 
-The `lang.js` script in `_static/` handles automatic language detection and redirect. It supports `en`, `de`, `ja` and presents a notification bar when the browser language differs from the current page language.
+The `lang.js` script in `_static/` handles automatic language detection and redirect. Supported languages: `en`, `de`, `es`, `fr`, `it`, `ja`, `zh`.
+
+Published URLs follow the pattern `https://docs.sunfounder.com/projects/pipower5/<lang>/latest/`.
 
 The language variable in `conf.py` is set to `'en'` by default. When building for other languages:
 - Set `language = '<locale>'` in `conf.py`
@@ -267,6 +269,58 @@ The I2C register table in `pipower_hat.rst` uses raw HTML tables with custom CSS
 - Keep the HTML structure intact
 - Ensure the custom CSS class names (`custom-register-table`) are preserved
 - The register addresses, data types, and descriptions must match the actual firmware
+
+### Verifying Language Branches
+
+The `docs` branch is the **English source** and must never contain translated content. After any operation that touches the remote repository (push, merge, force-push), verify the integrity of the `docs` branch and all language branches:
+
+**1. Verify `docs` is English:**
+
+Check that the remote `docs` branch contains English content, not a translation that was accidentally merged:
+
+```
+# Check language in conf.py
+git show remotes/origin/docs:docs/source/conf.py | grep "language ="
+# Expected: language = 'en'
+```
+
+If the remote `docs` shows a non-English language, restore it from the canonical English source immediately:
+
+```
+# From the canonical English workspace:
+git push origin docs --force
+```
+
+**2. Verify each language branch has the correct language code:**
+
+| Branch | Expected `conf.py` | Published URL |
+|---|---|---|
+| `docs` | `language = 'en'` | `/en/latest/` |
+| `docs-de` | `language = 'de'` | `/de/latest/` |
+| `docs-es` | `language = 'es'` | `/es/latest/` |
+| `docs-fr` | `language = 'fr'` | `/fr/latest/` |
+| `docs-it` | `language = 'it'` | `/it/latest/` |
+| `docs-ja` | `language = 'ja'` | `/ja/latest/` |
+| `docs-zh` | `language = 'zh'` | `/zh/latest/` |
+
+**3. Quick verification script for all branches:**
+
+```bash
+for b in docs docs-de docs-es docs-fr docs-it docs-ja docs-zh; do
+  lang=$(git show "remotes/origin/$b:docs/source/conf.py" 2>/dev/null | grep "language =")
+  echo "$b: $lang"
+done
+```
+
+**4. When creating a new language branch:**
+
+- Always branch from `docs` (English), never from another language branch
+- Update `conf.py`: set `language = '<code>'`, add `|link_<lang>_tutorials|`, comment out `sphinx.ext.autosectionlabel`, translate link descriptions
+- Translate all `.rst` files and `README.md`
+- Translate `CLAUDE.md` and update the branch identifier
+- Run `make html` and resolve all warnings before committing
+- **CJK languages (Chinese, Japanese)**: CJK characters count as 2 display columns — section underlines/overlines must be 2× the character count. Inline `**markup**` adjacent to CJK characters needs `\ ` (escaped space) as delimiter.
+- After pushing, verify the remote branch content matches the intended language
 
 ---
 
