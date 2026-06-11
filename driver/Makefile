@@ -157,24 +157,19 @@ dkms_uninstall:
 	fi
 	@echo "DKMS uninstall completed."
 
-# Full install: DKMS + overlay + config.txt + load module
+# Full install: copy .ko + modules-load.d + overlay + config.txt + load
 install: module dtbo
 	@echo "Installing PiPower5 driver..."
 	@# Unload if loaded
 	-@sudo rmmod pipower5 2>/dev/null || true
-	@# Install DKMS if not present, then use DKMS
-	@if ! command -v dkms >/dev/null 2>&1; then \
-		echo "DKMS not found. Installing DKMS..."; \
-		sudo apt-get update -qq && sudo apt-get install -y dkms || { \
-			echo "Failed to install DKMS, falling back to traditional install."; \
-			$(MAKE) modules_install; \
-		}; \
-	fi
-	@if command -v dkms >/dev/null 2>&1; then \
-		$(MAKE) dkms_install; \
-	else \
-		$(MAKE) modules_install; \
-	fi
+	@# Clean up any DKMS leftovers
+	-@sudo dkms remove -m pipower5 --all 2>/dev/null || true
+	@sudo rm -rf /usr/src/pipower5-* /var/lib/dkms/pipower5 2>/dev/null || true
+	@# Simple install: copy .ko, update deps, auto-load via modules-load.d
+	@sudo mkdir -p /lib/modules/$(shell uname -r)/extra
+	@sudo cp -f pipower5.ko /lib/modules/$(shell uname -r)/extra/
+	@echo "pipower5" | sudo tee /etc/modules-load.d/pipower5.conf > /dev/null
+	@sudo depmod -a
 	@$(MAKE) install-overlay
 	@$(MAKE) install-config
 	@echo "Loading pipower5 module..."
@@ -193,10 +188,13 @@ uninstall:
 	fi
 	@# DKMS uninstall
 	-@$(MAKE) dkms_uninstall
-	@# Remove from traditional locations (including old pipower5_driver)
-	@sudo rm -f /lib/modules/$(shell uname -r)/extra/pipower5.ko* /lib/modules/$(shell uname -r)/updates/pipower5.ko* 2>/dev/null || true
+	@# Remove from all locations
+	@sudo rm -f /lib/modules/$(shell uname -r)/extra/pipower5.ko* 2>/dev/null || true
+	@sudo rm -f /lib/modules/$(shell uname -r)/updates/pipower5.ko* 2>/dev/null || true
 	@sudo rm -f /lib/modules/$(shell uname -r)/kernel/drivers/misc/pipower5_driver.ko* 2>/dev/null || true
-	@sudo rm -f /etc/modules-load.d/pipower5_driver.conf 2>/dev/null || true
+	@sudo rm -f /etc/modules-load.d/pipower5.conf /etc/modules-load.d/pipower5_driver.conf 2>/dev/null || true
+	-@sudo dkms remove -m pipower5 --all 2>/dev/null || true
+	@sudo rm -rf /usr/src/pipower5-* 2>/dev/null || true
 	@# Remove dtbo
 	@if [ -d "$(OVERLAY_DIR)" ]; then \
 		sudo rm -f $(OVERLAY_DIR)/$(DTBO_NAME); \
@@ -218,22 +216,18 @@ unload:
 status:
 	@echo "=== PiPower5 Driver Status ==="
 	@echo ""
-	@# Module file (check multiple locations, including DKMS .ko.xz)
+	@# Module file
 	@KO_PATH=$$(find /lib/modules/$(shell uname -r) -name 'pipower5.ko*' 2>/dev/null | head -1); \
 	if [ -n "$$KO_PATH" ]; then \
 		echo "Module file      : INSTALLED ($$KO_PATH)"; \
 	else \
 		echo "Module file      : MISSING (run 'sudo make install')"; \
 	fi
-	@# DKMS registration
-	@if command -v dkms >/dev/null 2>&1; then \
-		if dkms status pipower5 2>/dev/null | grep -q pipower5; then \
-			echo "DKMS status      : $(shell dkms status pipower5 2>/dev/null | head -1)"; \
-		else \
-			echo "DKMS status      : not registered"; \
-		fi; \
+	@# Auto-load config
+	@if [ -f /etc/modules-load.d/pipower5.conf ]; then \
+		echo "Auto-load        : ENABLED (/etc/modules-load.d/pipower5.conf)"; \
 	else \
-		echo "DKMS status      : DKMS not installed"; \
+		echo "Auto-load        : MISSING"; \
 	fi
 	@# Module loaded
 	@if lsmod | grep -q pipower5; then \
