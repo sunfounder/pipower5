@@ -168,6 +168,19 @@ def main():
             json.dump(current_config, f, indent=4)
         
 
+    # Merge pironman5 config if running under pironman5
+    pironman5_config = "/opt/pironman5/config.json"
+    if os.path.exists(pironman5_config):
+        try:
+            with open(pironman5_config, 'r') as f:
+                pm5 = json.load(f)
+            pm5_sys = pm5.get('system', pm5)
+            for k, v in pm5_sys.items():
+                if k not in current_config['system'] or current_config['system'][k] == SYSTEM_DEFAULT_CONFIG.get(k):
+                    current_config['system'][k] = v
+        except Exception:
+            pass
+
     if args.config:
         print(json.dumps(current_config, indent=4))
         quit()
