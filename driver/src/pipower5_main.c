@@ -186,22 +186,31 @@ static void pipower5_poll_work(struct work_struct *work) {
       }
 
       /* POWER_INSUFFICIENT: input plugged in but battery still discharging.
-       * Skip if just disconnected (MCU may report inconsistent snapshot).
-       * Skip for 5s after power restore — power supply needs time to stabilize.
-       * Rate-limited to once per 60s or on state change. */
-      if (pi_dev->is_input_plugged_in && !pi_dev->is_charging &&
-          batt_cur < -100 &&  /* significant discharge (>100mA), not float current */
-          !just_disconnected &&
-          time_after(jiffies, pi_dev->power_restored_jiffies + 5 * HZ)) {
+       * Condition must persist for 3s to avoid false trigger during capacitor
+       * drain after unplug (MCU still reports is_input_plugged_in=1 for ~1s
+       * while input capacitor discharges).  Also skip 5s after power restore.
+       * Rate-limited to once per 60s. */
+      {
+        static unsigned long pwr_insuf_start;
         static unsigned long last_pwr_insuf_log;
-        if (time_after(jiffies, last_pwr_insuf_log + 60 * HZ) ||
-            pi_dev->is_input_plugged_in != pi_dev->last_is_input_plugged_in) {
-          char *envp[] = { "PIPOWER5_EVENT=power_insufficient", NULL };
-          pipower5_log_event(pi_dev, "POWER_INSUFFICIENT bat=%d%% cur=%dmA",
-                             pi_dev->battery_percentage, batt_cur);
-          kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
-          pipower5_buzzer_event(pi_dev, "power_insufficient");
-          last_pwr_insuf_log = jiffies;
+
+        if (pi_dev->is_input_plugged_in && !pi_dev->is_charging &&
+            batt_cur < -100 &&
+            time_after(jiffies, pi_dev->power_restored_jiffies + 5 * HZ)) {
+          if (pwr_insuf_start == 0)
+            pwr_insuf_start = jiffies;
+
+          if (time_after(jiffies, pwr_insuf_start + 3 * HZ) &&
+              time_after(jiffies, last_pwr_insuf_log + 60 * HZ)) {
+            char *envp[] = { "PIPOWER5_EVENT=power_insufficient", NULL };
+            pipower5_log_event(pi_dev, "POWER_INSUFFICIENT bat=%d%% cur=%dmA",
+                               pi_dev->battery_percentage, batt_cur);
+            kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
+            pipower5_buzzer_event(pi_dev, "power_insufficient");
+            last_pwr_insuf_log = jiffies;
+          }
+        } else {
+          pwr_insuf_start = 0;
         }
       }
 
