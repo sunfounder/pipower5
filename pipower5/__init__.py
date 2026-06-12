@@ -431,13 +431,15 @@ Versions:
                 print("Buzz on: (cannot read sysfs)")
         else:
             pipower5._write_sysfs("buzz_on", args.buzz_on)
-            print(f"Set buzz_on: {args.buzz_on} (persist via /etc/modprobe.d/pipower5.conf)")
+            new_sys_config['pipower5_buzz_on'] = args.buzz_on
+            print(f"Set buzz_on: {args.buzz_on}")
     if args.buzzer_volume != '':
         if args.buzzer_volume == None:
             print(f"Buzzer volume: {pipower5.read_buzzer_volume()}")
         else:
             vol = int(args.buzzer_volume)
             pipower5.set_buzzer_volume(vol)
+            new_sys_config['pipower5_buzzer_volume'] = vol
             print(f"Set buzzer volume: {vol}")
     if args.buzzer_test != '':
         if args.buzzer_test == None:
