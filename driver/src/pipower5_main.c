@@ -186,10 +186,9 @@ static void pipower5_poll_work(struct work_struct *work) {
       }
 
       /* POWER_INSUFFICIENT: input plugged in but battery still discharging.
-       * Condition must persist for 3s to avoid false trigger during capacitor
-       * drain after unplug (MCU still reports is_input_plugged_in=1 for ~1s
-       * while input capacitor discharges).  Also skip 5s after power restore.
-       * Rate-limited to once per 60s. */
+       * 1.5s debounce avoids false trigger during capacitor drain after unplug
+       * (~1s), while still responsive to real insufficient power.
+       * Also skip 5s after power restore. Rate-limited to once per 60s. */
       {
         static unsigned long pwr_insuf_start;
         static unsigned long last_pwr_insuf_log;
@@ -200,7 +199,7 @@ static void pipower5_poll_work(struct work_struct *work) {
           if (pwr_insuf_start == 0)
             pwr_insuf_start = jiffies;
 
-          if (time_after(jiffies, pwr_insuf_start + 3 * HZ) &&
+          if (time_after(jiffies, pwr_insuf_start + HZ + HZ / 2) &&  /* 1.5s debounce */
               time_after(jiffies, last_pwr_insuf_log + 60 * HZ)) {
             char *envp[] = { "PIPOWER5_EVENT=power_insufficient", NULL };
             pipower5_log_event(pi_dev, "POWER_INSUFFICIENT bat=%d%% cur=%dmA",
