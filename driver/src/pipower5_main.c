@@ -321,8 +321,9 @@ static int pipower5_probe(struct i2c_client *client) {
   pi_dev->buzzer_volume = (u8)buzzer_volume;
   pi_dev->shutdown_percentage = (u8)shutdown_pct;
   /* User scale 0-10, MCU expects 0-100 */
+  /* MCU 0-100, cap at 99 to avoid overflow */
   __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL,
-      buzzer_volume >= 10 ? 100 : (u8)(buzzer_volume * 10));
+      buzzer_volume >= 10 ? 99 : (u8)(buzzer_volume * 10));
   __pipower5_write_byte(pi_dev, REG_WRITE_SHUTDOWN_PERCENTAGE, (u8)shutdown_pct);
 
   /* Initialize always-on statistics and power failure test */

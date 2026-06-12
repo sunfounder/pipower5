@@ -409,8 +409,9 @@ static ssize_t buzzer_volume_store(struct device *dev,
   /* MCU expects 0-100 */
   mutex_lock(&pi_dev->lock);
   pi_dev->buzzer_volume = (u8)value;
+  /* MCU expects 0-100, but 100 may overflow. Cap at 99. */
   ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL,
-      value >= 10 ? 100 : (u8)(value * 10));
+      value >= 10 ? 99 : (u8)(value * 10));
   mutex_unlock(&pi_dev->lock);
 
   if (ret < 0) {
@@ -518,13 +519,13 @@ static const struct {
   const char *name;
   const char *default_seq;
 } buzzer_events[] = {
-  {"battery_activated",                 "440,200;0,100;494,200"},
-  {"low_battery",                       "440,200;0,100;440,200"},
-  {"power_disconnected",                "587,200;0,100;392,200"},
-  {"power_restored",                    "392,200;0,100;587,200"},
-  {"power_insufficient",                "494,200;0,100;494,200"},
-  {"battery_critical_shutdown",         "1047,300;0,100;1047,300;0,100;1047,500"},
-  {"battery_voltage_critical_shutdown", "1047,300;0,100;1047,300;0,100;1047,500"},
+  {"battery_activated",                 "440,50;0,100;494,50"},
+  {"low_battery",                       "440,50;0,100;440,50"},
+  {"power_disconnected",                "587,50;0,100;392,50"},
+  {"power_restored",                    "392,50;0,100;587,50"},
+  {"power_insufficient",                "494,50;0,100;494,50;0,100;494,100"},
+  {"battery_critical_shutdown",         "1047,50;0,60;1047,50;0,60;1047,100"},
+  {"battery_voltage_critical_shutdown", "1047,50;0,60;1047,50;0,60;1047,100;0,60;1047,100"},
 };
 
 static const char *buzzer_lookup_event(const char *name) {

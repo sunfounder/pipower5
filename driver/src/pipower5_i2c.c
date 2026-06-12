@@ -241,7 +241,7 @@ int pipower5_update_status(struct pipower5_device *pi_dev) {
   ret = __pipower5_read_byte(pi_dev, REG_READ_BUZZER_VOLUME);
   if (ret >= 0)
     /* MCU returns 0-100, expose 0-10 to userspace */
-    pi_dev->buzzer_volume = (u8)(ret >= 100 ? 10 : ret / 10);
+    pi_dev->buzzer_volume = (u8)(ret >= 99 ? 10 : ret / 10);
   else
     goto out;
 
