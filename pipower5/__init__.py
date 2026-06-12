@@ -424,15 +424,20 @@ Versions:
     # buzzer
     if args.buzz_on != '':
         if args.buzz_on == None:
-            try:
-                with open(f"{DEVICE_PATH}/buzz_on", "r") as f:
-                    print(f"Buzz on: {f.read().strip()}")
-            except Exception:
-                print("Buzz on: (cannot read sysfs)")
+            mask = pipower5.get_buzz_on()
+            events = pipower5._bitmask_to_events(mask)
+            print(f"Buzz on: 0x{mask:02X} => {events}")
         else:
-            pipower5._write_sysfs("buzz_on", args.buzz_on)
-            new_sys_config['pipower5_buzz_on'] = args.buzz_on
-            print(f"Set buzz_on: {args.buzz_on}")
+            # Accept comma-separated event names or hex bitmask
+            val = args.buzz_on
+            if val.startswith("0x") or val.startswith("0X"):
+                mask = val
+            else:
+                events = [e.strip() for e in val.split(",")]
+                mask = f"0x{pipower5._events_to_bitmask(events):02X}"
+            pipower5._write_sysfs("buzz_on", mask)
+            new_sys_config['pipower5_buzz_on'] = [e.strip() for e in val.split(",")] if not val.startswith("0x") else val
+            print(f"Set buzz_on: {mask}")
     if args.buzzer_volume != '':
         if args.buzzer_volume == None:
             print(f"Buzzer volume: {pipower5.read_buzzer_volume()}")

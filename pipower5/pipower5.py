@@ -115,6 +115,10 @@ class PiPower5:
             mask |= cls.BUZZ_EVENT_BIT.get(e, 0)
         return mask
 
+    @classmethod
+    def _bitmask_to_events(cls, mask):
+        return [e for e, b in cls.BUZZ_EVENT_BIT.items() if mask & b]
+
     def set_buzz_on(self, events):
         """Write buzz_on bitmask to kernel driver. events is a list of event name strings.
         Kernel filters per-event by bit position."""
