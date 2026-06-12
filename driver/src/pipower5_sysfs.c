@@ -399,16 +399,18 @@ static ssize_t buzzer_volume_store(struct device *dev,
     return ret;
   }
 
-  if (value > 100) {
-    value = 100;
+  /* User-facing scale: 0-10. Clamp. */
+  if (value > 10) {
+    value = 10;
   }
 
-  /* Update module parameter for runtime persistence */
   buzzer_volume = value;
 
+  /* MCU expects 0-100, scale up */
   mutex_lock(&pi_dev->lock);
   pi_dev->buzzer_volume = (u8)value;
-  ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL, (u8)value);
+  ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL,
+      value >= 10 ? 100 : (u8)(value * 10));
   mutex_unlock(&pi_dev->lock);
 
   if (ret < 0) {

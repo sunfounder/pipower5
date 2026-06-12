@@ -317,7 +317,9 @@ static int pipower5_probe(struct i2c_client *client) {
   /* Apply module parameters to hardware */
   pi_dev->buzzer_volume = (u8)buzzer_volume;
   pi_dev->shutdown_percentage = (u8)shutdown_pct;
-  __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL, (u8)buzzer_volume);
+  /* User scale 0-10, MCU expects 0-100 */
+  __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL,
+      buzzer_volume >= 10 ? 100 : (u8)(buzzer_volume * 10));
   __pipower5_write_byte(pi_dev, REG_WRITE_SHUTDOWN_PERCENTAGE, (u8)shutdown_pct);
 
   /* Initialize always-on statistics and power failure test */
