@@ -406,12 +406,10 @@ static ssize_t buzzer_volume_store(struct device *dev,
 
   buzzer_volume = value;
 
-  /* MCU expects 0-100 */
+  /* MCU register accepts 0-10 directly (confirmed by SPC library) */
   mutex_lock(&pi_dev->lock);
   pi_dev->buzzer_volume = (u8)value;
-  /* MCU expects 0-100, but 100 may overflow. Cap at 99. */
-  ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL,
-      value >= 10 ? 99 : (u8)(value * 10));
+  ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL, (u8)value);
   mutex_unlock(&pi_dev->lock);
 
   if (ret < 0) {
@@ -446,8 +444,7 @@ static void pipower5_buzzer_work_func(struct work_struct *work) {
   /* Safety: no more notes or empty sequence → silence */
   if (pi_dev->buzzer_note_index >= pi_dev->buzzer_note_count) {
     mutex_lock(&pi_dev->lock);
-    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
-    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+    __pipower5_write_word(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
     mutex_unlock(&pi_dev->lock);
     pi_dev->buzzer_playing = false;
     return;
@@ -458,8 +455,7 @@ static void pipower5_buzzer_work_func(struct work_struct *work) {
   if (pi_dev->buzzer_playing) {
     /* Finished playing current note → turn off buzzer, advance */
     mutex_lock(&pi_dev->lock);
-    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
-    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+    __pipower5_write_word(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
     mutex_unlock(&pi_dev->lock);
     pi_dev->buzzer_playing = false;
     pi_dev->buzzer_note_index++;
@@ -469,12 +465,9 @@ static void pipower5_buzzer_work_func(struct work_struct *work) {
       queue_delayed_work(pi_dev->wq, &pi_dev->buzzer_work, 0);
     }
   } else {
-    /* Start playing a new note */
+    /* Start playing a new note — write frequency as 16-bit word (matching SPC library) */
     mutex_lock(&pi_dev->lock);
-    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L,
-                          note->freq & 0xFF);
-    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H,
-                          (note->freq >> 8) & 0xFF);
+    __pipower5_write_word(pi_dev, REG_WRITE_BUZZER_FEQ_L, note->freq);
     mutex_unlock(&pi_dev->lock);
     pi_dev->buzzer_playing = true;
 
@@ -637,8 +630,7 @@ static ssize_t buzzer_play_store(struct device *dev,
     }
     /* Unknown name, treat as stop */
     mutex_lock(&pi_dev->lock);
-    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
-    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+    __pipower5_write_word(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
     mutex_unlock(&pi_dev->lock);
     dev_warn(dev, "buzzer_play: unknown event '%s'\n", trimmed);
     return count;
@@ -649,15 +641,11 @@ static ssize_t buzzer_play_store(struct device *dev,
     if (sscanf(buf, "%u", &single_freq) == 1) {
       if (single_freq == 0 || single_freq > 65534) {
         mutex_lock(&pi_dev->lock);
-        __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
-        __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H, 0);
+        __pipower5_write_word(pi_dev, REG_WRITE_BUZZER_FEQ_L, 0);
         mutex_unlock(&pi_dev->lock);
       } else {
         mutex_lock(&pi_dev->lock);
-        __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L,
-                              single_freq & 0xFF);
-        __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H,
-                              (single_freq >> 8) & 0xFF);
+        __pipower5_write_word(pi_dev, REG_WRITE_BUZZER_FEQ_L, (u16)single_freq);
         mutex_unlock(&pi_dev->lock);
         pi_dev->buzzer_notes[0].freq = (u16)single_freq;
         pi_dev->buzzer_notes[0].duration_ms = PIPOWER5_BUZZER_MAX_SINGLE_MS;

@@ -180,6 +180,7 @@ struct pipower5_device {
 int __pipower5_read_word(struct pipower5_device *pi_dev, u8 reg);
 int __pipower5_read_byte(struct pipower5_device *pi_dev, u8 reg);
 int __pipower5_write_byte(struct pipower5_device *pi_dev, u8 reg, u8 value);
+int __pipower5_write_word(struct pipower5_device *pi_dev, u8 reg, u16 value);
 int __pipower5_write_block(struct pipower5_device *pi_dev, u8 cmd, u8 *data, u8 len);
 int __pipower5_read_raw_byte(struct pipower5_device *pi_dev);
 int pipower5_update_status(struct pipower5_device *pi_dev);
