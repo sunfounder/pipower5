@@ -158,6 +158,7 @@ dkms_uninstall:
 install: module dtbo
 	@echo "Installing PiPower5 driver (DKMS)..."
 	-@sudo rmmod pipower5 2>/dev/null || true
+	-@sudo rmmod pipower5_driver 2>/dev/null || true
 	@$(MAKE) dkms_install
 	@$(MAKE) install-overlay
 	@$(MAKE) install-config
