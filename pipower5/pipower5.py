@@ -127,6 +127,19 @@ class PiPower5:
         raw = self._read_sysfs("buzz_on")
         return int(raw, 16) if raw.startswith("0x") else int(raw)
 
+    @staticmethod
+    def test_smtp(config):
+        """Test SMTP connection. Returns (bool, message)."""
+        try:
+            from .email_sender import EmailSender
+            sender = EmailSender(config)
+            if not sender.is_ready():
+                return False, "SMTP settings incomplete"
+            sender.connect()
+            return True, ""
+        except Exception as e:
+            return False, str(e)
+
     # ---- Buzzer playback ----
     def buzz_sequence(self, sequence):
         """Play buzzer by event name via kernel driver sysfs.
