@@ -171,10 +171,15 @@ static void pipower5_poll_work(struct work_struct *work) {
       }
 
       /* BATTERY_ACTIVATED: switched to battery power.
-       * Skip buzzer if power was just disconnected in this same cycle —
-       * POWER_DISCONNECTED buzzer is already playing and this is the consequence. */
+       * 1s debounce to avoid false trigger during power transients.
+       * Skip buzzer if power was just disconnected in this same cycle. */
       if (pi_dev->power_source != pi_dev->last_power_source &&
           pi_dev->power_source == 1) {
+        pi_dev->battery_activated_jiffies = jiffies;
+      }
+      if (pi_dev->power_source == 1 &&
+          pi_dev->battery_activated_jiffies != 0 &&
+          time_after(jiffies, pi_dev->battery_activated_jiffies + HZ)) {
         bool just_unplugged = (pi_dev->is_input_plugged_in != pi_dev->last_is_input_plugged_in
                                && pi_dev->is_input_plugged_in == 0);
         char *envp[] = { "PIPOWER5_EVENT=battery_activated", NULL };
@@ -183,7 +188,10 @@ static void pipower5_poll_work(struct work_struct *work) {
         kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
         if (!just_unplugged)
           pipower5_buzzer_event(pi_dev, "battery_activated");
+        pi_dev->battery_activated_jiffies = 0;  /* reset after firing */
       }
+      if (pi_dev->power_source != 1)
+        pi_dev->battery_activated_jiffies = 0;
 
       /* POWER_INSUFFICIENT: external power present but battery still discharging.
        * Skip if power_source == BATTERY — during capacitor drain after unplug,
