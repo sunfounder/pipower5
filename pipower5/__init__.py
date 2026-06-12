@@ -87,7 +87,7 @@ def main():
     pipower5 = PiPower5()
     parser = argparse.ArgumentParser(prog='pipower5', description='PiPower 5')
     parser.add_argument("command",
-                        choices=["doctor", "uninstall", "info", "status", "send-email"],
+                        choices=["start", "doctor", "uninstall", "info", "status", "send-email"],
                         nargs="?",
                         help="Command")
     parser.add_argument("--fix", action="store_true", help="Attempt auto-repair (with doctor)")
@@ -199,6 +199,43 @@ def main():
             except ValueError:
                 print(f"Invalid value for database retention days, it should be a number")
                 quit()
+
+    if args.command == "start":
+        print("Starting pipower5 dashboard...")
+        from pm_dashboard.pm_dashboard import PMDashboard
+        from pm_auto.pm_auto import PMAuto
+        from importlib.resources import files as resource_files
+        import logging
+
+        log = logging.getLogger("pipower5")
+        log.setLevel(logging.INFO)
+        h = logging.StreamHandler()
+        h.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
+        log.addHandler(h)
+
+        device_info = {"name": "PiPower 5", "id": "pipower5",
+                       "peripherals": list(SYSTEM_DEFAULT_CONFIG.keys()),
+                       "version": __version__, "app_name": "pipower5",
+                       "config_path": config_path}
+
+        pm_auto = PMAuto(SYSTEM_DEFAULT_CONFIG,
+                         peripherals=["system"],
+                         device_info=device_info,
+                         log=log)
+        pm_auto.start()
+
+        dashboard = PMDashboard(device_info=device_info,
+                                database="pipower5",
+                                config=current_config,
+                                log=log)
+        dashboard.set_read_data(pm_auto.read)
+        dashboard.set_read_config(lambda: current_config)
+        dashboard.set_on_config_changed(lambda cfg: None)
+        dashboard.start()
+
+        import time
+        import signal
+        signal.pause()
 
     if args.command == "doctor":
         from .device import doctor
