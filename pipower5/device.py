@@ -31,7 +31,7 @@ RESET  = "\033[0m"
 
 def is_connected() -> bool:
     """Check if the pipower5 kernel module is loaded."""
-    return os.path.exists(MODULE_PATH)
+    return os.path.exists(MODULE_PATH) or os.path.exists(DEVICE_PATH)
 
 def check_pipower5_connected():
     """Raise IOError if PiPower 5 driver is not loaded."""
