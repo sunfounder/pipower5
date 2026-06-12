@@ -150,6 +150,7 @@ static void pipower5_poll_work(struct work_struct *work) {
     /* ── Event detection (first poll skipped to avoid false events) ── */
     if (pi_dev->events_initialized) {
       s16 batt_cur = (s16)pi_dev->battery_current; /* signed: +charge, -discharge */
+      bool just_disconnected = false;
 
       /* POWER_DISCONNECTED / POWER_RESTORED */
       if (pi_dev->is_input_plugged_in != pi_dev->last_is_input_plugged_in) {
@@ -161,6 +162,7 @@ static void pipower5_poll_work(struct work_struct *work) {
         } else {
           envp[0] = "PIPOWER5_EVENT=power_disconnected";
           pipower5_log_event(pi_dev, "POWER_DISCONNECTED");
+          just_disconnected = true;
         }
         kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
         pipower5_buzzer_event(pi_dev,
@@ -184,10 +186,12 @@ static void pipower5_poll_work(struct work_struct *work) {
       }
 
       /* POWER_INSUFFICIENT: input plugged in but battery still discharging.
+       * Skip if just disconnected (MCU may report inconsistent snapshot).
        * Skip for 5s after power restore — power supply needs time to stabilize.
        * Rate-limited to once per 60s or on state change. */
       if (pi_dev->is_input_plugged_in && !pi_dev->is_charging &&
           batt_cur < -100 &&  /* significant discharge (>100mA), not float current */
+          !just_disconnected &&
           time_after(jiffies, pi_dev->power_restored_jiffies + 5 * HZ)) {
         static unsigned long last_pwr_insuf_log;
         if (time_after(jiffies, last_pwr_insuf_log + 60 * HZ) ||
