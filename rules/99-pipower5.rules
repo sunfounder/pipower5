@@ -1,19 +1,19 @@
 # pipower5 uevent rules — email notifications on power events
-# Uses sh -c 'sleep 2' because udev fires before DNS is ready
+# Uses systemd-run because udev runs with PrivateNetwork=yes (no DNS)
 ACTION=="change", SUBSYSTEM=="pipower5", ENV{PIPOWER5_EVENT}=="low_battery", \
-  RUN+="/usr/bin/sh -c 'sleep 2; /usr/local/bin/pipower5 send-email low_battery'"
+  RUN+="/usr/bin/systemd-run --no-block --collect /usr/local/bin/pipower5 send-email low_battery"
 
 ACTION=="change", SUBSYSTEM=="pipower5", ENV{PIPOWER5_EVENT}=="power_disconnected", \
-  RUN+="/usr/bin/sh -c 'sleep 2; /usr/local/bin/pipower5 send-email power_disconnected'"
+  RUN+="/usr/bin/systemd-run --no-block --collect /usr/local/bin/pipower5 send-email power_disconnected"
 
 ACTION=="change", SUBSYSTEM=="pipower5", ENV{PIPOWER5_EVENT}=="power_restored", \
-  RUN+="/usr/bin/sh -c 'sleep 2; /usr/local/bin/pipower5 send-email power_restored'"
+  RUN+="/usr/bin/systemd-run --no-block --collect /usr/local/bin/pipower5 send-email power_restored"
 
 ACTION=="change", SUBSYSTEM=="pipower5", ENV{PIPOWER5_EVENT}=="battery_activated", \
-  RUN+="/usr/bin/sh -c 'sleep 2; /usr/local/bin/pipower5 send-email battery_activated'"
+  RUN+="/usr/bin/systemd-run --no-block --collect /usr/local/bin/pipower5 send-email battery_activated"
 
 ACTION=="change", SUBSYSTEM=="pipower5", ENV{PIPOWER5_EVENT}=="power_insufficient", \
-  RUN+="/usr/bin/sh -c 'sleep 2; /usr/local/bin/pipower5 send-email power_insufficient'"
+  RUN+="/usr/bin/systemd-run --no-block --collect /usr/local/bin/pipower5 send-email power_insufficient"
 
 # Also log all events to syslog
 ACTION=="change", SUBSYSTEM=="pipower5", \
