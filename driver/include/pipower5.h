@@ -71,7 +71,7 @@
 #define PIPOWER5_DEVICE_ID 0x50 /* Example device ID */
 
 /* Polling interval in milliseconds */
-#define PIPOWER5_POLL_INTERVAL 1000
+#define PIPOWER5_POLL_INTERVAL 500  /* 2 Hz, faster power event detection */
 #define PIPOWER5_BUTTON_POLL_INTERVAL 20  /* 50 Hz for responsive button */
 
 /* Constants */
