@@ -98,6 +98,35 @@ class PiPower5:
     write_shutdown_percentage = lambda self, v: self._write_sysfs("shutdown_percentage", v)
     set_buzzer_volume         = lambda self, v: self._write_sysfs("buzzer_volume", v)
 
+    BUZZ_EVENT_BIT = {
+        "battery_activated":                 0x01,
+        "low_battery":                       0x02,
+        "power_disconnected":                0x04,
+        "power_restored":                    0x08,
+        "power_insufficient":                0x10,
+        "battery_critical_shutdown":         0x20,
+        "battery_voltage_critical_shutdown": 0x40,
+    }
+
+    @classmethod
+    def _events_to_bitmask(cls, events):
+        mask = 0
+        for e in events:
+            mask |= cls.BUZZ_EVENT_BIT.get(e, 0)
+        return mask
+
+    def set_buzz_on(self, events):
+        """Write buzz_on bitmask to kernel driver. events is a list of event name strings.
+        Kernel filters per-event by bit position."""
+        mask = self._events_to_bitmask(events)
+        self._write_sysfs("buzz_on", f"0x{mask:02X}")
+        return mask
+
+    def get_buzz_on(self):
+        """Read current buzz_on bitmask from kernel. Returns int."""
+        raw = self._read_sysfs("buzz_on")
+        return int(raw, 16) if raw.startswith("0x") else int(raw)
+
     # ---- Buzzer playback ----
     def buzz_sequence(self, sequence):
         """Play buzzer by event name via kernel driver sysfs.

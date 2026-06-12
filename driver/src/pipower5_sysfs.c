@@ -753,8 +753,14 @@ void pipower5_buzzer_event(struct pipower5_device *pi_dev, const char *event_nam
 
   if (!seq)
     return;
-  if (!buzz_on)  /* bitmask 0 = all disabled */
-    return;
+  /* Per-event bitmask: event index → buzz_on bit */
+  {
+    int idx = buzzer_event_index(event_name);
+    if (idx >= 0 && !(buzz_on & (1 << idx)))
+      return;  /* this event is disabled */
+    if (idx < 0 && !buzz_on)
+      return;  /* unknown event, global disable */
+  }
 
   cancel_delayed_work_sync(&pi_dev->buzzer_work);
   pi_dev->buzzer_note_count = 0;
