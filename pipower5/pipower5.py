@@ -109,12 +109,21 @@ class PiPower5:
 
     def power_failure_simulation(self, test_time=60):
         """Simulate power outage via kernel driver.
-        The driver disables VBUS, samples at 1Hz, re-enables VBUS,
-        and returns stats via sysfs. Python just polls for the result.
+        Writes progress/results to /opt/pipower5/blackout_simulation.*
+        for dashboard compatibility.
         """
-        import json, time
+        import json, time, os
 
-        # Start the test via sysfs (kernel driver handles everything)
+        OUT_DIR = "/opt/pipower5"
+        LOCK = f"{OUT_DIR}/blackout_simulation.lock"
+        JSON = f"{OUT_DIR}/blackout_simulation.json"
+        os.makedirs(OUT_DIR, exist_ok=True)
+
+        # Write lock file to signal test in progress
+        with open(LOCK, "w") as f:
+            f.write(f"{test_time}")
+
+        # Start the test via sysfs
         self._write_sysfs("power_failure_test", str(test_time))
 
         last_progress = -1
@@ -122,8 +131,6 @@ class PiPower5:
             status = self._read_sysfs("power_failure_test")
             if status.startswith("done "):
                 result = json.loads(status[5:])
-                # Convert driver units (mV, mA, mAh*1000) to human-readable
-                n = result.get("samples", 1) or 1
                 bat_v_avg = result["bat_voltage_avg"] / 1000.0
                 bat_c_avg = result["bat_current_avg"] / 1000.0
                 delta_mah = result["delta_mah"] / 1000.0
@@ -134,7 +141,8 @@ class PiPower5:
                 print(f"\nResults: {delta_mah:.1f}mAh used, "
                       f"avg {bat_v_avg:.2f}V {bat_c_avg:.2f}A, "
                       f"~{est_h}h{est_m}m runtime")
-                return {
+
+                output = {
                     "bat_mah_used": round(delta_mah, 3),
                     "bat_percent_used": result.get("bat_percent_used", 0),
                     "bat_voltage_avg": round(bat_v_avg, 3),
@@ -158,6 +166,13 @@ class PiPower5:
                     "available_time_str": f"{est_h}h {est_m}m",
                     "available_bat_capacity": result.get("available_bat_capacity", 0),
                 }
+                # Write JSON for dashboard
+                with open(JSON, "w") as f:
+                    json.dump(output, f, indent=2)
+                # Remove lock
+                if os.path.exists(LOCK):
+                    os.remove(LOCK)
+                return output
             elif status.startswith("running"):
                 parts = status.split()
                 elapsed = int(parts[1])
@@ -170,6 +185,8 @@ class PiPower5:
                     last_progress = elapsed
             elif status.startswith("idle"):
                 print("Test was cancelled or did not start.")
+                if os.path.exists(LOCK):
+                    os.remove(LOCK)
                 return None
             time.sleep(0.5)
 

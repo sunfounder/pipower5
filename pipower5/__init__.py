@@ -310,11 +310,6 @@ def main():
         print(f"Output current: {pipower5.read_output_current()} mA")
     if args.battery_voltage:
         print(f"Battery voltage: {pipower5.read_battery_voltage()} mV")
-    if BOARD_VERSION == '50':
-        if args.battery_1_voltage:
-            print(f"Battery 1 voltage: {pipower5.read_battery_1_voltage()} mV")
-        if args.battery_2_voltage:
-            print(f"Battery 2 voltage: {pipower5.read_battery_2_voltage()} mV")
     if args.battery_current:
         print(f"Battery current: {pipower5.read_battery_current()} mA")
     if args.battery_percentage:
