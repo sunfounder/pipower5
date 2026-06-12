@@ -42,7 +42,7 @@ def main():
             "battery_critical_shutdown",
             "battery_voltage_critical_shutdown",
         ],
-        "pipower5_buzzer_volume": 3,
+        "pipower5_buzzer_volume": 50,
         "pipower5_buzz_on": [
             "battery_activated",
             "low_battery",

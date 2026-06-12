@@ -403,7 +403,9 @@ static ssize_t buzzer_volume_store(struct device *dev,
     value = 100;
   }
 
-  /* Cache update + I2C write under one lock */
+  /* Update module parameter for runtime persistence */
+  buzzer_volume = value;
+
   mutex_lock(&pi_dev->lock);
   pi_dev->buzzer_volume = (u8)value;
   ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL, (u8)value);
