@@ -157,6 +157,7 @@ static void pipower5_poll_work(struct work_struct *work) {
         if (pi_dev->is_input_plugged_in) {
           envp[0] = "PIPOWER5_EVENT=power_restored";
           pipower5_log_event(pi_dev, "POWER_RESTORED");
+          pi_dev->power_restored_jiffies = jiffies;  /* start debounce window */
         } else {
           envp[0] = "PIPOWER5_EVENT=power_disconnected";
           pipower5_log_event(pi_dev, "POWER_DISCONNECTED");
@@ -178,9 +179,11 @@ static void pipower5_poll_work(struct work_struct *work) {
       }
 
       /* POWER_INSUFFICIENT: input plugged in but battery still discharging.
+       * Skip for 5s after power restore — power supply needs time to stabilize.
        * Rate-limited to once per 60s or on state change. */
       if (pi_dev->is_input_plugged_in && !pi_dev->is_charging &&
-          batt_cur < -100) {  /* significant discharge (>100mA), not float current */
+          batt_cur < -100 &&  /* significant discharge (>100mA), not float current */
+          time_after(jiffies, pi_dev->power_restored_jiffies + 5 * HZ)) {
         static unsigned long last_pwr_insuf_log;
         if (time_after(jiffies, last_pwr_insuf_log + 60 * HZ) ||
             pi_dev->is_input_plugged_in != pi_dev->last_is_input_plugged_in) {

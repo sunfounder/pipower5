@@ -154,6 +154,7 @@ struct pipower5_device {
   u8 last_is_input_plugged_in;
   u8 last_power_source;
   u8 last_is_charging;
+  unsigned long power_restored_jiffies;  /* debounce: skip POWER_INSUFFICIENT for 5s after restore */
   u8 buzzer_volume;
 
   /* Buzzer playback sequence */
