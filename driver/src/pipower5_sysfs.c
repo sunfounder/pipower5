@@ -473,8 +473,14 @@ static void pipower5_buzzer_work_func(struct work_struct *work) {
       queue_delayed_work(pi_dev->wq, &pi_dev->buzzer_work, 0);
     }
   } else {
-    /* Start playing a new note */
+    /* Start playing a new note — write volume + frequency */
     mutex_lock(&pi_dev->lock);
+    /* Re-assert volume; some MCU firmwares reset it on frequency change */
+    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL,
+        pi_dev->buzzer_volume == 0 ? 0 :
+        pi_dev->buzzer_volume >= 10 ? 100 :
+        (u8)(pi_dev->buzzer_volume * 10) < 20 ? 20 :
+        (u8)(pi_dev->buzzer_volume * 10));
     __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L,
                           note->freq & 0xFF);
     __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H,
