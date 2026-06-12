@@ -406,11 +406,16 @@ static ssize_t buzzer_volume_store(struct device *dev,
 
   buzzer_volume = value;
 
-  /* MCU expects 0-100, scale up */
+  /* MCU expects 0-100. Minimum floor of 20 (2/10) so buzzer can physically oscillate. */
   mutex_lock(&pi_dev->lock);
   pi_dev->buzzer_volume = (u8)value;
-  ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL,
-      value >= 10 ? 100 : (u8)(value * 10));
+  if (value == 0) {
+    ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL, 0);
+  } else {
+    u8 mcu_val = (u8)(value * 10);
+    if (mcu_val < 20) mcu_val = 20;
+    ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL, mcu_val);
+  }
   mutex_unlock(&pi_dev->lock);
 
   if (ret < 0) {
