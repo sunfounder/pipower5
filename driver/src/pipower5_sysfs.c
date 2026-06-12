@@ -406,16 +406,11 @@ static ssize_t buzzer_volume_store(struct device *dev,
 
   buzzer_volume = value;
 
-  /* MCU expects 0-100. Minimum floor of 20 (2/10) so buzzer can physically oscillate. */
+  /* MCU expects 0-100 */
   mutex_lock(&pi_dev->lock);
   pi_dev->buzzer_volume = (u8)value;
-  if (value == 0) {
-    ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL, 0);
-  } else {
-    u8 mcu_val = (u8)(value * 10);
-    if (mcu_val < 20) mcu_val = 20;
-    ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL, mcu_val);
-  }
+  ret = __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL,
+      value >= 10 ? 100 : (u8)(value * 10));
   mutex_unlock(&pi_dev->lock);
 
   if (ret < 0) {
@@ -473,14 +468,8 @@ static void pipower5_buzzer_work_func(struct work_struct *work) {
       queue_delayed_work(pi_dev->wq, &pi_dev->buzzer_work, 0);
     }
   } else {
-    /* Start playing a new note — write volume + frequency */
+    /* Start playing a new note */
     mutex_lock(&pi_dev->lock);
-    /* Re-assert volume; some MCU firmwares reset it on frequency change */
-    __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_VOL,
-        pi_dev->buzzer_volume == 0 ? 0 :
-        pi_dev->buzzer_volume >= 10 ? 100 :
-        (u8)(pi_dev->buzzer_volume * 10) < 20 ? 20 :
-        (u8)(pi_dev->buzzer_volume * 10));
     __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_L,
                           note->freq & 0xFF);
     __pipower5_write_byte(pi_dev, REG_WRITE_BUZZER_FEQ_H,
@@ -529,13 +518,13 @@ static const struct {
   const char *name;
   const char *default_seq;
 } buzzer_events[] = {
-  {"battery_activated",                 "440,50;0,100;494,50"},
-  {"low_battery",                       "440,50;0,100;440,50"},
-  {"power_disconnected",                "587,50;0,100;392,50"},
-  {"power_restored",                    "392,50;0,100;587,50"},
-  {"power_insufficient",                "494,50;0,100;494,50;0,100;494,100"},
-  {"battery_critical_shutdown",         "1047,50;0,60;1047,50;0,60;1047,100"},
-  {"battery_voltage_critical_shutdown", "1047,50;0,60;1047,50;0,60;1047,100;0,60;1047,100"},
+  {"battery_activated",                 "440,200;0,100;494,200"},
+  {"low_battery",                       "440,200;0,100;440,200"},
+  {"power_disconnected",                "587,200;0,100;392,200"},
+  {"power_restored",                    "392,200;0,100;587,200"},
+  {"power_insufficient",                "494,200;0,100;494,200"},
+  {"battery_critical_shutdown",         "1047,300;0,100;1047,300;0,100;1047,500"},
+  {"battery_voltage_critical_shutdown", "1047,300;0,100;1047,300;0,100;1047,500"},
 };
 
 static const char *buzzer_lookup_event(const char *name) {
