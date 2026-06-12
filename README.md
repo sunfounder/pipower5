@@ -1,88 +1,52 @@
 # PiPower 5
 
-UPS HAT for Raspberry Pi 5.
+UPS HAT for Raspberry Pi 5 — I2C-based kernel driver with sysfs interface.
 
-## Installation
+## Quick Install
 
-### Option 1: One-liner
-
-Install PiPower 5 standalone:
+PiPower 5 standalone:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/sunfounder/sunfounder-installer-scripts/main/pironman5/install.sh | sudo bash -s -- --variant pipower5
+curl -sSL https://raw.githubusercontent.com/sunfounder/pironman5/ups/install.sh | sudo bash -s -- --variant pipower5
 ```
 
-Or install as Pironman 5 UPS bundle:
+Or as Pironman 5 plugin:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/sunfounder/sunfounder-installer-scripts/main/pironman5/install.sh | sudo bash -s -- --variant ups
+curl -sSL https://raw.githubusercontent.com/sunfounder/pironman5/ups/install.sh | sudo bash -s -- --variant ups
 ```
 
-If Pironman 5 is already installed, add PiPower 5 as a plugin:
+## CLI Usage
 
 ```bash
-pironman5 plugin install pipower5
+pipower5 -a                  # Show all status
+pipower5 -bv                 # Battery voltage
+pipower5 -bp                 # Battery percentage
+pipower5 --power-failure-simulation 60  # Battery runtime test (60s)
+pipower5 --buzz-on           # Show buzzer event settings
+pipower5 --buzzer-volume 8   # Set buzzer volume (0-10)
+pipower5 send-email test     # Test email configuration
+pipower5 doctor              # Hardware diagnostic
+pipower5 doctor --fix        # Auto-repair
 ```
 
-### Option 2: Manual install
+## Web Dashboard
 
-**Step 1: Install kernel driver**
+After install, open `http://<ip>:34001` for the dashboard.
 
-```bash
-cd driver
-sudo bash install.sh
-sudo reboot
-```
+## Architecture
 
-**Step 2: Install Python library**
-
-```bash
-sudo pip3 install git+https://github.com/sunfounder/pipower5.git@feature/native-driver
-```
-
-## Usage
-
-```bash
-pipower5 -a              # Show all status
-pipower5 -bv             # Battery voltage
-pipower5 -bp             # Battery percentage
-pipower5 doctor          # Hardware diagnostic
-pipower5 doctor --fix    # Auto-repair
-pipower5 uninstall       # Remove driver and package
-```
+- **Kernel driver** (`/sys/class/pipower5/pipower5/`): sysfs interface for all sensors, buzzer, power failure test
+- **Python library** (`pipower5`): wraps sysfs, provides CLI + email + config management
+- **pm_auto addon** (`PiPower5Addon`): bridges driver to pironman5 event bus
+- **Email**: kernel uevents → udev rules → `pipower5 send-email` via `systemd-run`
 
 ## Development
 
-Clone and install in editable mode:
+Clone and build:
 
 ```bash
-git clone https://github.com/sunfounder/pipower5.git
-cd pipower5
-sudo pip3 install -e .
+git clone -b feature/native-driver https://github.com/sunfounder/pipower5.git
+cd pipower5/driver && make && make install && sudo reboot
+cd .. && sudo pip3 install -e .
 ```
-
-Build and install driver from source:
-
-```bash
-cd driver
-sudo bash install.sh
-sudo reboot
-```
-
-Debug with journal:
-
-```bash
-journalctl -xefu pipower5.service
-# or if installed via pironman5:
-journalctl -xefu pironman5.service
-```
-
-## Power-off signal for Pi 3B+ / Pi Zero
-
-Edit `/boot/firmware/config.txt`:
-
-```
-dtoverlay=gpio-poweroff,gpio_pin=26,active_low=1
-gpio=26=op,dh
-```
-
