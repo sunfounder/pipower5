@@ -168,14 +168,19 @@ static void pipower5_poll_work(struct work_struct *work) {
           "power_restored" : "power_disconnected");
       }
 
-      /* BATTERY_ACTIVATED: switched to battery power */
+      /* BATTERY_ACTIVATED: switched to battery power.
+       * Skip buzzer if power was just disconnected in this same cycle —
+       * POWER_DISCONNECTED buzzer is already playing and this is the consequence. */
       if (pi_dev->power_source != pi_dev->last_power_source &&
           pi_dev->power_source == 1) {
+        bool just_unplugged = (pi_dev->is_input_plugged_in != pi_dev->last_is_input_plugged_in
+                               && pi_dev->is_input_plugged_in == 0);
         char *envp[] = { "PIPOWER5_EVENT=battery_activated", NULL };
         pipower5_log_event(pi_dev, "BATTERY_ACTIVATED bat=%d%%",
                            pi_dev->battery_percentage);
         kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_CHANGE, envp);
-        pipower5_buzzer_event(pi_dev, "battery_activated");
+        if (!just_unplugged)
+          pipower5_buzzer_event(pi_dev, "battery_activated");
       }
 
       /* POWER_INSUFFICIENT: input plugged in but battery still discharging.
