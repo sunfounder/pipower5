@@ -153,7 +153,7 @@ class PiPower5:
                 'input_status': 'N/A',
                 'charging_status': 'N/A',
             }
-            result = sender.send_preset_email('battery_activated', test_data)
+            result = sender.send_preset_email('test', test_data)
             if result is not True:
                 return False, f"Connection OK but send failed: {result}"
             return True, "Test email sent"
