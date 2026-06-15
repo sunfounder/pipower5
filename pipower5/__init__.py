@@ -229,11 +229,17 @@ def main():
             quit()
         event = extra[0]
 
-        # Load config: try pironman5 first, then pipower5 standalone
+        # Load config: merge pironman5 + pipower5 CLI (pironman5 takes priority for non-empty values)
         pironman5_config = "/opt/pironman5/config.json"
         if os.path.exists(pironman5_config):
             with open(pironman5_config, 'r') as f:
                 cfg = json.load(f).get('system', {})
+            # Merge CLI config as fallback for empty/missing values
+            if os.path.exists(config_path):
+                cli_cfg = current_config.get('system', {})
+                for k in ('send_email_to', 'smtp_server', 'smtp_email', 'smtp_password', 'smtp_port', 'smtp_security'):
+                    if not cfg.get(k) and cli_cfg.get(k):
+                        cfg[k] = cli_cfg[k]
         elif os.path.exists(config_path):
             cfg = current_config.get('system', {})
         else:
