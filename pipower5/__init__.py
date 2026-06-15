@@ -246,6 +246,13 @@ def main():
             cfg = SYSTEM_DEFAULT_CONFIG
 
         from .email_sender import EmailSender
+
+        # Check if this event is enabled in send_email_on
+        send_email_on = cfg.get('send_email_on', [])
+        if send_email_on and event not in send_email_on:
+            print(f"Email for '{event}' is disabled in send_email_on config")
+            quit()
+
         sender = EmailSender(cfg)
         bat_pct = pipower5.read_battery_percentage()
         bat_cur = pipower5.read_battery_current()
