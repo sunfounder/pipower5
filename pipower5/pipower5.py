@@ -133,14 +133,30 @@ class PiPower5:
 
     @staticmethod
     def test_smtp(config):
-        """Test SMTP connection. Returns (bool, message)."""
+        """Test SMTP connection and send a test email. Returns (bool, message)."""
         try:
             from .email_sender import EmailSender
             sender = EmailSender(config)
             if not sender.is_ready():
                 return False, "SMTP settings incomplete"
             sender.connect()
-            return True, ""
+            # Send a test email
+            import time
+            test_data = {
+                'device_name': 'PiPower5',
+                'battery_percentage': 'N/A',
+                'battery_voltage': 'N/A',
+                'shutdown_percentage': 'N/A',
+                'battery_current_output': 'N/A',
+                'estimated_time': 'N/A',
+                'switch_time': time.strftime('%Y-%m-%d %H:%M:%S'),
+                'input_status': 'N/A',
+                'charging_status': 'N/A',
+            }
+            result = sender.send_preset_email('battery_activated', test_data)
+            if result is not True:
+                return False, f"Connection OK but send failed: {result}"
+            return True, "Test email sent"
         except Exception as e:
             return False, str(e)
 
