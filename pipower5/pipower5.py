@@ -131,8 +131,7 @@ class PiPower5:
         raw = self._read_sysfs("buzz_on")
         return int(raw, 16) if raw.startswith("0x") else int(raw)
 
-    @staticmethod
-    def test_smtp(config):
+    def test_smtp(self, config):
         """Test SMTP connection and send a test email. Returns (bool, message)."""
         try:
             from .email_sender import EmailSender
@@ -140,18 +139,22 @@ class PiPower5:
             if not sender.is_ready():
                 return False, "SMTP settings incomplete"
             sender.connect()
-            # Send a test email
+            # Send a test email with real hardware data
             import time
+            bat_pct = self.read_battery_percentage()
+            bat_cur = self.read_battery_current()
+            is_plugged = self.read_is_input_plugged_in()
+            is_charging = self.read_is_charging()
             test_data = {
                 'device_name': 'PiPower5',
-                'battery_percentage': 'N/A',
-                'battery_voltage': 'N/A',
-                'shutdown_percentage': 'N/A',
-                'battery_current_output': 'N/A',
+                'battery_percentage': f'{bat_pct}%',
+                'battery_voltage': f'{self.read_battery_voltage() / 1000:.1f}V',
+                'shutdown_percentage': f'{self.read_shutdown_percentage()}%',
+                'battery_current_output': f'{bat_cur}mA',
                 'estimated_time': 'N/A',
                 'switch_time': time.strftime('%Y-%m-%d %H:%M:%S'),
-                'input_status': 'N/A',
-                'charging_status': 'N/A',
+                'input_status': 'Plugged In' if is_plugged else 'Unplugged',
+                'charging_status': 'Charging' if is_charging else ('Not Charging' if is_plugged else 'N/A (on battery)'),
             }
             result = sender.send_preset_email('test', test_data)
             if result is not True:
