@@ -17,8 +17,8 @@ pipower5-objs := \
 	src/pipower5_button.o \
 	src/pipower5_shutdown.o
 
-# Compilation flags
-EXTRA_CFLAGS := -I$(PWD)/include
+# Compilation flags (ccflags-y for Kbuild compatibility across all kernel versions)
+ccflags-y := -I$(PWD)/include
 
 # Device Tree Compiler and overlay file settings
 DTC := dtc
@@ -64,7 +64,7 @@ all: module dtbo
 module:
 	@echo "Building PiPower5 driver v$(DRIVER_VERSION)..."
 	@$(check_kdir)
-	$(MAKE) -C $(KDIR) M=$(PWD) EXTRA_CFLAGS="$(EXTRA_CFLAGS)" modules
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
 	@echo "Module build completed."
 
 dtbo:
