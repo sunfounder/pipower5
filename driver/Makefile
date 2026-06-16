@@ -4,8 +4,10 @@
 KDIR ?= /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
 
-# Extract version from pipower5.h
-DRIVER_VERSION := $(shell grep 'PIPOWER5_DRIVER_VERSION' include/pipower5.h | head -1 | sed 's/.*"\(.*\)".*/\1/')
+# Extract version from pipower5.h (2>/dev/null: sub-make re-parse runs from kernel
+# build dir where the relative path doesn't resolve — version is only needed by
+# parent make targets like dkms_install, so a silent miss in sub-make is harmless)
+DRIVER_VERSION := $(shell grep 'PIPOWER5_DRIVER_VERSION' $(PWD)/include/pipower5.h 2>/dev/null | head -1 | sed 's/.*"\(.*\)".*/\1/')
 
 # Module definition - Combine all source files into a single module
 obj-m += pipower5.o
@@ -18,7 +20,9 @@ pipower5-objs := \
 	src/pipower5_shutdown.o
 
 # Compilation flags (ccflags-y for Kbuild compatibility across all kernel versions)
-ccflags-y := -I$(PWD)/include
+# $(src) is set by Kbuild to the module directory — always correct, unlike $(PWD) which
+# changes to the kernel build directory during sub-make.
+ccflags-y := -I$(src)/include
 
 # Device Tree Compiler and overlay file settings
 DTC := dtc
