@@ -29,8 +29,11 @@ DTC := dtc
 DTBO_NAME := sunfounder-pipower5.dtbo
 DTOVERLAY_NAME := sunfounder-pipower5
 
-# Automatically detect the correct overlay directory path
+# Automatically detect the correct overlay directory path.
+# Ubuntu uses os_prefix=current/ in config.txt, so the firmware reads
+# overlays from /boot/firmware/current/overlays/ instead of /boot/firmware/overlays/.
 OVERLAY_DIRS := \
+	/boot/firmware/current/overlays \
 	/boot/firmware/overlays \
 	/boot/overlays \
 	/lib/firmware \
