@@ -4,8 +4,10 @@
 KDIR ?= /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
 
-# Extract version from pipower5.h
-DRIVER_VERSION := $(shell grep 'PIPOWER5_DRIVER_VERSION' include/pipower5.h | head -1 | sed 's/.*"\(.*\)".*/\1/')
+# Extract version from pipower5.h (2>/dev/null: sub-make re-parse runs from kernel
+# build dir where the relative path doesn't resolve — version is only needed by
+# parent make targets like dkms_install, so a silent miss in sub-make is harmless)
+DRIVER_VERSION := $(shell grep 'PIPOWER5_DRIVER_VERSION' $(PWD)/include/pipower5.h 2>/dev/null | head -1 | sed 's/.*"\(.*\)".*/\1/')
 
 # Module definition - Combine all source files into a single module
 obj-m += pipower5.o
@@ -17,16 +19,21 @@ pipower5-objs := \
 	src/pipower5_button.o \
 	src/pipower5_shutdown.o
 
-# Compilation flags
-EXTRA_CFLAGS := -I$(PWD)/include
+# Compilation flags (ccflags-y for Kbuild compatibility across all kernel versions)
+# $(src) is set by Kbuild to the module directory — always correct, unlike $(PWD) which
+# changes to the kernel build directory during sub-make.
+ccflags-y := -I$(src)/include
 
 # Device Tree Compiler and overlay file settings
 DTC := dtc
 DTBO_NAME := sunfounder-pipower5.dtbo
 DTOVERLAY_NAME := sunfounder-pipower5
 
-# Automatically detect the correct overlay directory path
+# Automatically detect the correct overlay directory path.
+# Ubuntu uses os_prefix=current/ in config.txt, so the firmware reads
+# overlays from /boot/firmware/current/overlays/ instead of /boot/firmware/overlays/.
 OVERLAY_DIRS := \
+	/boot/firmware/current/overlays \
 	/boot/firmware/overlays \
 	/boot/overlays \
 	/lib/firmware \
@@ -64,7 +71,7 @@ all: module dtbo
 module:
 	@echo "Building PiPower5 driver v$(DRIVER_VERSION)..."
 	@$(check_kdir)
-	$(MAKE) -C $(KDIR) M=$(PWD) EXTRA_CFLAGS="$(EXTRA_CFLAGS)" modules
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
 	@echo "Module build completed."
 
 dtbo:
