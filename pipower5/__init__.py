@@ -84,7 +84,6 @@ def main():
     new_sys_config = {}
     new_peripheral_config = {}
 
-    pipower5 = PiPower5()
     parser = argparse.ArgumentParser(prog='pipower5', description='PiPower 5')
     parser.add_argument("command",
                         choices=["doctor", "uninstall", "info", "status", "send-email"],
@@ -133,6 +132,21 @@ def main():
 
     if not len(sys.argv) > 1:
         parser.print_help()
+        quit()
+
+    # ── Commands that don't need hardware ──
+    if args.command == "doctor":
+        from .device import doctor
+        doctor(fix=args.fix)
+        quit()
+
+    if args.command == "uninstall":
+        from .device import uninstall
+        uninstall()
+        quit()
+
+    if args.version:
+        print(__version__)
         quit()
 
     current_config = {
@@ -213,10 +227,7 @@ def main():
                 print(f"Invalid value for database retention days, it should be a number")
                 quit()
 
-    if args.command == "doctor":
-        from .device import doctor
-        doctor(fix=args.fix)
-        quit()
+    pipower5 = PiPower5()
 
     if args.command in ("info", "status"):
         args.all = True  # alias for -a
@@ -274,15 +285,6 @@ def main():
             print(f"Email sent for: {event}")
         else:
             print(f"Failed to send email: {result}")
-        quit()
-
-    if args.command == "uninstall":
-        from .device import uninstall
-        uninstall()
-        quit()
-
-    if args.version:
-        print(__version__)
         quit()
 
     if args.remove_dashboard:
