@@ -51,14 +51,17 @@ CONFIG_TXT := $(firstword $(wildcard /boot/firmware/config.txt /boot/config.txt)
 check_kdir = \
 	(if [ ! -f "$(KDIR)/Makefile" ]; then \
 		echo "  Kernel headers not found, installing..."; \
-		sudo apt install -y linux-headers-$$(uname -r) 2>/dev/null \
-		|| sudo apt install -y raspberrypi-kernel-headers 2>/dev/null \
+		echo "  -> apt install -y linux-headers-$$(uname -r)"; \
+		sudo apt install -y linux-headers-$$(uname -r) 2>&1 \
+		|| { echo "  -> linux-headers-$$(uname -r) not available, trying raspberrypi-kernel-headers..."; \
+		     sudo apt install -y raspberrypi-kernel-headers 2>&1; } \
 		|| true; \
 		if [ ! -f "$(KDIR)/Makefile" ]; then \
 			echo "" >&2; \
 			echo "ERROR: Failed to install kernel headers." >&2; \
-			echo "Try: sudo apt install linux-headers-$$(uname -r)" >&2; \
-			echo "  or: sudo apt install raspberrypi-kernel-headers" >&2; \
+			echo "  The kernel headers package for $$(uname -r) is not available." >&2; \
+			echo "  This can happen on Debian trixie when the kernel is newer than the headers." >&2; \
+			echo "  Run 'pipower5 doctor' for details, or contact support with the output." >&2; \
 			exit 1; \
 		fi; \
 		echo "  Kernel headers installed."; \
