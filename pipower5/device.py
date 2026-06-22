@@ -135,12 +135,38 @@ def _check_power_supply() -> tuple:
     return ok, "" if ok else "Power supply not registered. Driver may need reload."
 
 def _check_i2c_device() -> tuple:
-    rc, out = _run_command("i2cdetect -y 1 0x5c 0x5c 2>/dev/null | grep -c 5c || echo 0")
+    # Driver-claimed device shows as "UU", unclaimed shows as "5c"
+    rc, out = _run_command("i2cdetect -y 1 0x5c 0x5c 2>/dev/null | grep -cE '5c|UU' || echo 0")
     try:
         ok = int(out.strip()) > 0
     except ValueError:
         ok = False
-    return ok, "" if ok else "PiPower5 (0x5C) not found on I2C bus 1."
+    if ok:
+        return True, ""
+    return False, "PiPower5 (0x5C) not found on I2C bus 1. Check that the HAT is properly attached and powered."
+
+def _check_module_file() -> tuple:
+    rc, out = _run_command("uname -r")
+    kver = out.strip()
+    # Check standard and DKMS locations
+    paths = [
+        f"/lib/modules/{kver}/extra/pipower5.ko",
+        f"/lib/modules/{kver}/updates/pipower5.ko",
+        f"/lib/modules/{kver}/updates/dkms/pipower5.ko",
+    ]
+    for path in paths:
+        if os.path.exists(path):
+            return True, ""
+        for ext in ("", ".xz", ".zst", ".gz"):
+            if os.path.exists(path + ext):
+                return True, ""
+    return False, f"pipower5.ko not found in /lib/modules/{kver}/ (checked extra/ and updates/). Driver may need rebuild."
+
+def _check_dkms_status() -> tuple:
+    rc, out = _run_command("dkms status pipower5 2>/dev/null || true")
+    if out.strip():
+        return True, out.strip()
+    return False, "pipower5 not registered with DKMS. Run 'sudo dkms build/install pipower5'."
 
 def doctor(fix: bool = False) -> dict:
     """Run hardware/driver health checks.
@@ -167,6 +193,8 @@ def doctor(fix: bool = False) -> dict:
         ("power_supply registered",_check_power_supply),
         ("dtoverlay in config.txt",_check_dtoverlay_config),
         ("device tree blob (.dtbo)",_check_dtbo_file),
+        ("kernel module file",     _check_module_file),
+        ("DKMS registered",        _check_dkms_status),
     ]
 
     for name, func in checks:
@@ -181,7 +209,10 @@ def doctor(fix: bool = False) -> dict:
     print("")
     if not results.get("I2C device (0x5C)", False):
         print(f"  {RED}PiPower5 not detected on I2C bus.{RESET}")
-        print(f"  → Ensure the HAT is properly attached and powered.")
+        print(f"  → Check that the HAT is properly attached and powered.")
+        print(f"  → Verify I2C is enabled: {BOLD}raspi-config{RESET} → Interface Options → I2C")
+        if not results.get("kernel module loaded", True) and not results.get("sysfs interface", True):
+            print(f"  (The driver is not loaded; if the HAT is attached, run --fix to load it.)")
     elif not results.get("dtoverlay in config.txt", False):
         print(f"  {YELLOW}dtoverlay not in config.txt{RESET}")
         if fix:
@@ -195,15 +226,151 @@ def doctor(fix: bool = False) -> dict:
     elif not results.get("kernel module loaded", False):
         print(f"  {YELLOW}Module not loaded{RESET}")
         if fix:
-            print("  → Running modprobe pipower5...")
-            _run_command("sudo modprobe pipower5 2>/dev/null")
+            print("  → Attempting to load module...")
+
+            # Check if module file exists
+            mod_file_ok, _ = _check_module_file()
+            if not mod_file_ok:
+                print(f"  {YELLOW}  Module file missing — attempting rebuild...{RESET}")
+
+                # Try DKMS build first
+                dkms_ok, dkms_detail = _check_dkms_status()
+                if dkms_ok:
+                    print("  → Rebuilding via DKMS...")
+                    _run_command("sudo dkms build -m pipower5 -v $(grep -oP '(?<=PACKAGE_VERSION=\")\\d+\\.\\d+\\.\\d+' /usr/src/pipower5-*/dkms.conf 2>/dev/null | head -1) 2>&1")
+                    _run_command("sudo dkms install -m pipower5 -v $(grep -oP '(?<=PACKAGE_VERSION=\")\\d+\\.\\d+\\.\\d+' /usr/src/pipower5-*/dkms.conf 2>/dev/null | head -1) --force 2>&1")
+                else:
+                    print("  → DKMS source not found. Trying rebuild from source...")
+                    for src_dir in ["/home/pi/pipower5/driver", "/home/kc5jim/pipower5/driver", "/root/pipower5/driver"]:
+                        if os.path.exists(f"{src_dir}/Makefile"):
+                            _run_command(f"cd {src_dir} && sudo make clean && sudo make module && sudo make dkms_install 2>&1")
+                            break
+
+                # Re-check module file
+                mod_file_ok, _ = _check_module_file()
+
+            if mod_file_ok:
+                print("  → Running modprobe pipower5...")
+                _run_command("sudo depmod -a")
+                rc, _ = _run_command("sudo modprobe pipower5 2>&1")
+                if rc == 0:
+                    print(f"  {GREEN}→ Module loaded successfully.{RESET}")
+                else:
+                    print(f"  {RED}→ modprobe failed. Try rebooting or send the following to support:{RESET}")
+                    rc, dmesg_out = _run_command("dmesg | grep -i pipower5 2>/dev/null || true")
+                    if dmesg_out.strip():
+                        print(f"    {BOLD}[dmesg]{RESET}")
+                        for line in dmesg_out.strip().split("\n"):
+                            print(f"      {line}")
+            else:
+                print(f"  {RED}→ Could not rebuild module. Install kernel headers first:{RESET}")
+                print(f"     sudo apt install linux-headers-$(uname -r)")
         else:
             print(f"  → Run: {BOLD}pipower5 doctor --fix{RESET}")
     elif overall:
         print(f"  {GREEN}All checks passed.{RESET}")
     else:
         print(f"  {YELLOW}Some checks failed.{RESET}")
-        print(f"  → Run: {BOLD}pipower5 doctor --fix{RESET}")
+        if fix:
+            fixed = 0
+            # Try to register with DKMS if missing
+            if not results.get("DKMS registered", True):
+                print("  → Attempting DKMS registration...")
+                # Find source in common locations
+                src_found = None
+                for d in ["/home/pi/pipower5", "/home/kc5jim/pipower5",
+                          "/root/pipower5", "/home/only/pipower5"]:
+                    conf = f"{d}/driver/dkms.conf"
+                    if os.path.exists(conf):
+                        src_found = d
+                        break
+                if src_found:
+                    drv_dir = f"{src_found}/driver"
+                    # Get version from header
+                    rc, ver = _run_command(f"grep -oP '(?<=PIPOWER5_DRIVER_VERSION \")[^\"]+' {drv_dir}/include/pipower5.h 2>/dev/null || echo 2.1.0")
+                    ver = ver.strip() or "2.1.0"
+                    dkms_src = f"/usr/src/pipower5-{ver}"
+                    # Copy source and register
+                    _run_command(f"sudo mkdir -p {dkms_src}/src {dkms_src}/include")
+                    _run_command(f"sudo cp {drv_dir}/Makefile {drv_dir}/dkms.conf {dkms_src}/")
+                    _run_command(f"sudo cp {drv_dir}/include/*.h {dkms_src}/include/")
+                    _run_command(f"sudo cp {drv_dir}/src/*.c {dkms_src}/src/")
+                    _run_command(f"sudo sed -i 's/^PACKAGE_VERSION=.*/PACKAGE_VERSION=\"{ver}\"/' {dkms_src}/dkms.conf")
+                    rc1, _ = _run_command(f"sudo dkms add -m pipower5 -v {ver} 2>&1")
+                    rc2, _ = _run_command(f"sudo dkms build -m pipower5 -v {ver} 2>&1")
+                    rc3, _ = _run_command(f"sudo dkms install -m pipower5 -v {ver} --force 2>&1")
+                    dkms_ok, _ = _check_dkms_status()
+                    if dkms_ok:
+                        print(f"  {GREEN}→ DKMS registered.{RESET}")
+                        fixed += 1
+                    else:
+                        print(f"  {RED}→ DKMS registration failed.{RESET}")
+                else:
+                    print(f"  {RED}→ Source not found. Reinstall PiPower5 package.{RESET}")
+
+            # Handle power_supply not registered (needs DT overlay + reboot)
+            if not results.get("power_supply registered", True):
+                if results.get("kernel module loaded", False):
+                    print(f"  {YELLOW}→ Power supply not registered. Reloading driver...{RESET}")
+                    _run_command("sudo rmmod pipower5 2>/dev/null")
+                    _run_command("sudo modprobe pipower5 2>&1")
+                    ps_ok, _ = _check_power_supply()
+                    if ps_ok:
+                        print(f"  {GREEN}→ Power supply registered.{RESET}")
+                        fixed += 1
+                    else:
+                        print(f"  {YELLOW}→ Power supply still not registered. A reboot is required to apply the device tree overlay.{RESET}")
+                        print(f"  {BOLD}  Reboot now? (y/n):{RESET} ", end="", flush=True)
+                        try:
+                            ans = input().strip().lower()
+                            if ans in ("y", "yes"):
+                                print("  → Rebooting...")
+                                _run_command("sudo reboot")
+                        except (EOFError, OSError):
+                            print("  → Run 'sudo reboot' manually after saving your work.")
+                else:
+                    print(f"  {YELLOW}→ Power supply will register after reboot with dtoverlay.{RESET}")
+                    print(f"  {BOLD}  Reboot now? (y/n):{RESET} ", end="", flush=True)
+                    try:
+                        ans = input().strip().lower()
+                        if ans in ("y", "yes"):
+                            print("  → Rebooting...")
+                            _run_command("sudo reboot")
+                    except (EOFError, OSError):
+                        print("  → Run 'sudo reboot' manually after saving your work.")
+
+            # Fallback: try rebuilding module file if missing
+            if not results.get("kernel module file", True):
+                _run_command("sudo depmod -a")
+                mod_ok, _ = _check_module_file()
+                if mod_ok:
+                    print(f"  {GREEN}→ Module file restored.{RESET}")
+                    fixed += 1
+
+            if fixed > 0:
+                # Re-evaluate all checks
+                for name, func in checks:
+                    ok, detail = func()
+                    results[name] = ok
+                    _print_check(name, ok, detail)
+                print(f"  {GREEN}→ {fixed} issue(s) fixed.{RESET}")
+                # Check if everything is green now
+                if all(results.get(k, True) for k in ("I2C device (0x5C)", "sysfs interface",
+                    "kernel module loaded", "power_supply registered",
+                    "dtoverlay in config.txt", "device tree blob (.dtbo)",
+                    "kernel module file", "DKMS registered")):
+                    print(f"  {GREEN}All checks passed.{RESET}")
+            else:
+                print(f"  → Could not auto-fix. Please send the following to support:")
+                rc, dmesg_out = _run_command("dmesg | grep -i pipower5 2>/dev/null || true")
+                if dmesg_out.strip():
+                    print(f"  {BOLD}[dmesg | grep pipower5]{RESET}")
+                    for line in dmesg_out.strip().split("\n"):
+                        print(f"    {line}")
+                else:
+                    print(f"     (no pipower5 messages in dmesg)")
+        else:
+            print(f"  → Run: {BOLD}pipower5 doctor --fix{RESET}")
 
     print("")
     print("=" * 55)
