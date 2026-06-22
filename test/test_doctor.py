@@ -54,13 +54,19 @@ __all__ = ["TestDoctor", "TestIsConnected", "TestMainDispatch"]
 #  Helper factories for mock side-effects
 # ════════════════════════════════════════════════════════════════════════
 
-def mock_run_cmd(i2c_found=True, module_loaded=True):
+def mock_run_cmd(i2c_found=True, module_loaded=True, kernel_ver="6.6.31+rpt-rpi-2712", dkms_installed=True):
     """Return a callable that simulates device._run_command()."""
     def side_effect(cmd, timeout=10):
         if "i2cdetect" in cmd:
             return (0, "1" if i2c_found else "0")
         if "lsmod" in cmd:
             return (0, "yes" if module_loaded else "no")
+        if "uname -r" in cmd:
+            return (0, kernel_ver)
+        if "dkms status" in cmd:
+            if dkms_installed:
+                return (0, f"pipower5/2.1.0, {kernel_ver}, aarch64: installed")
+            return (0, "")
         return (0, "")
     return side_effect
 
@@ -71,13 +77,17 @@ PATH_ALWAYS = {
 
 
 def _path_set(sysfs=True, module=True, power_supply=True,
-              dtbo=True, config_txt=True):
+              dtbo=True, config_txt=True, mod_file=True):
     s = set(PATH_ALWAYS)
     if sysfs:        s.add(DEVICE_PATH)
     if module:       s.add(MODULE_PATH)
     if power_supply: s.add("/sys/class/power_supply/pipower5")
     if dtbo:         s.add("/boot/firmware/overlays/sunfounder-pipower5.dtbo")
     if config_txt:   s.add("/boot/firmware/config.txt")
+    if mod_file:
+        s.add("/lib/modules/6.6.31+rpt-rpi-2712/extra/pipower5.ko")
+        s.add("/lib/modules/6.6.31+rpt-rpi-2712/updates/pipower5.ko")
+        s.add("/lib/modules/6.6.31+rpt-rpi-2712/updates/dkms/pipower5.ko")
     return s
 
 
@@ -97,8 +107,8 @@ class TestDoctor(unittest.TestCase):
         """Run doctor() with mocked os.path and _run_command.
 
         Parameters (all bool, default True):
-            sysfs, module, power_supply, dtbo, config_txt
-            i2c, module_loaded
+            sysfs, module, power_supply, dtbo, config_txt, mod_file
+            i2c, module_loaded, dkms_installed
 
         config_txt_lines: list of lines to mock as config.txt content.
                           Default = ``["dtoverlay=sunfounder-pipower5\n"]``
@@ -109,11 +119,13 @@ class TestDoctor(unittest.TestCase):
             power_supply=kwargs.get("power_supply", True),
             dtbo=kwargs.get("dtbo", True),
             config_txt=kwargs.get("config_txt", True),
+            mod_file=kwargs.get("mod_file", True),
         )
         path_side = mock_os_path(ps)
         cmd_side = mock_run_cmd(
             i2c_found=kwargs.get("i2c", True),
             module_loaded=kwargs.get("module_loaded", True),
+            dkms_installed=kwargs.get("dkms_installed", True),
         )
 
         # Config.txt content — default has dtoverlay, caller can override
@@ -140,7 +152,8 @@ class TestDoctor(unittest.TestCase):
         self.assertTrue(r["overall"])
         for key in ("I2C device (0x5C)", "sysfs interface",
                     "kernel module loaded", "power_supply registered",
-                    "dtoverlay in config.txt", "device tree blob (.dtbo)"):
+                    "dtoverlay in config.txt", "device tree blob (.dtbo)",
+                    "kernel module file", "DKMS registered"):
             with self.subTest(check=key):
                 self.assertTrue(r[key])
 
@@ -197,6 +210,16 @@ class TestDoctor(unittest.TestCase):
             "# Config\n", "arm_64bit=1\n",
         ])
         self.assertFalse(r["dtoverlay in config.txt"])
+
+    def test_module_file_missing(self):
+        r = self._doctor(mod_file=False)
+        self.assertFalse(r["kernel module file"])
+        self.assertFalse(r["overall"])
+
+    def test_dkms_not_registered(self):
+        r = self._doctor(dkms_installed=False)
+        self.assertFalse(r["DKMS registered"])
+        self.assertFalse(r["overall"])
 
 
 # ════════════════════════════════════════════════════════════════════════
