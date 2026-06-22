@@ -53,14 +53,21 @@ check_kdir = \
 		echo "  Kernel headers not found, installing..."; \
 		echo "  -> apt install -y linux-headers-$$(uname -r)"; \
 		sudo apt install -y linux-headers-$$(uname -r) 2>&1 \
-		|| { echo "  -> linux-headers-$$(uname -r) not available, trying raspberrypi-kernel-headers..."; \
+		|| { _flav=$$(echo "$$(uname -r)" | sed 's/^[0-9.]*//' | sed 's/^[+-]//'); \
+		     echo "  -> trying linux-headers-$${_flav} (flavor name)..."; \
+		     sudo apt install -y "linux-headers-${_flav}" 2>&1; } \
+		|| { echo "  -> trying raspberrypi-kernel-headers..."; \
 		     sudo apt install -y raspberrypi-kernel-headers 2>&1; } \
 		|| true; \
 		if [ ! -f "$(KDIR)/Makefile" ]; then \
 			echo "" >&2; \
 			echo "ERROR: Failed to install kernel headers." >&2; \
-			echo "  The kernel headers package for $$(uname -r) is not available." >&2; \
-			echo "  This can happen on Debian trixie when the kernel is newer than the headers." >&2; \
+			echo "  Tried: linux-headers-$$(uname -r)" >&2; \
+			echo "  Tried: linux-headers-$$(echo "$$(uname -r)" | sed 's/^[0-9.]*//' | sed 's/^[+-]//')" >&2; \
+			echo "  Tried: raspberrypi-kernel-headers" >&2; \
+			echo "  Run 'pipower5 doctor' for details, or contact support with the output." >&2; \
+			echo "  Tried: raspberrypi-kernel-headers" >&2; \
+>>>>>>> 91dd894 (fix: add Armbian kernel headers fallback)
 			echo "  Run 'pipower5 doctor' for details, or contact support with the output." >&2; \
 			exit 1; \
 		fi; \
