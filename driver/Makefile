@@ -66,9 +66,6 @@ check_kdir = \
 			echo "  Tried: linux-headers-$$(echo "$$(uname -r)" | sed 's/^[0-9.]*//' | sed 's/^[+-]//')" >&2; \
 			echo "  Tried: raspberrypi-kernel-headers" >&2; \
 			echo "  Run 'pipower5 doctor' for details, or contact support with the output." >&2; \
-			echo "  Tried: raspberrypi-kernel-headers" >&2; \
->>>>>>> 91dd894 (fix: add Armbian kernel headers fallback)
-			echo "  Run 'pipower5 doctor' for details, or contact support with the output." >&2; \
 			exit 1; \
 		fi; \
 		echo "  Kernel headers installed."; \
