@@ -136,22 +136,13 @@ def _check_power_supply() -> tuple:
 
 def _check_i2c_device() -> tuple:
     # Driver-claimed device shows as "UU", unclaimed shows as "5c"
-    # Try without sudo first (works on RPi OS where pi user is in i2c group)
-    rc, out = _run_command("i2cdetect -y 1 0x5c 0x5c 2>/dev/null | grep -cE '5c|UU' || echo 0")
+    rc, out = _run_command("sudo i2cdetect -y 1 0x5c 0x5c 2>/dev/null | grep -cE '5c|UU' || echo 0")
     try:
         ok = int(out.strip()) > 0
     except ValueError:
         ok = False
     if ok:
         return True, ""
-    # If failed, try with sudo to distinguish "no permission" from "no device"
-    rc2, out2 = _run_command("sudo -n i2cdetect -y 1 0x5c 0x5c 2>/dev/null | grep -cE '5c|UU' || echo 0")
-    try:
-        ok2 = int(out2.strip()) > 0
-    except ValueError:
-        ok2 = False
-    if ok2:
-        return False, "Device found (via sudo) but your user lacks I2C permission. Fix: sudo usermod -aG i2c $USER && newgrp i2c"
     return False, "PiPower5 (0x5C) not found on I2C bus 1. Check that the HAT is properly attached and powered."
 
 def _check_module_file() -> tuple:
