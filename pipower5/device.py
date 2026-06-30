@@ -136,7 +136,7 @@ def _check_power_supply() -> tuple:
 
 def _check_i2c_device() -> tuple:
     # Driver-claimed device shows as "UU", unclaimed shows as "5c"
-    rc, out = _run_command("i2cdetect -y 1 0x5c 0x5c 2>/dev/null | grep -cE '5c|UU' || echo 0")
+    rc, out = _run_command("sudo i2cdetect -y 1 0x5c 0x5c 2>/dev/null | grep -cE '5c|UU' || echo 0")
     try:
         ok = int(out.strip()) > 0
     except ValueError:
