@@ -142,6 +142,12 @@ dkms_install:
 			echo "Error: Failed to install DKMS."; exit 1; \
 		}; \
 	fi
+	@# Ensure kernel headers meta-package is installed for future kernel updates.
+	@# On Ubuntu, linux-image-raspi does not depend on linux-headers-raspi,
+	@# so headers are not automatically pulled in when the kernel updates.
+	@# Without headers, DKMS cannot auto-rebuild modules after kernel upgrades.
+	@echo "Ensuring kernel headers are installed..."
+	@sudo apt-get install -y linux-headers-raspi 2>/dev/null || true
 	@# Remove only the current version if already installed (not --all)
 	-@sudo dkms remove -m pipower5 -v $(DRIVER_VERSION) 2>/dev/null || true
 	@# Clean non-DKMS module files
@@ -159,6 +165,8 @@ dkms_install:
 	@sudo dkms build -m pipower5 -v $(DRIVER_VERSION)
 	@sudo dkms install -m pipower5 -v $(DRIVER_VERSION) --force
 	@echo "DKMS installation completed. Driver will auto-rebuild on kernel updates."
+	@echo "Loading pipower5 module..."
+	@sudo modprobe pipower5 || echo "  Warning: Failed to load module. A reboot may be needed."
 
 dkms_uninstall:
 	@echo "Removing PiPower5 driver from DKMS..."
