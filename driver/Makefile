@@ -148,8 +148,9 @@ dkms_install:
 	@# Without headers, DKMS cannot auto-rebuild modules after kernel upgrades.
 	@echo "Ensuring kernel headers are installed..."
 	@sudo apt-get install -y linux-headers-raspi 2>/dev/null || true
-	@# Remove only the current version if already installed (not --all)
-	-@sudo dkms remove -m pipower5 -v $(DRIVER_VERSION) 2>/dev/null || true
+	@# Remove current kernel's build only — preserves other kernel builds
+	@# (e.g. from DKMS autoinstall triggered by linux-headers postinst hook).
+	-@sudo dkms remove -m pipower5 -v $(DRIVER_VERSION) -k $(shell uname -r) 2>/dev/null || true
 	@# Clean non-DKMS module files
 	@sudo rm -f /lib/modules/$(shell uname -r)/extra/pipower5.ko* 2>/dev/null || true
 	@sudo rm -f /etc/modules-load.d/pipower5.conf 2>/dev/null || true
@@ -160,8 +161,12 @@ dkms_install:
 	@sudo cp -f include/*.h $(DKMS_SRC)/include/
 	@sudo cp -f src/*.c $(DKMS_SRC)/src/
 	@sudo sed -i 's/^PACKAGE_VERSION=.*/PACKAGE_VERSION="$(DRIVER_VERSION)"/' $(DKMS_SRC)/dkms.conf
-	@# Add, build, install
-	@sudo dkms add -m pipower5 -v $(DRIVER_VERSION)
+	@# Add (skip if already registered), build, install
+	@if sudo dkms status -m pipower5 -v $(DRIVER_VERSION) 2>/dev/null | grep -q .; then \
+		echo "pipower5/$(DRIVER_VERSION) already registered with DKMS, skipping add."; \
+	else \
+		sudo dkms add -m pipower5 -v $(DRIVER_VERSION); \
+	fi
 	@sudo dkms build -m pipower5 -v $(DRIVER_VERSION)
 	@sudo dkms install -m pipower5 -v $(DRIVER_VERSION) --force
 	@echo "DKMS installation completed. Driver will auto-rebuild on kernel updates."
