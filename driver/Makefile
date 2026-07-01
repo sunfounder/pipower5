@@ -181,7 +181,14 @@ dkms_install:
 	@sudo dkms install -m pipower5 -v $(DRIVER_VERSION) --force
 	@# Build module for all other installed kernels that have headers
 	@echo "Building for all installed kernels..."
-	@sudo dkms autoinstall 2>/dev/null || true
+	@for k in /lib/modules/*; do \
+		kver=$$(basename $$k); \
+		[ "$$kver" = "$(shell uname -r)" ] && continue; \
+		[ -f "$$k/build/Makefile" ] || continue; \
+		echo "  -> $$kver"; \
+		sudo dkms build -m pipower5 -v $(DRIVER_VERSION) -k "$$kver" 2>&1 || true; \
+		sudo dkms install -m pipower5 -v $(DRIVER_VERSION) -k "$$kver" 2>&1 || true; \
+	done
 	@echo "DKMS installation completed. Driver will auto-rebuild on kernel updates."
 	@echo "Loading pipower5 module..."
 	@sudo modprobe pipower5 || echo "  Warning: Failed to load module. A reboot may be needed."
