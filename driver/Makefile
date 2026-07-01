@@ -210,6 +210,8 @@ install: module dtbo
 	@$(MAKE) install-overlay
 	@$(MAKE) install-config
 	@$(MAKE) install-postinst-hook
+	@# Run hook immediately to cover all existing overlay directories
+	@sudo /etc/kernel/postinst.d/sunfounder-dtbos 2>/dev/null || true
 	@echo "Loading pipower5 module..."
 	@sudo modprobe pipower5 || echo "Warning: Failed to load module. A reboot may be needed."
 	@echo "Installation completed."
