@@ -108,12 +108,18 @@ modules_install:
 	@echo "Module installed."
 
 install-overlay:
-	@echo "Installing device tree overlay to $(OVERLAY_DIR)/"
-	@if [ ! -d "$(OVERLAY_DIR)" ]; then \
-		echo "Error: Overlay directory $(OVERLAY_DIR) does not exist."; \
+	@echo "Installing device tree overlay..."
+	@# Copy to all existing overlay directories (covers multi-kernel scenarios)
+	@INSTALLED=0; \
+	for d in $(OVERLAY_DIRS); do \
+		if [ -d "$$d" ]; then \
+			sudo cp -f $(DTBO_NAME) "$$d/" 2>/dev/null && INSTALLED=1 && echo "  -> $$d/"; \
+		fi; \
+	done; \
+	if [ "$$INSTALLED" = "0" ]; then \
+		echo "Error: No overlay directory found. Checked: $(OVERLAY_DIRS)"; \
 		exit 1; \
 	fi
-	@cp -f $(DTBO_NAME) $(OVERLAY_DIR)/ || { echo "Error: Permission denied. Run with sudo."; exit 1; }
 	@$(MAKE) persist-overlay
 
 # Add dtoverlay line to config.txt
@@ -173,6 +179,9 @@ dkms_install:
 	fi
 	@sudo dkms build -m pipower5 -v $(DRIVER_VERSION)
 	@sudo dkms install -m pipower5 -v $(DRIVER_VERSION) --force
+	@# Build module for all other installed kernels that have headers
+	@echo "Building for all installed kernels..."
+	@sudo dkms autoinstall 2>/dev/null || true
 	@echo "DKMS installation completed. Driver will auto-rebuild on kernel updates."
 	@echo "Loading pipower5 module..."
 	@sudo modprobe pipower5 || echo "  Warning: Failed to load module. A reboot may be needed."
@@ -218,7 +227,7 @@ uninstall:
 	-@sudo dkms remove -m pipower5 --all 2>/dev/null || true
 	@sudo rm -rf /usr/src/pipower5-* 2>/dev/null || true
 	@# Remove dtbo from overlay dirs
-	@for d in /boot/firmware/*/overlays/ /boot/overlays/; do \
+	@for d in /boot/firmware/\*/overlays/ /boot/overlays/; do \
 		[ -d "$$d" ] && sudo rm -f "$$d/$(DTBO_NAME)" 2>/dev/null || true; \
 	done
 	@# Remove from persistent store
@@ -305,7 +314,7 @@ persist-overlay:
 install-postinst-hook:
 	@echo "Installing kernel postinst hook for DT overlay persistence..."
 	@sudo mkdir -p /etc/kernel/postinst.d
-	@printf '#!/bin/bash\n# SunFounder: persist DT overlays across kernel updates\nfor dtbo in /usr/local/share/sunfounder/overlays/*.dtbo; do\n    [ -f "$$dtbo" ] || continue\n    for d in /boot/firmware/*/overlays/ /boot/overlays/; do\n        [ -d "$$d" ] && cp "$$dtbo" "$$d/"\n    done\ndone\n' | sudo tee /etc/kernel/postinst.d/sunfounder-dtbos > /dev/null
+	@sudo cp -f $(PWD)/../bin/sunfounder-dtbos-hook /etc/kernel/postinst.d/sunfounder-dtbos
 	@sudo chmod +x /etc/kernel/postinst.d/sunfounder-dtbos
 	@echo "Kernel postinst hook installed."
 
