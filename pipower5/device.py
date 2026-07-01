@@ -125,7 +125,7 @@ def _check_dtoverlay_config() -> tuple:
     return ok, "" if ok else f"dtoverlay={DTOVERLAY_NAME} not in config.txt. Run 'pipower5 doctor --fix'."
 
 def _check_dtbo_file() -> tuple:
-    for d in ["/boot/firmware/overlays", "/boot/overlays"]:
+    for d in ["/boot/firmware/current/overlays", "/boot/firmware/overlays", "/boot/overlays"]:
         if os.path.isfile(f"{d}/{DTOVERLAY_NAME}.dtbo"):
             return True, ""
     return False, f"{DTOVERLAY_NAME}.dtbo not found in overlays dir."
@@ -230,7 +230,7 @@ def doctor(fix: bool = False) -> dict:
         # Fix: DTBO file missing
         if not results.get("device tree blob (.dtbo)", True):
             dtbo_fixed = False
-            for d in ["/boot/firmware/overlays", "/boot/overlays"]:
+            for d in ["/boot/firmware/current/overlays", "/boot/firmware/overlays", "/boot/overlays"]:
                 if os.path.isdir(d):
                     # Try local source first, then curl fallback
                     for src_dir in ["/home/pi/pipower5/driver", "/home/kc5jim/pipower5/driver",
@@ -457,7 +457,7 @@ def uninstall() -> bool:
 
     # 4. Remove dtbo and config.txt entry
     print("  [4/5] Removing device tree overlay and config...")
-    for d in ["/boot/firmware/overlays", "/boot/overlays"]:
+    for d in ["/boot/firmware/current/overlays", "/boot/firmware/overlays", "/boot/overlays"]:
         _run_command(f"sudo rm -f {d}/{DTOVERLAY_NAME}.dtbo 2>/dev/null")
     remove_dtoverlay()
     print(f"  {GREEN}[OK]{RESET} Overlay and config cleaned")
