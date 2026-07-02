@@ -44,6 +44,9 @@ OVERLAY_DIR := $(firstword $(wildcard $(OVERLAY_DIRS)))
 # DKMS source destination
 DKMS_SRC := /usr/src/pipower5-$(DRIVER_VERSION)
 
+# Persistent overlay storage (survives Ubuntu flash-kernel directory rotation)
+PERSIST_OVERLAY_DIR := /usr/local/share/sunfounder/overlays
+
 # config.txt path
 CONFIG_TXT := $(firstword $(wildcard /boot/firmware/config.txt /boot/config.txt))
 
@@ -105,12 +108,19 @@ modules_install:
 	@echo "Module installed."
 
 install-overlay:
-	@echo "Installing device tree overlay to $(OVERLAY_DIR)/"
-	@if [ ! -d "$(OVERLAY_DIR)" ]; then \
-		echo "Error: Overlay directory $(OVERLAY_DIR) does not exist."; \
+	@echo "Installing device tree overlay..."
+	@# Copy to all existing overlay directories (covers multi-kernel scenarios)
+	@INSTALLED=0; \
+	for d in $(OVERLAY_DIRS); do \
+		if [ -d "$$d" ]; then \
+			sudo cp -f $(DTBO_NAME) "$$d/" 2>/dev/null && INSTALLED=1 && echo "  -> $$d/"; \
+		fi; \
+	done; \
+	if [ "$$INSTALLED" = "0" ]; then \
+		echo "Error: No overlay directory found. Checked: $(OVERLAY_DIRS)"; \
 		exit 1; \
 	fi
-	@cp -f $(DTBO_NAME) $(OVERLAY_DIR)/ || { echo "Error: Permission denied. Run with sudo."; exit 1; }
+	@$(MAKE) persist-overlay
 
 # Add dtoverlay line to config.txt
 install-config:
@@ -169,6 +179,16 @@ dkms_install:
 	fi
 	@sudo dkms build -m pipower5 -v $(DRIVER_VERSION)
 	@sudo dkms install -m pipower5 -v $(DRIVER_VERSION) --force
+	@# Build module for all other installed kernels that have headers
+	@echo "Building for all installed kernels..."
+	@for k in /lib/modules/*; do \
+		kver=$$(basename $$k); \
+		[ "$$kver" = "$(shell uname -r)" ] && continue; \
+		[ -f "$$k/build/Makefile" ] || continue; \
+		echo "  -> $$kver"; \
+		sudo dkms build -m pipower5 -v $(DRIVER_VERSION) -k "$$kver" 2>&1 || true; \
+		sudo dkms install -m pipower5 -v $(DRIVER_VERSION) -k "$$kver" 2>&1 || true; \
+	done
 	@echo "DKMS installation completed. Driver will auto-rebuild on kernel updates."
 	@echo "Loading pipower5 module..."
 	@sudo modprobe pipower5 || echo "  Warning: Failed to load module. A reboot may be needed."
@@ -189,6 +209,9 @@ install: module dtbo
 	@$(MAKE) dkms_install
 	@$(MAKE) install-overlay
 	@$(MAKE) install-config
+	@$(MAKE) install-postinst-hook
+	@# Run hook immediately to cover all existing overlay directories
+	@sudo /etc/kernel/postinst.d/sunfounder-dtbos 2>/dev/null || true
 	@echo "Loading pipower5 module..."
 	@sudo modprobe pipower5 || echo "Warning: Failed to load module. A reboot may be needed."
 	@echo "Installation completed."
@@ -212,9 +235,16 @@ uninstall:
 	@sudo rm -f /etc/modules-load.d/pipower5.conf /etc/modules-load.d/pipower5_driver.conf 2>/dev/null || true
 	-@sudo dkms remove -m pipower5 --all 2>/dev/null || true
 	@sudo rm -rf /usr/src/pipower5-* 2>/dev/null || true
-	@# Remove dtbo
-	@if [ -d "$(OVERLAY_DIR)" ]; then \
-		sudo rm -f $(OVERLAY_DIR)/$(DTBO_NAME); \
+	@# Remove dtbo from overlay dirs
+	@for d in /boot/firmware/\*/overlays/ /boot/overlays/; do \
+		[ -d "$$d" ] && sudo rm -f "$$d/$(DTBO_NAME)" 2>/dev/null || true; \
+	done
+	@# Remove from persistent store
+	@sudo rm -f $(PERSIST_OVERLAY_DIR)/$(DTBO_NAME)
+	@# Remove persistent dir if empty; remove hook if no dtbos left
+	@sudo rmdir $(PERSIST_OVERLAY_DIR) 2>/dev/null || true
+	@if [ ! -d $(PERSIST_OVERLAY_DIR) ] || [ -z "$$(ls -A $(PERSIST_OVERLAY_DIR) 2>/dev/null)" ]; then \
+		sudo rm -f /etc/kernel/postinst.d/sunfounder-dtbos; \
 	fi
 	@# Remove config.txt entry
 	@$(MAKE) remove-config
@@ -278,6 +308,25 @@ status:
 	fi
 	@echo ""
 
+# Persist DT overlay for kernel update survival.
+# On Ubuntu, flash-kernel rotates overlay directories (current/ <-> old/)
+# on kernel updates, stranding custom dtbos. Storing a copy in a stable
+# location + a kernel postinst.d hook ensures the dtbo is re-copied to
+# the active overlay directory after every kernel update.
+persist-overlay:
+	@mkdir -p $(PERSIST_OVERLAY_DIR)
+	@cp -f $(DTBO_NAME) $(PERSIST_OVERLAY_DIR)/
+	@echo "DT overlay persisted to $(PERSIST_OVERLAY_DIR)/"
+
+# Install kernel postinst hook that re-copies all SunFounder dtbos from
+# the persistent store to active overlay directories after kernel updates.
+install-postinst-hook:
+	@echo "Installing kernel postinst hook for DT overlay persistence..."
+	@sudo mkdir -p /etc/kernel/postinst.d
+	@sudo cp -f $(PWD)/../bin/sunfounder-dtbos-hook /etc/kernel/postinst.d/sunfounder-dtbos
+	@sudo chmod +x /etc/kernel/postinst.d/sunfounder-dtbos
+	@echo "Kernel postinst hook installed."
+
 help:
 	@echo "PiPower5 Driver Makefile v$(DRIVER_VERSION)"
 	@echo ""
@@ -299,4 +348,5 @@ help:
 	@echo ""
 
 .PHONY: all module dtbo clean modules_install install-overlay install-config remove-config \
-        dkms_install dkms_uninstall install uninstall load unload status help
+        dkms_install dkms_uninstall install uninstall persist-overlay install-postinst-hook \
+        load unload status help
