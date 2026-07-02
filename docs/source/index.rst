@@ -50,7 +50,7 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
 * **Input**: 5-15V, 45W, USB Type-C PD, DC5.5-2.1
 * **Output**: 5V/5A via Raspberry Pi GPIO, USB Type-A, and 2x4P 2.54mm pin headers
 * **Charging Power**: Up to 20W
-* **Battery Specs**: 7.4V 2 Cell 18650 Li-ion, XH2.54 3P connector
+* **Battery Specs**: 7.4V battery, VH3.96 2pin connector
 * **Configurable Settings via Jumpers**:
 
   * Default On Jumper: Configure whether the device powers on automatically when connected to power.
@@ -91,7 +91,7 @@ Combining advanced battery management with broad compatibility, PiPower 5 is an 
    :caption: Hardware Overview
 
    pipower_hat
-   battery
+
 
 .. toctree::
    :maxdepth: 2
