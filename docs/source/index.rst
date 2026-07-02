@@ -50,7 +50,7 @@ Durch die Kombination aus fortschrittlichem Akkumanagement und breiter Kompatibi
 * **Eingang**: 5-15V, 45W, USB Type-C PD, DC5.5-2.1
 * **Ausgang**: 5V/5A über Raspberry Pi GPIO, USB Type-A und 2x4P 2,54mm Stiftleisten
 * **Ladeleistung**: Bis zu 20W
-* **Akku-Spezifikationen**: 7,4V 2 Zellen 18650 Li-Ion, XH2.54 3P Anschluss
+* **Akku-Spezifikationen**: 7,4V 2 Zellen Li-Ion, XH2.54 3P Anschluss
 * **Konfigurierbare Einstellungen über Jumper**:
 
   * Default-On-Jumper: Legen Sie fest, ob das Gerät beim Anschließen der Stromversorgung automatisch eingeschaltet wird.
@@ -91,7 +91,7 @@ Durch die Kombination aus fortschrittlichem Akkumanagement und breiter Kompatibi
    :caption: Hardware-Übersicht
 
    pipower_hat
-   battery
+
 
 .. toctree::
    :maxdepth: 2
