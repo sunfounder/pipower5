@@ -50,7 +50,7 @@ PiPower 5 は、Raspberry Pi デバイスとのシームレスな統合のため
 * **入力**: 5-15V、45W、USB Type-C PD、DC5.5-2.1
 * **出力**: Raspberry Pi GPIO 経由で 5V/5A、USB Type-A、2x4P 2.54mm ピンヘッダー
 * **充電電力**: 最大 20W
-* **バッテリー仕様**: 7.4V 2セル 18650 Li-ion、XH2.54 3P コネクタ
+* **バッテリー仕様**: 7.4V 2セル Li-ion、XH2.54 3P コネクタ
 * **ジャンパーによる設定可能な設定**:
 
   * デフォルトONジャンパー: 電源接続時にデバイスを自動起動するかどうかを設定。
@@ -91,7 +91,7 @@ PiPower 5 は、Raspberry Pi デバイスとのシームレスな統合のため
    :caption: ハードウェア概要
 
    pipower_hat
-   battery
+
 
 .. toctree::
    :maxdepth: 2
