@@ -50,7 +50,7 @@ Alliant une gestion avancée de la batterie à une large compatibilité, le PiPo
 * **Entrée** : 5-15V, 45W, USB Type-C PD, DC5.5-2.1
 * **Sortie** : 5V/5A via GPIO Raspberry Pi, USB Type-A et connecteurs à broches 2x4P 2.54mm
 * **Puissance de charge** : Jusqu'à 20W
-* **Spécifications de la batterie** : 7.4V 2 cellules 18650 Li-ion, connecteur XH2.54 3P
+* **Spécifications de la batterie** : 7.4V 2 cellules Li-ion, connecteur XH2.54 3P
 * **Paramètres configurables via cavaliers** :
 
   * Cavalier Default On : Configure si l'appareil s'allume automatiquement lorsqu'il est connecté à l'alimentation.
@@ -91,7 +91,7 @@ Alliant une gestion avancée de la batterie à une large compatibilité, le PiPo
    :caption: Aperçu du matériel
 
    pipower_hat
-   battery
+
 
 .. toctree::
    :maxdepth: 2
