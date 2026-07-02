@@ -50,7 +50,7 @@ Combinando una gestión avanzada de batería con amplia compatibilidad, PiPower 
 * **Entrada**: 5-15V, 45W, USB Type-C PD, DC5.5-2.1
 * **Salida**: 5V/5A a través de GPIO de Raspberry Pi, USB Type-A y pines de 2x4P 2.54mm
 * **Potencia de Carga**: Hasta 20W
-* **Especificaciones de Batería**: 7.4V 2 Celdas 18650 Ion de litio, conector XH2.54 3P
+* **Especificaciones de Batería**: 7.4V 2 Celdas Ion de litio, conector XH2.54 3P
 * **Ajustes Configurables mediante Jumpers**:
 
   * Jumper de Encendido Predeterminado: Configure si el dispositivo se enciende automáticamente al conectar la alimentación.
@@ -91,7 +91,7 @@ Combinando una gestión avanzada de batería con amplia compatibilidad, PiPower 
    :caption: Descripción General del Hardware
 
    pipower_hat
-   battery
+
 
 .. toctree::
    :maxdepth: 2
