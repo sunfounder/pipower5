@@ -50,7 +50,7 @@ Combinando una gestione avanzata della batteria con un'ampia compatibilità, PiP
 * **Ingresso**: 5-15V, 45W, USB Type-C PD, DC5.5-2.1
 * **Uscita**: 5V/5A tramite GPIO Raspberry Pi, USB Type-A e connettori a pin 2x4P 2.54mm
 * **Potenza di carica**: Fino a 20W
-* **Specifiche batteria**: 7.4V 2 celle 18650 Li-ion, connettore XH2.54 3P
+* **Specifiche batteria**: 7.4V 2 celle Li-ion, connettore XH2.54 3P
 * **Impostazioni configurabili tramite ponticelli**:
 
   * Ponticello Default On: Configura se il dispositivo si accende automaticamente quando è collegato all'alimentazione.
@@ -91,7 +91,7 @@ Combinando una gestione avanzata della batteria con un'ampia compatibilità, PiP
    :caption: Panoramica hardware
 
    pipower_hat
-   battery
+
 
 .. toctree::
    :maxdepth: 2
