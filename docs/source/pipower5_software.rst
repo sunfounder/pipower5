@@ -22,6 +22,23 @@ Después de que el Raspberry Pi complete el apagado, PiPower 5 puede desconectar
 
 .. start_install_pipower5
 
+.. important::
+
+   PiPower 5 requires a **64-bit** operating system. The ``pipower5`` service
+   does not support 32-bit Raspberry Pi OS.
+
+   To check your system architecture, run:
+
+   .. code-block:: shell
+
+      uname -m
+
+   - ``aarch64`` → 64-bit (supported)
+   - ``armv7l`` → 32-bit (not supported)
+
+   If you are running a 32-bit OS, please reinstall with the 64-bit version of
+   Raspberry Pi OS before proceeding.
+
 Instalar la Herramienta ``pipower5``
 ----------------------------------------------------
 
