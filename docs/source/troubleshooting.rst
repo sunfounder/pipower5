@@ -337,6 +337,25 @@ Diagnosi basata sui sintomi
    Se si sente un suono, l'hardware del buzzer funziona — il problema è nella configurazione degli eventi.
 
 
+"pipower5 Service Fails to Start" — 32-bit System
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+**What you see**: After installation, ``sudo systemctl status pipower5.service``
+shows the service failed to start, or ``pipower5`` commands return errors.
+
+**Check your system architecture:**
+
+.. code-block:: shell
+
+   uname -m
+
+If the output is ``armv7l``, you are running a **32-bit** version of Raspberry Pi OS.
+PiPower 5 only supports **64-bit** systems (``aarch64``).
+
+**Solution**: Reinstall your Raspberry Pi with the 64-bit version of Raspberry Pi OS,
+then reinstall PiPower 5.
+
+
 "Il Raspberry Pi mostra un avviso di bassa tensione"
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
