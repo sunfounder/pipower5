@@ -113,6 +113,50 @@ int __pipower5_read_raw_byte(struct pipower5_device *pi_dev) {
 }
 
 /*
+ * Plausibility checks for battery readings.
+ *
+ * A failed or corrupted I2C transfer must not be published to the power_supply
+ * and hwmon interfaces: a bogus 0% (or a wildly wrong voltage) makes UPower
+ * believe the battery is critical and ask systemd-logind to power the machine
+ * off.  Keep the previously cached value instead and let the next poll correct
+ * it.
+ */
+static bool pipower5_voltage_plausible(struct pipower5_device *pi_dev, u16 mv)
+{
+  int diff;
+
+  if (mv < PIPOWER5_BATTERY_VOLTAGE_MIN_PLAUSIBLE ||
+      mv > PIPOWER5_BATTERY_VOLTAGE_MAX_PLAUSIBLE)
+    return false;
+
+  if (!pi_dev->status_initialized)
+    return true;
+
+  diff = (int)mv - (int)pi_dev->battery_voltage;
+  if (diff < 0)
+    diff = -diff;
+
+  return diff <= PIPOWER5_BATTERY_VOLTAGE_MAX_JUMP;
+}
+
+static bool pipower5_percentage_plausible(struct pipower5_device *pi_dev, u8 pct)
+{
+  int diff;
+
+  if (pct > 100)
+    return false;
+
+  if (!pi_dev->status_initialized)
+    return true;
+
+  diff = (int)pct - (int)pi_dev->battery_percentage;
+  if (diff < 0)
+    diff = -diff;
+
+  return diff <= PIPOWER5_BATTERY_PCT_MAX_JUMP;
+}
+
+/*
  * Read all registers in one pass, holding pi_dev->lock for the entire
  * I2C transaction batch.  This is more efficient than lock/unlock per
  * register and prevents sysfs readers from seeing half-updated data.
@@ -148,9 +192,14 @@ int pipower5_update_status(struct pipower5_device *pi_dev) {
     goto out;
 
   ret = __pipower5_read_word(pi_dev, REG_READ_BATTERY_VOLTAGE);
-  if (ret >= 0)
-    pi_dev->battery_voltage = (u16)ret;
-  else
+  if (ret >= 0) {
+    if (pipower5_voltage_plausible(pi_dev, (u16)ret))
+      pi_dev->battery_voltage = (u16)ret;
+    else
+      dev_warn(&pi_dev->client->dev,
+               "ignoring implausible battery voltage %umV, keeping %umV\n",
+               (u16)ret, pi_dev->battery_voltage);
+  } else
     goto out;
 
   ret = __pipower5_read_word(pi_dev, REG_READ_BATTERY_CURRENT);
@@ -160,9 +209,14 @@ int pipower5_update_status(struct pipower5_device *pi_dev) {
     goto out;
 
   ret = __pipower5_read_byte(pi_dev, REG_READ_BATTERY_PERCENTAGE);
-  if (ret >= 0)
-    pi_dev->battery_percentage = (u8)ret;
-  else
+  if (ret >= 0) {
+    if (pipower5_percentage_plausible(pi_dev, (u8)ret))
+      pi_dev->battery_percentage = (u8)ret;
+    else
+      dev_warn(&pi_dev->client->dev,
+               "ignoring implausible battery percentage %u%%, keeping %u%%\n",
+               (u8)ret, pi_dev->battery_percentage);
+  } else
     goto out;
 
   ret = __pipower5_read_byte(pi_dev, REG_READ_BATTERY_CAPACITY);
@@ -258,6 +312,8 @@ int pipower5_update_status(struct pipower5_device *pi_dev) {
     goto out;
 
 out:
+  if (ret >= 0)
+    pi_dev->status_initialized = true;
   mutex_unlock(&pi_dev->lock);
   return ret;
 }

@@ -64,8 +64,26 @@
 #define SHUTDOWN_REQUEST_BUTTON 2
 #define SHUTDOWN_REQUEST_LOW_VOLTAGE 3
 
+/* A corrupted I2C read can fabricate a value in the shutdown-request register,
+ * and acting on it cuts the power immediately.  The MCU therefore has to report
+ * the same non-zero request this many polls in a row (see
+ * pipower5_shutdown_request_confirmed()). */
+#define PIPOWER5_SHUTDOWN_CONFIRM_DEFAULT 3
+
+/* A button-triggered shutdown request is only accepted when a real button
+ * event was seen within this window (ms). */
+#define PIPOWER5_BUTTON_EVENT_WINDOW_MS 10000
+
+/* Plausibility limits for battery readings: anything outside these ranges, or
+ * jumping further than this between two 1 Hz polls, is treated as I2C
+ * corruption and the previous cached value is kept. */
+#define PIPOWER5_BATTERY_VOLTAGE_MIN_PLAUSIBLE 3000 /* mV */
+#define PIPOWER5_BATTERY_VOLTAGE_MAX_PLAUSIBLE 9600 /* mV */
+#define PIPOWER5_BATTERY_VOLTAGE_MAX_JUMP 2000      /* mV per poll */
+#define PIPOWER5_BATTERY_PCT_MAX_JUMP 20            /* % per poll */
+
 /* Driver version */
-#define PIPOWER5_DRIVER_VERSION "2.1.0"
+#define PIPOWER5_DRIVER_VERSION "2.1.1"
 
 /* Device ID values */
 #define PIPOWER5_DEVICE_ID 0x50 /* Example device ID */
@@ -114,6 +132,9 @@ struct pipower5_device {
   u8 is_input_plugged_in;
   u8 is_charging;
   u8 shutdown_request;
+  u8 shutdown_candidate;      /* last non-zero request awaiting confirmation */
+  u8 shutdown_confirm_count;  /* consecutive identical requests seen so far */
+  bool status_initialized;    /* first full status read completed */
   u8 fw_major;
   u8 fw_minor;
   u8 fw_patch;
@@ -204,6 +225,8 @@ void pipower5_pft_cancel(struct pipower5_device *pi_dev);
 extern unsigned int buzz_on;
 extern unsigned int buzzer_volume;
 extern unsigned int shutdown_pct;
+extern unsigned int auto_shutdown;
+extern unsigned int shutdown_confirm;
 
 /* Function prototypes for upower operations */
 int pipower5_create_upower(struct pipower5_device *pi_dev);
@@ -217,5 +240,6 @@ void pipower5_button_check(struct pipower5_device *pi_dev);
 /* Function prototypes for shutdown operations */
 void pipower5_log_event(struct pipower5_device *pi_dev, const char *fmt, ...);
 void pipower5_handle_shutdown(struct pipower5_device *pi_dev);
+bool pipower5_shutdown_request_confirmed(struct pipower5_device *pi_dev);
 
 #endif /* _PIPOWER5_H */

@@ -57,6 +57,41 @@ cat /sys/class/pipower5/pipower5/battery_voltage
 # ... (24 attributes total)
 ```
 
+## Shutdown request handling
+
+The MCU can ask the host to power off (`shutdown_request` register, also
+exposed at `/sys/class/pipower5/pipower5/shutdown_request`) for low battery,
+low input voltage or a button long-press. The driver only acts on such a
+request when
+
+1. the MCU reports the same non-zero value `shutdown_confirm` polls in a row
+   (default 3), and
+2. the matching condition is plausible — `battery_percentage` below
+   `shutdown_percentage` for `low_battery`, `battery_voltage` below 6400 mV
+   for `low_voltage`, or a real button event within the last 10 s for
+   `button`.
+
+A single corrupted I2C read can therefore no longer power the board off.
+Battery voltage and percentage readings that are out of range, or that jump too
+far between two polls, are discarded in favour of the previous value, so a bus
+error cannot report 0% to UPower either.
+
+### Module parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `auto_shutdown` | `1` | Honour MCU shutdown requests. `0` = never power off automatically |
+| `shutdown_confirm` | `3` | Consecutive identical MCU shutdown requests required before acting |
+
+```bash
+# Disable automatic shutdown for this boot only
+sudo modprobe -r pipower5
+sudo modprobe pipower5 auto_shutdown=0
+
+# Persist it
+echo 'options pipower5 auto_shutdown=0' | sudo tee /etc/modprobe.d/pipower5.conf
+```
+
 ## UPower / Desktop Integration
 
 The driver registers as a native `power_supply` device. Desktop
