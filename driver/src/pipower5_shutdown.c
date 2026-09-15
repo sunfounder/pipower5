@@ -39,9 +39,16 @@ void pipower5_log_event(struct pipower5_device *pi_dev, const char *fmt, ...)
  *
  * The request is a single byte read over I2C once per second; a corrupted
  * transfer (e.g. -EREMOTEIO on a busy bus) can fabricate a non-zero value, and
- * acting on it cuts the power immediately.  So a request only counts when the
- * MCU reports the same non-zero value several polls in a row AND the matching
- * condition is plausible given what we actually measured.
+ * acting on it cuts the power immediately.  Two guards are used:
+ *
+ *   1. only the three values the MCU is known to send are accepted at all, and
+ *   2. the MCU has to report the same value shutdown_confirm polls in a row
+ *      (default 3, i.e. roughly 2-3 seconds), so a single bad read is filtered.
+ *
+ * There is deliberately no cross-check against the cached battery readings:
+ * the MCU knows better than our up-to-one-second-old copy, and refusing a
+ * genuine low-battery/low-voltage request would risk over-discharge (or a hard
+ * cut by the MCU itself) - worse than the problem being fixed here.
  */
 bool pipower5_shutdown_request_confirmed(struct pipower5_device *pi_dev)
 {
@@ -49,6 +56,17 @@ bool pipower5_shutdown_request_confirmed(struct pipower5_device *pi_dev)
   u8 req = pi_dev->shutdown_request;
 
   if (req == SHUTDOWN_REQUEST_NONE) {
+    pi_dev->shutdown_candidate = SHUTDOWN_REQUEST_NONE;
+    pi_dev->shutdown_confirm_count = 0;
+    return false;
+  }
+
+  /* Unknown values can only come from a corrupted transfer */
+  if (req != SHUTDOWN_REQUEST_LOW_BATTERY &&
+      req != SHUTDOWN_REQUEST_BUTTON &&
+      req != SHUTDOWN_REQUEST_LOW_VOLTAGE) {
+    dev_warn(&pi_dev->client->dev,
+             "ignoring unknown shutdown request %u\n", req);
     pi_dev->shutdown_candidate = SHUTDOWN_REQUEST_NONE;
     pi_dev->shutdown_confirm_count = 0;
     return false;
@@ -65,38 +83,6 @@ bool pipower5_shutdown_request_confirmed(struct pipower5_device *pi_dev)
     dev_info(&pi_dev->client->dev,
              "shutdown request %u not confirmed yet (%u/%u)\n",
              req, pi_dev->shutdown_confirm_count, need);
-    return false;
-  }
-
-  switch (req) {
-  case SHUTDOWN_REQUEST_LOW_BATTERY:
-    if (pi_dev->battery_percentage >= pi_dev->shutdown_percentage) {
-      dev_warn(&pi_dev->client->dev,
-               "ignoring low_battery shutdown request: bat=%u%% threshold=%u%%\n",
-               pi_dev->battery_percentage, pi_dev->shutdown_percentage);
-      return false;
-    }
-    break;
-  case SHUTDOWN_REQUEST_LOW_VOLTAGE:
-    if (pi_dev->battery_voltage >= PIPOWER5_BATTERY_MIN_VOLTAGE) {
-      dev_warn(&pi_dev->client->dev,
-               "ignoring low_voltage shutdown request: bat_voltage=%umV min=%umV\n",
-               pi_dev->battery_voltage, PIPOWER5_BATTERY_MIN_VOLTAGE);
-      return false;
-    }
-    break;
-  case SHUTDOWN_REQUEST_BUTTON:
-    if (time_after(jiffies, pi_dev->button_event_jiffies +
-                             msecs_to_jiffies(PIPOWER5_BUTTON_EVENT_WINDOW_MS))) {
-      dev_warn(&pi_dev->client->dev,
-               "ignoring button shutdown request: no button event in the last %ums\n",
-               PIPOWER5_BUTTON_EVENT_WINDOW_MS);
-      return false;
-    }
-    break;
-  default:
-    dev_warn(&pi_dev->client->dev,
-             "ignoring unknown shutdown request %u\n", req);
     return false;
   }
 

@@ -61,20 +61,21 @@ cat /sys/class/pipower5/pipower5/battery_voltage
 
 The MCU can ask the host to power off (`shutdown_request` register, also
 exposed at `/sys/class/pipower5/pipower5/shutdown_request`) for low battery,
-low input voltage or a button long-press. The driver only acts on such a
+low voltage or a button long-press (values 1/2/3). The driver only acts on a
 request when
 
-1. the MCU reports the same non-zero value `shutdown_confirm` polls in a row
-   (default 3), and
-2. the matching condition is plausible — `battery_percentage` below
-   `shutdown_percentage` for `low_battery`, `battery_voltage` below 6400 mV
-   for `low_voltage`, or a real button event within the last 10 s for
-   `button`.
+1. the value is one of the three the MCU is known to send — anything else is a
+   corrupted transfer and is dropped, and
+2. the MCU reports the same value `shutdown_confirm` polls in a row (default 3,
+   i.e. roughly 2-3 seconds).
 
-A single corrupted I2C read can therefore no longer power the board off.
+A single corrupted I2C read can therefore no longer power the board off, while
+a genuine low-battery, low-voltage or button request is still honoured after a
+few seconds.
+
 Battery voltage and percentage readings that are out of range, or that jump too
-far between two polls, are discarded in favour of the previous value, so a bus
-error cannot report 0% to UPower either.
+far between two 1 Hz polls, are discarded in favour of the previous value, so a
+bus error cannot report 0% to UPower either.
 
 ### Module parameters
 

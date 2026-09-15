@@ -10,7 +10,6 @@
  */
 
 #include <linux/i2c.h>
-#include <linux/jiffies.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/mutex.h>
@@ -295,11 +294,6 @@ int pipower5_update_status(struct pipower5_device *pi_dev) {
   ret = __pipower5_read_byte(pi_dev, REG_READ_POWER_BUTTON_STATE);
   if (ret >= 0) {
     pi_dev->power_button_state = (u8)ret;
-    /* This poll consumes the button event just like the 50 Hz fast poll does,
-     * so it has to stamp the timestamp too - otherwise a button-triggered
-     * shutdown request could be rejected for "no button event". */
-    if ((u8)ret != 0)
-      pi_dev->button_event_jiffies = jiffies;
     /* Reset button state register so next poll gets fresh value */
     __pipower5_write_byte(pi_dev, REG_WRITE_POWER_BTN_STATE, 0);
   } else

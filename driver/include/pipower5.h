@@ -70,10 +70,6 @@
  * pipower5_shutdown_request_confirmed()). */
 #define PIPOWER5_SHUTDOWN_CONFIRM_DEFAULT 3
 
-/* A button-triggered shutdown request is only accepted when a real button
- * event was seen within this window (ms). */
-#define PIPOWER5_BUTTON_EVENT_WINDOW_MS 10000
-
 /* Plausibility limits for battery readings: anything outside these ranges, or
  * jumping further than this between two 1 Hz polls, is treated as I2C
  * corruption and the previous cached value is kept. */
