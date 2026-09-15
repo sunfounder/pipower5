@@ -34,6 +34,61 @@ void pipower5_log_event(struct pipower5_device *pi_dev, const char *fmt, ...)
   dev_info(&pi_dev->client->dev, "%s\n", pi_dev->event_log[idx]);
 }
 
+/*
+ * Decide whether the MCU's shutdown request may be acted upon.
+ *
+ * The request is a single byte read over I2C once per second; a corrupted
+ * transfer (e.g. -EREMOTEIO on a busy bus) can fabricate a non-zero value, and
+ * acting on it cuts the power immediately.  Two guards are used:
+ *
+ *   1. only the three values the MCU is known to send are accepted at all, and
+ *   2. the MCU has to report the same value shutdown_confirm polls in a row
+ *      (default 3, i.e. roughly 2-3 seconds), so a single bad read is filtered.
+ *
+ * There is deliberately no cross-check against the cached battery readings:
+ * the MCU knows better than our up-to-one-second-old copy, and refusing a
+ * genuine low-battery/low-voltage request would risk over-discharge (or a hard
+ * cut by the MCU itself) - worse than the problem being fixed here.
+ */
+bool pipower5_shutdown_request_confirmed(struct pipower5_device *pi_dev)
+{
+  unsigned int need = shutdown_confirm ? shutdown_confirm : 1;
+  u8 req = pi_dev->shutdown_request;
+
+  if (req == SHUTDOWN_REQUEST_NONE) {
+    pi_dev->shutdown_candidate = SHUTDOWN_REQUEST_NONE;
+    pi_dev->shutdown_confirm_count = 0;
+    return false;
+  }
+
+  /* Unknown values can only come from a corrupted transfer */
+  if (req != SHUTDOWN_REQUEST_LOW_BATTERY &&
+      req != SHUTDOWN_REQUEST_BUTTON &&
+      req != SHUTDOWN_REQUEST_LOW_VOLTAGE) {
+    dev_warn(&pi_dev->client->dev,
+             "ignoring unknown shutdown request %u\n", req);
+    pi_dev->shutdown_candidate = SHUTDOWN_REQUEST_NONE;
+    pi_dev->shutdown_confirm_count = 0;
+    return false;
+  }
+
+  if (req != pi_dev->shutdown_candidate) {
+    pi_dev->shutdown_candidate = req;
+    pi_dev->shutdown_confirm_count = 1;
+  } else if (pi_dev->shutdown_confirm_count < need) {
+    pi_dev->shutdown_confirm_count++;
+  }
+
+  if (pi_dev->shutdown_confirm_count < need) {
+    dev_info(&pi_dev->client->dev,
+             "shutdown request %u not confirmed yet (%u/%u)\n",
+             req, pi_dev->shutdown_confirm_count, need);
+    return false;
+  }
+
+  return true;
+}
+
 void pipower5_handle_shutdown(struct pipower5_device *pi_dev)
 {
   const char *reason;
@@ -61,9 +116,11 @@ void pipower5_handle_shutdown(struct pipower5_device *pi_dev)
     envp[0] = event_buf;
 
     pipower5_log_event(pi_dev,
-      "SHUTDOWN reason=%s bat=%d%% bat_voltage=%dmV input_plugged=%d",
-      reason, pi_dev->battery_percentage, pi_dev->battery_voltage,
-      pi_dev->is_input_plugged_in);
+      "SHUTDOWN reason=%s req=%u bat=%d%% batV=%dmV inV=%dmV outV=%dmV plugged=%d src=%d",
+      reason, pi_dev->shutdown_request, pi_dev->battery_percentage,
+      pi_dev->battery_voltage, pi_dev->input_voltage,
+      pi_dev->output_voltage, pi_dev->is_input_plugged_in,
+      pi_dev->power_source);
 
     kobject_uevent_env(&pi_dev->pipower5_dev->kobj, KOBJ_OFFLINE, envp);
   }

@@ -50,6 +50,16 @@ unsigned int shutdown_pct = 10;
 module_param_named(shutdown_percentage, shutdown_pct, uint, 0644);
 MODULE_PARM_DESC(shutdown_percentage, "Auto-shutdown battery % (default 10)");
 
+unsigned int auto_shutdown = 1;
+module_param(auto_shutdown, uint, 0644);
+MODULE_PARM_DESC(auto_shutdown,
+                 "Honor MCU shutdown requests (0 = never power off automatically, default 1)");
+
+unsigned int shutdown_confirm = PIPOWER5_SHUTDOWN_CONFIRM_DEFAULT;
+module_param(shutdown_confirm, uint, 0644);
+MODULE_PARM_DESC(shutdown_confirm,
+                 "Consecutive identical MCU shutdown requests required before acting (default 3)");
+
 /*
  * Fix sysfs permissions for non-root users.
  * class_create() / device_create() may create directories without the
@@ -241,8 +251,22 @@ static void pipower5_poll_work(struct work_struct *work) {
     pi_dev->last_is_charging = pi_dev->is_charging;
     pi_dev->events_initialized = true;
 
-    /* Check for shutdown request */
-    if (pi_dev->shutdown_request != SHUTDOWN_REQUEST_NONE) {
+    /* Check for shutdown request.
+     * A single corrupted I2C read must never power the board off, so the MCU
+     * has to report the same request over several polls and the matching
+     * condition has to be plausible before we act on it. */
+    if (!auto_shutdown) {
+      if (pi_dev->shutdown_request != SHUTDOWN_REQUEST_NONE &&
+          pi_dev->shutdown_request != pi_dev->shutdown_candidate) {
+        pipower5_log_event(pi_dev,
+                           "SHUTDOWN ignored (auto_shutdown=0) request=%u bat=%d%%",
+                           pi_dev->shutdown_request, pi_dev->battery_percentage);
+        pi_dev->shutdown_candidate = pi_dev->shutdown_request;
+      } else if (pi_dev->shutdown_request == SHUTDOWN_REQUEST_NONE) {
+        pi_dev->shutdown_candidate = SHUTDOWN_REQUEST_NONE;
+      }
+      pi_dev->shutdown_confirm_count = 0;
+    } else if (pipower5_shutdown_request_confirmed(pi_dev)) {
       pipower5_handle_shutdown(pi_dev);
     }
   }
