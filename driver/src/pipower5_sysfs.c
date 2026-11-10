@@ -366,6 +366,11 @@ static ssize_t charge_current_max_show(struct device *dev,
   int ret;
 
   mutex_lock(&pi_dev->lock);
+  /* The MCU updates the charge-current setting at runtime; re-read the
+   * register here so the attribute never reports a stale (boot-time) value. */
+  ret = __pipower5_read_byte(pi_dev, REG_READ_CHARGE_CURRENT_MAX);
+  if (ret >= 0)
+    pi_dev->charge_current_max = (u8)ret;
   ret = snprintf(buf, PAGE_SIZE, "%u\n", pi_dev->charge_current_max);
   mutex_unlock(&pi_dev->lock);
 

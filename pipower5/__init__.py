@@ -103,7 +103,7 @@ def main():
     parser.add_argument('-ov', '--output-voltage', action='store_true', help='Read output voltage')
     parser.add_argument('-oc', '--output-current', action='store_true', help='Read output current')
     parser.add_argument('-bv', '--battery-voltage', action='store_true', help='Read battery voltage')
-    parser.add_argument('-bc', '--battery-current', action='store_true', help='Read battery current')
+    parser.add_argument('-bc', '--battery-current', action='store_true', help='Read battery current (positive for both charging and discharging - use -ichg for charging state)')
     parser.add_argument('-bp', '--battery-percentage', action='store_true', help='Read battery percentage')
     parser.add_argument('-bs', '--battery-source', action='store_true', help='Read battery source')
     parser.add_argument('-ii', '--is-input-plugged_in', action='store_true', help='Read is input plugged in')
