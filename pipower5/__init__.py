@@ -476,6 +476,12 @@ Versions:
             print(f"Set buzzer volume: {vol}")
     if args.buzzer_test != '':
         if args.buzzer_test == None:
+            try:
+                _seq = pipower5._read_sysfs("buzz_seq")
+                _names = [ln.split("=")[0].strip() for ln in str(_seq).splitlines() if "=" in ln]
+                print("Available events: " + ", ".join(_names))
+            except Exception:
+                pass
             print("Usage: --buzzer-test <frequency> (e.g. 440) or --buzzer-test <event_name>")
         else:
             from .device import DEVICE_PATH as _DP
@@ -485,7 +491,10 @@ Versions:
                 pipower5._write_sysfs("buzzer_play", str(freq))
                 print(f"Playing {freq}Hz for 5s...")
             except ValueError:
-                print(f"Event '{val}' - buzzer auto-triggers on kernel events. Use frequency value to test manually.")
+                # The kernel driver also accepts an event name on buzzer_play (see the
+                # buzz_seq sysfs); pass it straight through so the sequence plays.
+                pipower5._write_sysfs("buzzer_play", val)
+                print(f"Playing buzz sequence for event '{val}'...")
 
     # ── Also sync to pironman5 config if running under pironman5 ──────
     def _sync_to_pironman5_config(patches):
