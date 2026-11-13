@@ -18,3 +18,14 @@ ACTION=="change", SUBSYSTEM=="pipower5", ENV{PIPOWER5_EVENT}=="power_insufficien
 # Also log all events to syslog
 ACTION=="change", SUBSYSTEM=="pipower5", \
   RUN+="/usr/bin/logger -t pipower5 'PiPower5 event: $env{PIPOWER5_EVENT}'"
+
+# ---------------------------------------------------------------------------
+# Allow the pironman5 group to read the pipower5 sysfs attributes without sudo.
+# The driver creates /sys/class/pipower5/pipower5/* with root-only modes, so a
+# normal user (e.g. the one running the CLI or a production-test script) hits
+# PermissionError on charge_current_max etc. Grant group read on every add
+# event; the group is created and the user added to it by the pironman5
+# installer.
+# ---------------------------------------------------------------------------
+SUBSYSTEM=="pipower5", ACTION=="add", \
+  RUN+="/bin/sh -c 'chmod g+x /sys/class/pipower5 2>/dev/null; chmod -R g+r /sys/class/pipower5/pipower5 2>/dev/null'"
