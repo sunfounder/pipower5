@@ -115,14 +115,14 @@ def main():
     parser.add_argument('-fv', '--firmware', action='store_true', help='PiPower5 MCU firmware version')
     parser.add_argument('-dv', '--driver-version', action='store_true', help='PiPower5 kernel driver version')
     parser.add_argument('-pfs', '--power-failure-simulation', nargs='?', default='', help='Power failure simulation (seconds)')
-    parser.add_argument("-seo", '--send-email-on', nargs='?', default='', help=f"Send email on events (comma-separated)")
+    parser.add_argument("-seo", '--send-email-on', nargs='*', default=None, help="Send email on events (space or comma separated; leave empty to read)")
     parser.add_argument("-set", '--send-email-to', nargs='?', default='', help="Email recipient address")
     parser.add_argument("-ss", '--smtp-server', nargs='?', default='', help="SMTP server")
     parser.add_argument("-smp", '--smtp-port', nargs='?', default='', help="SMTP port")
     parser.add_argument("-se", '--smtp-email', nargs='?', default='', help="SMTP email")
     parser.add_argument("-spw", '--smtp-password', nargs='?', default='', help="SMTP password")
     parser.add_argument("-ssc", '--smtp-security', nargs='?', default='', help="SMTP security: none, ssl, tls")
-    parser.add_argument("-bzo", '--buzz-on', nargs='?', default='', help='Buzzer event bitmask (e.g. 0x7F), leave empty to read')
+    parser.add_argument("-bzo", '--buzz-on', nargs='*', default=None, help='Buzzer event bitmask (e.g. 0x7F), leave empty to read')
     parser.add_argument("-bzv", '--buzzer-volume', nargs='?', default='', help='Buzzer volume (0-10), leave empty to read')
     parser.add_argument("-bzt", '--buzzer-test', nargs='?', default='', help='Test buzzer: event name or frequency')
 
@@ -405,15 +405,16 @@ Versions:
                 pass
         pipower5.power_failure_simulation(test_time)
     # send email config
-    if args.send_email_on != '':
-        if args.send_email_on == None:
+    if args.send_email_on is not None:
+        if not args.send_email_on:
             print(f"Send email on: {current_config['system']['send_email_on']}")
         else:
             import json as _json
+            _events = [e.strip() for v in args.send_email_on for e in str(v).split(',') if e.strip()]
             email_cfg = _json.loads(_json.dumps(current_config['system']))
-            email_cfg['send_email_on'] = args.send_email_on.split(',')
-            new_sys_config['send_email_on'] = email_cfg['send_email_on']
-            print(f"Set Send email on: {new_sys_config['send_email_on']}")
+            email_cfg['send_email_on'] = _events
+            new_sys_config['send_email_on'] = _events
+            print(f"Set Send email on: {_events}")
     if args.send_email_to != '':
         if args.send_email_to == None:
             print(f"Send email to: {current_config['system']['send_email_to']}")
@@ -450,22 +451,21 @@ Versions:
                 quit()
             new_sys_config['smtp_security'] = sec
     # buzzer
-    if args.buzz_on != '':
-        if args.buzz_on == None:
+    if args.buzz_on is not None:
+        if not args.buzz_on:
             mask = pipower5.get_buzz_on()
             events = pipower5._bitmask_to_events(mask)
             print(f"Buzz on: 0x{mask:02X} => {events}")
         else:
-            # Accept comma-separated event names or hex bitmask
-            val = args.buzz_on
-            if val.startswith("0x") or val.startswith("0X"):
-                mask = val
+            # Accept space/comma separated event names or a hex bitmask
+            events = [e.strip() for v in args.buzz_on for e in str(v).split(',') if e.strip()]
+            if len(events) == 1 and (events[0].startswith("0x") or events[0].startswith("0X")):
+                mask = events[0]
             else:
-                events = [e.strip() for e in val.split(",")]
                 mask = f"0x{pipower5._events_to_bitmask(events):02X}"
             pipower5._write_sysfs("buzz_on", mask)
-            new_sys_config['pipower5_buzz_on'] = [e.strip() for e in val.split(",")] if not val.startswith("0x") else val
-            print(f"Set buzz_on: {mask}")
+            new_sys_config['pipower5_buzz_on'] = events
+            print(f"Set buzz_on: {mask} => {events}")
     if args.buzzer_volume != '':
         if args.buzzer_volume == None:
             print(f"Buzzer volume: {pipower5.read_buzzer_volume()}")
